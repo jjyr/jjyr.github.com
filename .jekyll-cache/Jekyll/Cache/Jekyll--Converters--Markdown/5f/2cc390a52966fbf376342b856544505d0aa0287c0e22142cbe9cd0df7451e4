@@ -1,0 +1,59 @@
+I"�<p>##为什么需要使用ActiveSupport::Concern
+<em>active_support/concern.rb</em>中已解释的很清楚
+简要的总结下
+————————
+module Bar需要在included时调用module Foo的方法</p>
+
+<p>此时需要在class C中include Bar就需要先include Foo</p>
+
+<p>但是像这样使用的时候需要关心依赖问题是很不爽的，我们希望使用Bar则include Bar即可,不应该再去管Bar的依赖问题</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Bar</span>
+  <span class="kp">include</span> <span class="no">Foo</span>
+  <span class="c1">#.....</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>这样我们就可以只include Bar而不需要关心Foo</p>
+
+<p>但这样也有问题,Foo可能在included中需要class C。但是现在这样Foo在included中取到的实际是Bar，并不是C</p>
+
+<p>ActiveSupport::Concern可以神奇的帮我们解决这个问题，保证Bar的执行没问题,并且使用者不需要关心Foo</p>
+
+<p>只需把def self.included换成Concern提供的include方法即可</p>
+
+<h2 id="concern源码">Concern源码</h2>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Concern</span>
+    <span class="c1">#被extend时会对extend其的module设置一个实例变量用于储存依赖数组</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">extended</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="c1">#:nodoc:</span>
+      <span class="n">base</span><span class="p">.</span><span class="nf">instance_variable_set</span><span class="p">(</span><span class="s2">"@_dependencies"</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">end</span>
+
+    <span class="c1">#被include时会在include其的module中追加依赖self</span>
+    <span class="c1">#如果include的对象中不包含@_dependencies(即没有extend Concern)</span>
+    <span class="c1">#则表明该对象为正确的include目标,在该对象上include所有本module依赖的module,extend ClassMethods。最后调用'included'可以保证避免included中的依赖问题</span>
+    <span class="k">def</span> <span class="nf">append_features</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">base</span><span class="p">.</span><span class="nf">instance_variable_defined?</span><span class="p">(</span><span class="s2">"@_dependencies"</span><span class="p">)</span>
+        <span class="n">base</span><span class="p">.</span><span class="nf">instance_variable_get</span><span class="p">(</span><span class="s2">"@_dependencies"</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+        <span class="k">return</span> <span class="kp">false</span>
+      <span class="k">else</span>
+        <span class="k">return</span> <span class="kp">false</span> <span class="k">if</span> <span class="n">base</span> <span class="o">&lt;</span> <span class="nb">self</span>
+        <span class="vi">@_dependencies</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">dep</span><span class="o">|</span> <span class="n">base</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:include</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span> <span class="p">}</span>
+        <span class="k">super</span>
+        <span class="n">base</span><span class="p">.</span><span class="nf">extend</span> <span class="nb">const_get</span><span class="p">(</span><span class="s2">"ClassMethods"</span><span class="p">)</span> <span class="k">if</span> <span class="nb">const_defined?</span><span class="p">(</span><span class="s2">"ClassMethods"</span><span class="p">)</span>
+        <span class="n">base</span><span class="p">.</span><span class="nf">class_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="vi">@_included_block</span><span class="p">)</span> <span class="k">if</span> <span class="n">instance_variable_defined?</span><span class="p">(</span><span class="s2">"@_included_block"</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="c1">#如果base不为nil则认为是调用super的included(保证通常的钩子也可使用)</span>
+    <span class="c1">#否则存下block待真正的类include时再调用</span>
+    <span class="k">def</span> <span class="nf">included</span><span class="p">(</span><span class="n">base</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">base</span><span class="p">.</span><span class="nf">nil?</span>
+        <span class="vi">@_included_block</span> <span class="o">=</span> <span class="n">block</span>
+      <span class="k">else</span>
+        <span class="k">super</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+<p>大致就是这样。用是否extend Concern来判断是用于include的module还是真正需要max-in的类</p>
+:ET

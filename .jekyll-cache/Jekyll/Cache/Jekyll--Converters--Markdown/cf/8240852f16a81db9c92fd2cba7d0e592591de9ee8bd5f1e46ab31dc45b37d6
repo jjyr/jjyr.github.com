@@ -1,0 +1,129 @@
+I"�1<p>说到脚本语言与高性能， Node.js 凭 benchmark 给人留下很深印象。</p>
+
+<p>Node.js 的高性能来自于异步 IO。Node 本身提供了 IO loop 和大量的异步接口，而其臭名昭著的 callback hell 也是源于此。</p>
+
+<p>IO loop，顾名思义就是一个循环，用来处理响应 IO 的代码。一般此类库的接口会允许注册一些 callback 用来处理 IO 结果。</p>
+
+<p>类似的语言或库大同小异，用 Ruby 的 EventMachine 库做比方：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># echo server 经过简化</span>
+<span class="k">class</span> <span class="nc">EchoServer</span> <span class="o">&lt;</span> <span class="no">EM</span><span class="o">::</span><span class="no">Connection</span>
+  <span class="k">def</span> <span class="nf">receive_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">send_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">EventMachine</span><span class="p">.</span><span class="nf">run</span> <span class="k">do</span>
+  <span class="no">EventMachine</span><span class="p">.</span><span class="nf">start_server</span><span class="p">(</span><span class="s2">"0.0.0.0"</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="no">EchoServer</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>这个简单的示例注册了 EchoServer，并启动了 EventMachine。代码看起来非常简单，不愧是优雅的 Ruby 程序。</p>
+
+<p>但毕竟是和 Node.js 同类的处理方式，也会有同样的问题。而问题就是出在 IO loop，掀开 EventMachine 的引擎盖：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 仅为示意，不是真正的 EventMachine 源码</span>
+<span class="k">module</span> <span class="nn">EventMachine</span>
+  <span class="k">def</span> <span class="nf">run</span>
+    <span class="k">yield</span>
+    <span class="c1"># IO loop</span>
+    <span class="kp">loop</span> <span class="k">do</span>
+      <span class="c1">#...</span>
+      <span class="no">IO</span><span class="p">.</span><span class="nf">select</span><span class="p">([</span><span class="vi">@servers</span><span class="p">])[</span><span class="mi">0</span><span class="p">].</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">server</span><span class="o">|</span>
+        <span class="n">run_receive_data</span> <span class="n">server</span>
+      <span class="k">end</span>
+      <span class="c1">#...</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>注意，所有的代码都是在 IO loop 中执行的。考虑到这是一个服务端程序，有一些耗费时间的操作会严重的影响程序性能。假如在处理时有个操作会耗费 1s，同时进入 10 个请求，最长响应时间会达到 10s 以上。</p>
+
+<p>所以使用 IO loop 时必须要尽可能减少 callback 执行的时间，Node 和 EventMachine 提供了大量异步接口，让 callback 中尽量减少同步的操作，这样可以保证程序几乎没有浪费的等待时间，而结果就是<strong>异步接口造成的 Callback Hell</strong>。</p>
+
+<p>既然找到了症结，也就有解决的方法，很多语言提供 Coroutine， Fiber 等机制，可以任意的切换控制流。通过这种机制可以使用同步接口来实现 IO loop 库。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## 示例代码</span>
+<span class="c1"># 异步接口</span>
+<span class="n">db</span><span class="p">.</span><span class="nf">async_query</span><span class="p">(</span><span class="s2">"..."</span><span class="p">,</span> <span class="nb">proc</span><span class="p">{</span><span class="o">|</span><span class="n">result</span><span class="o">|</span> <span class="n">http</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="ss">data: </span><span class="n">result</span><span class="p">)})</span>
+<span class="c1"># 同步接口</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="s2">"..."</span><span class="p">)</span> <span class="c1"># 1. caller_fiber = Fiber.current # 保留当前位置</span>
+                         <span class="c1"># 2. db.async_query("...", proc{|result| caller_fiber.transfer(result)}) # 回调时跳转回来</span>
+                         <span class="c1"># 3. io_loop_fiber.transfer # 移交控制流到 IO loop</span>
+<span class="n">http</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="ss">data: </span><span class="n">result</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>以上代码演示了大致方法，使用 Fiber 来包装接口，则可以获取性能的同时消灭 Callback Hell。<a href="https://github.com/socketry/async">async</a> 库使用了这种方法，是替代 EventMachine 比较好的选择。</p>
+
+<p>对于异步编程库的接口，其实我更满意的是 python 世界的 gevent，同样提供了同步接口，并且把 IO loop 变成了隐式开始，即省去了 <code class="highlighter-rouge">EventMachine.run</code> 的调用，对用户更加透明。(当然 IO loop 隐式显示各有好处，显示对用户较为麻烦，但是更为清晰，隐式相反，可以看下 async 库作者的<a href="https://www.reddit.com/r/ruby/comments/7iugtd/i_am_writing_a_new_networking_concurrency_gem_for/dr2204e/">论述</a>)。</p>
+
+<p>因为这点， gevent 可以在 IO loop 框架下可以提供多线程编程模型的接口。结合了 IO loop 的效率和多线程模型的简单灵活，我个人认为是目前异步编程的最佳方式。</p>
+
+<p>身为 rubyist 还是说回 Ruby, 我最近在实现 Ruby 世界的 gevent，一个以隐式的 IO loop 和同步接口为核心的库 <a href="https://github.com/socketry/lightio">LightIO</a>。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EchoServer</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    <span class="vi">@server</span> <span class="o">=</span> <span class="no">LightIO</span><span class="o">::</span><span class="no">TCPServer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">run</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">socket</span> <span class="o">=</span> <span class="vi">@server</span><span class="p">.</span><span class="nf">accept</span><span class="p">)</span>
+      <span class="n">_</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">host</span> <span class="o">=</span> <span class="n">socket</span><span class="p">.</span><span class="nf">peeraddr</span>
+      <span class="nb">puts</span> <span class="s2">"accept connection from </span><span class="si">#{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">#{</span><span class="n">port</span><span class="si">}</span><span class="s2">"</span>
+
+      <span class="c1"># LightIO::Beam is lightweight executor, provide thread-like interface</span>
+      <span class="c1"># just start new beam for per socket</span>
+      <span class="no">LightIO</span><span class="o">::</span><span class="no">Beam</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">socket</span><span class="o">|</span>
+        <span class="kp">loop</span> <span class="k">do</span>
+          <span class="n">echo</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">socket</span><span class="p">.</span><span class="nf">readpartial</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span>
+    <span class="n">socket</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="k">rescue</span> <span class="no">EOFError</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">host</span> <span class="o">=</span> <span class="n">socket</span><span class="p">.</span><span class="nf">peeraddr</span>
+    <span class="nb">puts</span> <span class="s2">"*** </span><span class="si">#{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">#{</span><span class="n">port</span><span class="si">}</span><span class="s2"> disconnected"</span>
+    <span class="n">socket</span><span class="p">.</span><span class="nf">close</span>
+    <span class="k">raise</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+
+<span class="no">EchoServer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'localhost'</span><span class="p">,</span> <span class="mi">3000</span><span class="p">).</span><span class="nf">run</span>
+</code></pre></div></div>
+
+<p>可以从示例中看到，使用 LightIO 和原生的多线程编程非常相似，而与其他的库有巨大的区别。</p>
+
+<p>打开引擎盖可以看到：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Beam</span> <span class="o">&lt;</span> <span class="no">Fiber</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="c1">#...</span>
+    <span class="vi">@ioloop</span> <span class="o">=</span> <span class="no">IOloop</span><span class="p">.</span><span class="nf">current</span>
+    <span class="c1">#...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">IOloop</span>
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@fiber</span> <span class="o">=</span> <span class="no">Fiber</span><span class="p">.</span><span class="nf">new</span><span class="p">{</span><span class="n">run_loop</span><span class="p">}</span>
+  <span class="k">end</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">current</span>
+    <span class="no">Thread</span><span class="p">.</span><span class="nf">current</span><span class="p">[</span><span class="ss">:"lightio.ioloop"</span><span class="p">]</span> <span class="o">||=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">new</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Beam 仅仅是对 Fiber 的封装，提供了方便操作的类似 Thread 的接口，创建／销毁 Beam 的成本非常低。</p>
+
+<p>所有的 Beam 则是在同一个 IO loop 中执行，相当于 IO loop 的 callback。虽然貌似多线程编程，其实是单线程的 IO loop。</p>
+
+<p>LightIO 目前在一个初步的阶段，经过半个月的时间完成了核心调度和 socket 库的包装。还未进行 Benchmark，性能优化等工作。预计 2018 年春季可以完成正式版。</p>
+
+<p>与 Samuel Williams (async 作者) 沟通后，<a href="https://github.com/socketry/lightio">LightIO</a> 移动到了 socketry 组织下！相信在高手的帮助下会取得更好的质量。</p>
+:ET

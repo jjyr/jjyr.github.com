@@ -1,0 +1,105 @@
+I"�A<p>GitHub 身为一家在美国的公司，随时有可能不出乎意料的由于不可抗原因停止对用户的服务。</p>
+
+<h3 id="1-安装备份脚本">1. 安装备份脚本</h3>
+
+<p><a href="https://github.com/josegonzalez/python-github-backup">python-github-backup</a> 提供了足够多的备份选择 repos, issues, PR 等等，几乎 GitHub 上有价值的信息都可以备份，而且还支持从 MacOS KeyChain 里读取 GitHub token</p>
+
+<p>安装最新版 python-github-backup，README 中表示支持 python3，但我使用时仍遇到了些兼容问题，使用 python2 可以正常运行</p>
+
+<p><code class="highlighter-rouge">pip install git+https://github.com/josegonzalez/python-github-backup.git#egg=github-backup</code></p>
+
+<p>安装完成，执行命令试一试能否成功备份</p>
+
+<h3 id="2-申请-github-personal-access-token">2. 申请 GitHub personal access token</h3>
+
+<p>去 GitHub 申请 <a href="https://github.blog/2013-05-16-personal-api-tokens/">personal access token</a></p>
+
+<p>尝试执行命令，替换 <code class="highlighter-rouge">jjyr</code> 为自己的用户名，<code class="highlighter-rouge">access_token</code> 为实际 token，以及替换备份目录路径</p>
+
+<p><code class="highlighter-rouge">github-backup jjyr -t access_token --output-directory /Users/jiangjinyang/github_backups --repositories</code></p>
+
+<p>执行后会把所有 repos clone 到备份目录下，我只有备份 repos 的需求, 其他选项详见 <a href="https://github.com/josegonzalez/python-github-backup">python-github-backup</a></p>
+
+<h3 id="3-在-mac-上设置定时任务">3. 在 Mac 上设置定时任务</h3>
+
+<p>按照 Apple 推荐使用 launchd 来设置定时任务</p>
+
+<p>我们在 <code class="highlighter-rouge">~/Library/LaunchAgents/</code> 下新建一个 plist 文件 <code class="highlighter-rouge">~/Library/LaunchAgents/github-backup.plist</code></p>
+
+<blockquote>
+  <p>在 <code class="highlighter-rouge">~/Library/LaunchAgents</code> 下的 plist 只会当前用户有效，
+plist 的配置和 launchd 其他用法详见<a href="https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html#//apple_ref/doc/uid/TP40001762-104142">官方文档</a></p>
+</blockquote>
+
+<p>文件内容为</p>
+
+<div class="language-plist highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">&lt;</span><span class="err">?xml</span><span class="mh"> </span><span class="err">v</span><span class="mh">e</span><span class="err">rsion="</span><span class="mh">1</span><span class="err">.</span><span class="mh">0</span><span class="err">"</span><span class="mh"> e</span><span class="err">n</span><span class="mh">c</span><span class="err">o</span><span class="mh">d</span><span class="err">ing="UT</span><span class="mh">F</span><span class="err">-</span><span class="mh">8</span><span class="err">"?</span><span class="p">&gt;</span><span class="w">
+</span><span class="p">&lt;</span><span class="err">!</span><span class="mh">D</span><span class="err">O</span><span class="mh">C</span><span class="err">TYP</span><span class="mh">E </span><span class="err">plist</span><span class="mh"> </span><span class="err">PU</span><span class="mh">B</span><span class="err">LI</span><span class="mh">C </span><span class="err">"-//</span><span class="mh">A</span><span class="err">ppl</span><span class="mh">e C</span><span class="err">omput</span><span class="mh">e</span><span class="err">r//</span><span class="mh">D</span><span class="err">T</span><span class="mh">D </span><span class="err">PLIST</span><span class="mh"> 1</span><span class="err">.</span><span class="mh">0</span><span class="err">//</span><span class="mh">E</span><span class="err">N"</span><span class="mh"> </span><span class="err">"http://www.</span><span class="mh">a</span><span class="err">ppl</span><span class="mh">e</span><span class="err">.</span><span class="mh">c</span><span class="err">om/</span><span class="mh">D</span><span class="err">T</span><span class="mh">D</span><span class="err">s/Prop</span><span class="mh">e</span><span class="err">rtyList-</span><span class="mh">1</span><span class="err">.</span><span class="mh">0</span><span class="err">.</span><span class="mh">d</span><span class="err">t</span><span class="mh">d</span><span class="err">"</span><span class="p">&gt;</span><span class="w">
+</span><span class="p">&lt;</span><span class="err">plist</span><span class="mh"> </span><span class="err">v</span><span class="mh">e</span><span class="err">rsion="</span><span class="mh">1</span><span class="err">.</span><span class="mh">0</span><span class="err">"</span><span class="p">&gt;</span><span class="w">
+</span><span class="p">&lt;</span><span class="mh">d</span><span class="err">i</span><span class="mh">c</span><span class="err">t</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">Label</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">com.jiangjinyang.github-backup</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">KeepAlive</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="mh">fa</span><span class="err">ls</span><span class="mh">e</span><span class="err">/</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">RunAtLoad</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="mh">fa</span><span class="err">ls</span><span class="mh">e</span><span class="err">/</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">EnvironmentVariables</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="mh">d</span><span class="err">i</span><span class="mh">c</span><span class="err">t</span><span class="p">&gt;</span><span class="w">
+      </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">http_proxy</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+      </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">http://127.0.0.1:1087</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+      </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">https_proxy</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+      </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">http://127.0.0.1:1087</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">/</span><span class="mh">d</span><span class="err">i</span><span class="mh">c</span><span class="err">t</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">StandardOutPath</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">/Users/jiangjinyang/github_backups/backup.log</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">StandardErrorPath</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">/Users/jiangjinyang/github_backups/backup.err.log</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">ProgramArguments</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="mh">a</span><span class="err">rr</span><span class="mh">a</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">/usr/local/bin/github-backup</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">jjyr</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">-t</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">access_token</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">--output-directory</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">/Users/jiangjinyang/github_backups</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">string</span><span class="p">&gt;</span><span class="l">--repositories</span><span class="p">&lt;</span><span class="err">/string</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">/</span><span class="mh">a</span><span class="err">rr</span><span class="mh">a</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">StartCalendarInterval</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="mh">d</span><span class="err">i</span><span class="mh">c</span><span class="err">t</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">Weekday</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">int</span><span class="mh">e</span><span class="err">g</span><span class="mh">e</span><span class="err">r</span><span class="p">&gt;</span><span class="l">6</span><span class="p">&lt;</span><span class="err">/int</span><span class="mh">e</span><span class="err">g</span><span class="mh">e</span><span class="err">r</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">Hour</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">int</span><span class="mh">e</span><span class="err">g</span><span class="mh">e</span><span class="err">r</span><span class="p">&gt;</span><span class="l">00</span><span class="p">&lt;</span><span class="err">/int</span><span class="mh">e</span><span class="err">g</span><span class="mh">e</span><span class="err">r</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="l">Minute</span><span class="p">&lt;</span><span class="err">/k</span><span class="mh">e</span><span class="err">y</span><span class="p">&gt;</span><span class="w">
+        </span><span class="p">&lt;</span><span class="err">int</span><span class="mh">e</span><span class="err">g</span><span class="mh">e</span><span class="err">r</span><span class="p">&gt;</span><span class="l">03</span><span class="p">&lt;</span><span class="err">/int</span><span class="mh">e</span><span class="err">g</span><span class="mh">e</span><span class="err">r</span><span class="p">&gt;</span><span class="w">
+    </span><span class="p">&lt;</span><span class="err">/</span><span class="mh">d</span><span class="err">i</span><span class="mh">c</span><span class="err">t</span><span class="p">&gt;</span><span class="w">
+</span><span class="p">&lt;</span><span class="err">/</span><span class="mh">d</span><span class="err">i</span><span class="mh">c</span><span class="err">t</span><span class="p">&gt;</span><span class="w">
+</span><span class="p">&lt;</span><span class="err">/plist</span><span class="p">&gt;</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li>把 Label 改为自己喜欢的服务名，这里我用的 <code class="highlighter-rouge">com.jiangjinyang.github-backup</code></li>
+  <li>把 EnvironmentVariables 中的环境变量改为自己使用的网络加速服务，如果没有则删掉这段</li>
+  <li>StandardOutPath 和 StandardErrorPath 是备份服务输出日志的路径，改为自己喜欢的路径</li>
+  <li>ProgramArguments 中改为自己使用的命令参数</li>
+  <li>调整 StartCalendarInterval 中的定时参数，示例中是每周备份一次</li>
+</ul>
+
+<p>保存文件并加载备份服务到 launchd，注意因为放在 <code class="highlighter-rouge">~/Library/LaunchAgents</code> 下面不需要用 <code class="highlighter-rouge">sudo</code></p>
+
+<p><code class="highlighter-rouge">launchctl load -w ~/Library/LaunchAgents/github-backup.plist</code></p>
+
+<p>用 <code class="highlighter-rouge">list</code> 命令输入服务名查看服务信息</p>
+
+<p><code class="highlighter-rouge">launchctl list com.jiangjinyang.github-backup</code></p>
+
+<p>使用 <code class="highlighter-rouge">start</code> 命令调用服务</p>
+
+<p><code class="highlighter-rouge">launchctl start com.jiangjinyang.github-backup</code></p>
+
+<p>这时再用 <code class="highlighter-rouge">list</code> 命令可以看到服务的 PID</p>
+
+<p>看到日志文件输出，repos 正常备份后，代表我们的配置成功，服务会定时来备份 GitHub</p>
+
+<p>再无后顾之忧</p>
+:ET

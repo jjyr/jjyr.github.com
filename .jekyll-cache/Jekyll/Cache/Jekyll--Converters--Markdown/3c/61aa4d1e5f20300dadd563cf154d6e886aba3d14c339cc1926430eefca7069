@@ -1,0 +1,119 @@
+I"L<h2 id="四个月后的更新">四个月后的更新</h2>
+<p>因为水平不足，对Reel造成了极大的误解..
+(希望不要误解到别人)</p>
+
+<p>更正下之前的误解</p>
+
+<p>Reel其实是异步IO单线程的，可以认为和EM一样，但是大家都知道Celluloid主打的就是并行编程</p>
+
+<p>于是..如果你想要并行的话可以调用<a href="http://rdoc.info/gems/reel/Reel/Connection:detach">detach</a>方法，并且自己管理socket</p>
+
+<p>当然这样做的话就不是异步IO了(WTF……….)</p>
+
+<p>另外reeltalk中的代码貌似也有一些问题..</p>
+
+<p>所以现在来说还是优先使用eventmachine, celluloid-io &amp; reel目前还是有一些问题(当然celluloid已经比较成熟了, 可以大胆使用)</p>
+
+<h2 id="起因">起因</h2>
+<p>本来是很追捧EM的，直到看到了一篇<a href="https://news.ycombinator.com/item?id=4695828">文章</a></p>
+
+<p>感觉之前学过些erlang, 应该很容易理解celluloid. 而且最近工作中也需要用到websocket，果断选择reel来做(无条件听信大牛..)</p>
+
+<h2 id="一坑">一坑</h2>
+<p>看了下文档，结果从README的helloworld就被坑了, 粘贴后执行程序会直接退出，不会block住</p>
+
+<p>源码</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'reel'</span>
+
+<span class="no">Reel</span><span class="o">::</span><span class="no">Server</span><span class="p">.</span><span class="nf">supervise</span><span class="p">(</span><span class="s2">"0.0.0.0"</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">connection</span><span class="o">|</span>
+  <span class="k">while</span> <span class="n">request</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="nf">request</span>
+    <span class="k">case</span> <span class="n">request</span>
+    <span class="k">when</span> <span class="no">Reel</span><span class="o">::</span><span class="no">Request</span>
+      <span class="nb">puts</span> <span class="s2">"Client requested: </span><span class="si">#{</span><span class="n">request</span><span class="p">.</span><span class="nf">method</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">request</span><span class="p">.</span><span class="nf">url</span><span class="si">}</span><span class="s2">"</span>
+      <span class="n">request</span><span class="p">.</span><span class="nf">respond</span> <span class="ss">:ok</span><span class="p">,</span> <span class="s2">"Hello, world!"</span>
+    <span class="k">when</span> <span class="no">Reel</span><span class="o">::</span><span class="no">WebSocket</span>
+      <span class="nb">puts</span> <span class="s2">"Client made a WebSocket request to: </span><span class="si">#{</span><span class="n">request</span><span class="p">.</span><span class="nf">url</span><span class="si">}</span><span class="s2">"</span>
+      <span class="n">request</span> <span class="o">&lt;&lt;</span> <span class="s2">"Hello everyone out there in WebSocket land"</span>
+      <span class="n">request</span><span class="p">.</span><span class="nf">close</span>
+      <span class="k">break</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>回去又翻了下celluloid的文档，发现README上的代码的确是有问题，因为是调用的<code class="highlighter-rouge">Server.supervise</code>所以Server是由<code class="highlighter-rouge">Supervisor</code>线程来执行的，主线程当然会直接退出，需要改成用run方法来直接执行，或者在后边调用sleep来阻塞住主线程(开源社区文档真是大问题啊..尤其是helloworld就跑不通的..严重打击新手)</p>
+
+<h2 id="二坑">二坑</h2>
+<p>关键这helloworld坑的还不止这里,因为之前写过EM的server再加上示例代码的误导，让我以为处理代码应该在代码中的when..case块中执行。结果发现无法判断客户端的disconnect。经过对比了EM和reel的源码后发现他们的设计思路是完全不同的。</p>
+
+<p>先来看下EM</p>
+
+<p>from em-websocket README</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>require 'em-websocket'
+
+EM.run {
+  EM::WebSocket.run(:host =&gt; "0.0.0.0", :port =&gt; 8080) do |ws|
+    ws.onopen { |handshake|
+      puts "WebSocket connection open"
+
+      # Access properties on the EM::WebSocket::Handshake object, e.g.
+      # path, query_string, origin, headers
+
+      # Publish message to the client
+      ws.send "Hello Client, you connected to #{handshake.path}"
+    }
+
+    ws.onclose { puts "Connection closed" }
+
+    ws.onmessage { |msg|
+      puts "Recieved message: #{msg}"
+      ws.send "Pong: #{msg}"
+    }
+  end
+}
+</code></pre></div></div>
+
+<p>代码是通过注册回调来完成的，然后EM会去并发执行这些回调</p>
+
+<p>EM的核心是一个loop{…}然后在其中触发所有已经注册的io对象和timer和heartbeat</p>
+
+<p>因为定期去进行io所以才会引发EOF的错误，从而得知客户端断开链接(之前我还以为socket都是不需要类似轮询的行为的。。)</p>
+
+<p>而on_exit就是在此时rescue块中被触发的</p>
+
+<p><del>reel中没有on_exit之类回调，且没EM的heartbeat机制去周期性io</del></p>
+
+<p><del>所以不会产生客户端断开的错误</del></p>
+
+<p><del>reel中把这个定期read交给用户来做。</del></p>
+
+<p><del>而用户需要的是在取到request时转发给一个Actor来处理(这样才会non-block,要是直接处理会阻塞到while)</del>
+<del>然后在actor中实现heartbeat去定时read Websocket</del></p>
+
+<p><del><a href="https://github.com/celluloid/reel/blob/master/examples/websockets.rb">就像这个刚开始被我忽视了，后来才好不容易找到的示例,这个才是正确的，reel的helloworld的太具有误导性了</a></del></p>
+
+<p><del>订正: <a href="https://github.com/tarcieri/reeltalk">现在最好的示例是这个</a></del></p>
+
+<h2 id="对比">对比</h2>
+<p>对比了下em-socket(eventmachine)和reel(celluloid)的设计思路</p>
+
+<p>reel是获取request后交给用户处理， 而em-socket是通过事件来回调用户的方法</p>
+
+<p><del>reel可以让用户自己去通过不同的Actor处理request, 而em-socket的回调类似于处理request的Actor的内部方法 所以有内存共享带来的麻烦</del></p>
+
+<p><del>reel的heartbeat需要自己实现，而EM有已经实现的统一的heartbeat。</del>所以EM的IO是’更异步’的(所有IO对象一起io)</p>
+
+<p>而celluloid(<del>每个connection有自己的io周期)</del>的优势则是并行(当然是在Jruby和rbx上),</p>
+
+<p>不过据说MRI的一些io操作是可以并行(毕竟本来也达不到性能瓶颈，而且Actor的优势还是很明显的,毕竟不会因为锁把程序搅乱)。</p>
+
+<h2 id="是自己坑的不能怪文档">是自己坑的，不能怪文档</h2>
+<p>被坑了一下午，真的感觉开源社区的文档真是很痛苦，尤其是helloworld(能不能笼络新手关键就看这个了..),当然主要原因还是自己对底层的一窍不通导致误解。。</p>
+
+<p>对应用层开发来讲底层知识比想象的要重要</p>
+
+<p>另外celluloid真的很好用..只要<code class="highlighter-rouge">async.method</code> or <code class="highlighter-rouge">future.method #可以取得返回值</code>就可以异步执行
+不需要像erlang那样再去做消息匹配。</p>
+
+<p>celluloid简洁的API 配合ruby强大的表达能力一定会越来越火</p>
+:ET

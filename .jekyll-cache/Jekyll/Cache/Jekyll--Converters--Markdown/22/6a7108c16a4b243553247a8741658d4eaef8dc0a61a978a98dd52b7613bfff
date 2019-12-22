@@ -1,0 +1,59 @@
+I"�<p>写这篇的目的是下次在看见有人认为ruby效率比python低时我可以直接贴给他链接..</p>
+
+<p>鉴于很多人用ruby1.8来benchmark说明ruby效率是多么低下，我使用了ruby和python标准实现的最新稳定版本</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ruby -v
+ruby 2.0.0p247 (2013-06-27 revision 41674) [x86_64-linux]
+
+python3 --version
+Python 3.3.2
+</code></pre></div></div>
+
+<p>使用传统的fibonacci来benchmark</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#ruby</span>
+<span class="nb">require</span> <span class="s1">'benchmark'</span>
+
+<span class="k">def</span> <span class="nf">fib</span> <span class="n">n</span>
+  <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span>
+    <span class="mi">1</span>
+  <span class="k">else</span>
+    <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">Benchmark</span><span class="p">.</span><span class="nf">bm</span><span class="p">{</span><span class="o">|</span><span class="n">bm</span><span class="o">|</span> <span class="n">bm</span><span class="p">.</span><span class="nf">report</span><span class="p">{</span><span class="nb">puts</span> <span class="n">fib</span><span class="p">(</span><span class="mi">35</span><span class="p">)}}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#python
+</span><span class="kn">import</span> <span class="nn">timeit</span>
+
+<span class="k">def</span> <span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+		<span class="k">return</span> <span class="mi">1</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">'__main__'</span><span class="p">:</span>
+	<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">Timer</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s">"print(fib(35))"</span><span class="p">,</span><span class="s">"from __main__ import fib"</span><span class="p">)</span>
+	<span class="k">print</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#ruby
+
+ruby fib.rb
+       user     system      total        real
+ 14930352
+  2.600000   0.000000   2.600000 (  2.601639)
+
+#python3.2.2
+
+fib.py 
+14930352
+9.720147652000378
+</code></pre></div></div>
+
+<p>ruby版本快了大概3.7倍
+我使用python2.7.5版会稍微快些，大概6.3秒，当然还是比ruby慢的</p>
+:ET

@@ -1,0 +1,266 @@
+I"&U<p>CSRF(跨站请求伪造：Cross-site request forgery) 可谓老生长谈的话题，有无数的博客和文章都在讲 CSRF 攻击与防范。</p>
+
+<p>近日感觉自己知识点之间存在着裂缝，无法做到了如指掌。于是弥补了下知识裂缝，并写成文章，贡献了 yet another CSRF 博文..</p>
+
+<p>摘要</p>
+<ul>
+  <li>CSRF 实践</li>
+  <li>POST 比 GET 安全？</li>
+  <li>为什么还要 CSRF protect token?</li>
+  <li>前后端分离和 CORS</li>
+</ul>
+
+<h2 id="csrf-实践">CSRF 实践</h2>
+<p>顾名思义，一句话概括<strong>跨站</strong>请求伪造(CSRF)就是：在用户浏览 A 站(恶意网站)时，伪造用户向 B 站(正常网站)发起请求。</p>
+
+<p>我们用 ruby sinatra 简单的模拟下这个过程，从而更好的理解这种攻击手段。</p>
+
+<p>用 a.rb, b.rb 两个脚本来模拟 A, B 站点，并修改 <code class="highlighter-rouge">/etc/hosts</code> 为两个站点提供不同的域名。</p>
+
+<p>如果不明白可以先略过这两个脚本，之后回来再看。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># a.rb</span>
+<span class="c1"># testa:4000</span>
+<span class="c1"># 恶意网站 A, 有一个奇怪的 img 标签</span>
+<span class="nb">require</span> <span class="s1">'sinatra'</span>
+
+<span class="n">get</span> <span class="s1">'/'</span> <span class="k">do</span>
+<span class="o">&lt;&lt;-</span><span class="no">HTML</span><span class="sh">
+&lt;img src="http://testb:5000/get"&gt;
+A
+</span><span class="no">HTML</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># b.rb</span>
+<span class="c1"># testb:5000</span>
+<span class="c1"># 善良网站 B, 提供基本的设置／获取 cookie 能力</span>
+<span class="nb">require</span> <span class="s1">'sinatra'</span>
+<span class="nb">require</span> <span class="s2">"sinatra/cookies"</span>
+
+<span class="n">get</span> <span class="s1">'/'</span> <span class="k">do</span>
+  <span class="s1">'B!'</span>
+<span class="k">end</span>
+
+<span class="n">get</span> <span class="s1">'/set'</span> <span class="k">do</span>
+  <span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span>
+  <span class="s1">'set!'</span>
+<span class="k">end</span>
+
+<span class="n">get</span> <span class="s1">'/get'</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="s2">"secret is </span><span class="si">#{</span><span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+  <span class="s2">"secret is </span><span class="si">#{</span><span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>分别启动这两个网站，现在开始模拟用户被攻击！</p>
+
+<ol>
+  <li>访问 <code class="highlighter-rouge">testb:5000/set?secret=123123</code> 模拟用户正常使用 B 站</li>
+  <li>访问 A 站</li>
+</ol>
+
+<p>OK，这时我们打开 chrome 的开发者工具，刷新 A 站，可以看到两个请求。第一个是我们访问页面的请求，第二个则是 A 站中潜藏的 img 标签发起的请求，因为 img 的 src 属性引用到 B 站，浏览器会发送请求来尝试获取图片。</p>
+
+<p><img src="/images/posts/CSRF/CSRF-1.jpg" alt="A site chrome dev tool" /></p>
+
+<p>点击 ‘Response’ 发现并没有显示内容，这是因为 B 返回的格式不是图片。</p>
+
+<p>我们看下 B 的 server log，发现的确被访问。
+<img src="/images/posts/CSRF/CSRF-2.jpg" alt="B site server log" /></p>
+
+<p>浏览器对<strong>同源</strong>的请求会附加上 <strong>cookie</strong> ，会被攻击者利用破坏你的数据，虽然示例中的 CSRF 没有造成实际损害，但我们把 A 站中的 img 的 src 换为 <code class="highlighter-rouge">testb:5000/set?secret=csrf_attack</code> 就会在用户不注意时写入数据，达到破坏的目的！</p>
+
+<p>同样的 iframe 等 HTML 标签也会有相同效果。</p>
+
+<p>经常会听说 POST 请求比 GET 要安全。仅看示例的话，如果我们把 B 的 ‘/set’ 换成 POST 请求，上述攻击的确无法成功，但如果因此认为 POST 有更高的安全性还是 too naive。</p>
+
+<h2 id="用-post-可以避免-csrf-吗">用 POST 可以避免 CSRF 吗？</h2>
+<p>当然不可以，要不然也不会有这一节</p>
+
+<p>我们就试一试 POST 是否安全</p>
+
+<p>把 B 站代码略作修改</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># get 变成 post</span>
+<span class="n">post</span> <span class="s1">'/set'</span> <span class="k">do</span>
+  <span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span>
+  <span class="s1">'set!'</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>道高一尺魔高一丈，这时我们的 A 站也升级了</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># a.rb</span>
+<span class="nb">require</span> <span class="s1">'sinatra'</span>
+
+<span class="n">get</span> <span class="s1">'/'</span> <span class="k">do</span>
+<span class="o">&lt;&lt;-</span><span class="no">HTML</span><span class="sh">
+&lt;form id="myform" method="POST" action="http://testb:5000/set"&gt;
+&lt;input type="hidden" value="321321" name="secret"&gt;
+&lt;/form&gt;
+
+&lt;script&gt;
+document.forms["myform"].submit();
+&lt;/script&gt;
+
+A
+</span><span class="no">HTML</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>访问 A，表单会自动提交到 B 站(浏览器会一起发送 B 站的 cookie)，并且成功的修改了数据。</p>
+
+<p>我们可以看到使用 POST 并<strong>没有更安全</strong>，仅仅把 GET 换为 POST 无法保证防止 CSRF 攻击。</p>
+
+<h2 id="csrf-protect-token">CSRF protect token</h2>
+
+<p>在流行 web 框架中基本都有 <strong>CSRF protect token</strong> 的概念，这就是为了防止我们在上一节演示的跨站提交表单攻击。</p>
+
+<p>基本思想是 A 服务器每次渲染 form 时，同时生成一个隐藏的表单元素(token)，A 处理表单提交时验证这个 token 是否正确，如不正确就拒绝这次提交。攻击者猜不出 token 的值，自然无法提交表单进行攻击。</p>
+
+<p>要注意的是 token 最好每次不同，并且不容易让人猜到，v2ex 论坛就曾因使用可以猜到的 CSRF protect token 而被人攻击。</p>
+
+<p>我们来修改 B 站，实现 CSRF protect token 功能。</p>
+
+<p>首先第一步，介绍一下我们的 token 生成算法。为了保证 CSRF protect token 的安全性，我们将 token 设计为: 1. 可以过期，2. 保证每个用户生成的不同，3. token 的内容是加密的无法篡改。</p>
+
+<p>我们使用简单的哈希表(Hash)来表示加密前的 token：</p>
+
+<p>token 结构如下</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+    <span class="ss">expired_at: </span><span class="o">&lt;</span><span class="n">unix_time</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="ss">current_secret: </span><span class="s2">"secret"</span> <span class="c1"># 在实际中这里应该使用 user_id</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这样当我们处理表单提交时，先检查 expired_at 验证 token 是否过期，再验证当前的 secret 是否正确(这里为了简化，使用 ‘cookie[:secret]’ 来区分不同用户，有很大概率碰撞。实际中应使用用户的 ‘user_id’ 来保证每个用户的 token 不同。)，只要有一个不通过我们就认为是恶意攻击。</p>
+
+<p>然后我们用 JSON 序列化 token，再对其进行加密处理。下面是一段将 token 加密解密的代码</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 当然实际中不要用全局变量..</span>
+<span class="vg">$iv</span> <span class="o">=</span> <span class="kp">nil</span>
+<span class="vg">$key</span> <span class="o">=</span> <span class="kp">nil</span>
+
+<span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">cipher</span> <span class="o">=</span> <span class="no">OpenSSL</span><span class="o">::</span><span class="no">Cipher</span><span class="o">::</span><span class="no">AES256</span><span class="p">.</span><span class="nf">new</span> <span class="ss">:CBC</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">encrypt</span>
+  <span class="vg">$key</span> <span class="o">||=</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">random_key</span> <span class="c1"># 随机生成密钥</span>
+  <span class="vg">$iv</span> <span class="o">||=</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">random_iv</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">key</span> <span class="o">=</span> <span class="vg">$key</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">iv</span> <span class="o">=</span> <span class="vg">$iv</span>
+  <span class="n">encrypted_text</span> <span class="o">=</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">final</span>
+  <span class="c1"># 使用 base64 生成可以放心插入到 HTML 的字符串</span>
+  <span class="no">Base64</span><span class="p">.</span><span class="nf">encode64</span><span class="p">(</span><span class="n">encrypted_text</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">encrypted_text</span> <span class="o">=</span> <span class="no">Base64</span><span class="p">.</span><span class="nf">decode64</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">cipher</span> <span class="o">=</span> <span class="no">OpenSSL</span><span class="o">::</span><span class="no">Cipher</span><span class="o">::</span><span class="no">AES256</span><span class="p">.</span><span class="nf">new</span> <span class="ss">:CBC</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">decrypt</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">key</span> <span class="o">=</span> <span class="vg">$key</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">iv</span> <span class="o">=</span> <span class="vg">$iv</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="n">encrypted_text</span><span class="p">)</span> <span class="o">+</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">final</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>通过以上代码加密，恶意网站不知道我们的密钥，无法篡改 token；而且因为使用了 user_id 隔离不同用户生成的 token，恶意网站无法用自己账号伪造 token (示例中用的 current_secret，隔离效果不好，仅作示范)；</p>
+
+<p>就算恶意网站侥幸得到了 token，我们还有过期时间的保护，只要段时间内无法对我们发起 CSRF 攻击，则还是具有一定安全。</p>
+
+<p>完整代码如下：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># b.rb</span>
+<span class="nb">require</span> <span class="s1">'sinatra'</span>
+<span class="nb">require</span> <span class="s2">"sinatra/cookies"</span>
+<span class="nb">require</span> <span class="s1">'openssl'</span>
+<span class="nb">require</span> <span class="s1">'base64'</span>
+<span class="nb">require</span> <span class="s1">'json'</span>
+
+<span class="n">get</span> <span class="s1">'/'</span> <span class="k">do</span>
+
+<span class="c1"># 使用当前时间加 60s 作为 token 过期时间</span>
+<span class="c1"># ! 真实情况下应该使用 user_id 等信息一起加密</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">expired_at: </span><span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">to_i</span> <span class="o">+</span> <span class="mi">60</span><span class="p">,</span>
+  <span class="ss">current_secret: </span><span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span>
+<span class="p">}</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">encrypt</span><span class="p">(</span><span class="no">JSON</span><span class="p">.</span><span class="nf">dump</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+<span class="o">&lt;&lt;-</span><span class="no">HTML</span><span class="sh">
+&lt;form id="myform" method="POST" action="/set"&gt;
+&lt;input type="hidden" name="token" value="</span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="sh">"&gt;
+&lt;input type="text" name="secret"&gt;
+&lt;input type="submit"&gt;
+&lt;/form&gt;
+
+  B!
+</span><span class="no">HTML</span>
+<span class="k">end</span>
+
+<span class="n">post</span> <span class="s1">'/set'</span> <span class="k">do</span>
+  <span class="n">token_data</span> <span class="o">=</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">decrypt</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:token</span><span class="p">]))</span>
+  <span class="k">if</span> <span class="n">token_data</span><span class="p">[</span><span class="s1">'expired_at'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">to_i</span> <span class="o">||</span> <span class="n">token_data</span><span class="p">[</span><span class="s1">'current_secret'</span><span class="p">]</span> <span class="o">!=</span> <span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">"you're bad guy"</span>
+  <span class="k">end</span>
+  <span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span>
+  <span class="s1">'set!'</span>
+<span class="k">end</span>
+
+<span class="n">get</span> <span class="s1">'/get'</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="s2">"secret is </span><span class="si">#{</span><span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+  <span class="s2">"secret is </span><span class="si">#{</span><span class="n">cookies</span><span class="p">[</span><span class="ss">:secret</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+
+<span class="kp">private</span>
+
+<span class="vg">$iv</span> <span class="o">=</span> <span class="kp">nil</span>
+<span class="vg">$key</span> <span class="o">=</span> <span class="kp">nil</span>
+
+<span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">cipher</span> <span class="o">=</span> <span class="no">OpenSSL</span><span class="o">::</span><span class="no">Cipher</span><span class="o">::</span><span class="no">AES256</span><span class="p">.</span><span class="nf">new</span> <span class="ss">:CBC</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">encrypt</span>
+  <span class="vg">$key</span> <span class="o">||=</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">random_key</span>
+  <span class="vg">$iv</span> <span class="o">||=</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">random_iv</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">key</span> <span class="o">=</span> <span class="vg">$key</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">iv</span> <span class="o">=</span> <span class="vg">$iv</span>
+  <span class="n">encrypted_text</span> <span class="o">=</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">final</span>
+  <span class="no">Base64</span><span class="p">.</span><span class="nf">encode64</span><span class="p">(</span><span class="n">encrypted_text</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">encrypted_text</span> <span class="o">=</span> <span class="no">Base64</span><span class="p">.</span><span class="nf">decode64</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">cipher</span> <span class="o">=</span> <span class="no">OpenSSL</span><span class="o">::</span><span class="no">Cipher</span><span class="o">::</span><span class="no">AES256</span><span class="p">.</span><span class="nf">new</span> <span class="ss">:CBC</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">decrypt</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">key</span> <span class="o">=</span> <span class="vg">$key</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">iv</span> <span class="o">=</span> <span class="vg">$iv</span>
+  <span class="n">cipher</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="n">encrypted_text</span><span class="p">)</span> <span class="o">+</span> <span class="n">cipher</span><span class="p">.</span><span class="nf">final</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>这样，我们终于得到了一个安全的，可以防范 CSRF 攻击的服务。</p>
+
+<h2 id="前后端分离和-cors">前后端分离和 CORS</h2>
+
+<p>CSRF 和前后端分离有什么关系呢？是不是前后端分离的架构中就不会出现 CSRF 攻击，也不会需要 form protect token？</p>
+
+<p>这话对也不对，对于服务器来说，CSRF 和前后端是否分离没太大关系，只要服务器端接受 form 请求还是有跨站提交的问题，目前基本都是使用 json 来通信，所以服务器端只要限制仅接受 <strong>Content-Type</strong> 为 <strong>application/json</strong> 格式的数据就可以避免 CSRF，至于为什么可以避免就要先介绍下 CORS。</p>
+
+<p>实践过前后端分离的读者基本都会听说过 CORS 这个东西。</p>
+
+<p>CORS 是在前端复杂化、后端 API 化后，为了避免类似 CSRF 攻击的悲剧而加入的限制策略。浏览器在发出真正请求前会先使用 ‘OPTION’ 请求询问服务器接受哪种 ‘Method’，哪些 ‘Headers’，如果发现 js 发出的请求不被服务器接受，则会禁止发送并报错。</p>
+
+<p><img src="/images/posts/CSRF/CSRF-3.jpg" alt="No 'Access-Control-Allow-Origin' header" /></p>
+
+<p>如上图所示，浏览器发现 js 请求的域名没有提供 <strong>Access-Control-Allow-Origin</strong>，于是报错。</p>
+
+<p>CORS 可以参考 MDN 的详细介绍:
+https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS</p>
+
+<p>值得一提的是在发送<strong>简单请求</strong>时，不会触发 ‘OPTION’ 的验证。
+根据 MDN 文章的解释，当使用 ‘GET’, ‘HEAD’ 请求，或使用  ‘POST’ 但 ‘Content-Type’ 的值为 ‘text/plain’、 ‘multipart/form-data’、’application/x-www-form-urlencoded’ 时，浏览器<strong>不会进行验证</strong>。</p>
+
+<p>这也就解释了 CORS 的控制边界，之前示范的表单提交属于简单请求，所以跨域不受浏览器限制。而前后端分离时大多使用 json 交互，这时就进入了 CORS 的保护范围。</p>
+
+<p>至于 form 提交，作为最基本的数据提交方式，跟随 Web 标准发展了几十年，仍因兼容性而允许跨站提交。幸好 Web 生态圈有社区推动的各种解决方案来不断的完善，才会有 csrf protect token 等方案让 Web 平台更加安全开放。</p>
+:ET

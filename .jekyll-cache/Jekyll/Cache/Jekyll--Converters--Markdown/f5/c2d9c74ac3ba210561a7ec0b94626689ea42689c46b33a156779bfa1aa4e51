@@ -1,0 +1,3 @@
+I"�<p>最近写了个<a href="https://github.com/jjyr/minidown">markdown parser</a>练手, 发现这种有规范的东西非常适合TDD, 照着markdown语法来写spec, 然后一个一个将其通过, 之前从未试过这么彻底的TDD</p>
+
+:ET
