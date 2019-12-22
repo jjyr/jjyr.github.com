@@ -1,2 +1,0 @@
-I"�<p>前几天<a href="https://github.com/jjyr/websocket-benchmark">benchmark了下ruby中比较有前途的websocket-server</a>(reel和em-websocket)，结果是eventmachine完胜..</p>
-:ET

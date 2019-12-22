@@ -1,6 +1,0 @@
-I"�<p>##为什么需要使用ActiveSupport::Concern
-<em>active_support/concern.rb</em>中已解释的很清楚
-简要的总结下
-————————
-module Bar需要在included时调用module Foo的方法</p>
-:ET
