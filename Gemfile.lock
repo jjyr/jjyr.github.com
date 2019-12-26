@@ -53,7 +53,10 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    rmmseg-cpp-new (0.3.1)
     rouge (3.14.0)
+    ruby-pinyin (0.5.0)
+      rmmseg-cpp-new (~> 0.3.1)
     safe_yaml (1.0.5)
     sassc (2.2.1)
       ffi (~> 1.9)
@@ -70,6 +73,7 @@ DEPENDENCIES
   jekyll-seo-tag
   jekyll-sitemap
   rake
+  ruby-pinyin
 
 BUNDLED WITH
    2.0.1
