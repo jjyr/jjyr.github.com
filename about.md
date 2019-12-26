@@ -15,4 +15,4 @@ Free feel to reach me:
 
 * Twitter: [@_jjy0](https://twitter.com/_jjy0)
 * GitHub: [@jjyr](https://github.com/jjyr)
-* WeChat: fweedm (Please mark who you are)
+* WeChat: fweedm (Please remark who you are)
