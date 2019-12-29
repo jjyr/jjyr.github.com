@@ -5,11 +5,11 @@ data: 2019-12-24 10:24
 comments: true
 ---
 
-AFAIK, the most popular contracts that deployed on CKB is writing in C, yeah, there are 3 default contracts in the genesis block: `secp256k1 lock`, `secp256k1 multisig lock` and `Deposited DAO`, basically everyone uses CKB are using these contracts.
+AFAIK, the most popular contracts that deployed on CKB is writing in C. There are 3 default contracts in the genesis block: `secp256k1 lock`, `secp256k1 multisig lock` and `Deposited DAO`, basically everyone uses CKB are using these contracts.
 
-But as a rustacean, I understand that you want to write everything in Rust. The good news is yes, CKB-VM supports RISC-V ISA(instruction set architecture), and recently the RISC-V target is added to Rust, which means we can directly compile our code to RISC-V. However, the bad news is that the RISC-V target is not supporting the std library yet, which means we only can use `no_std` Rust.
+As a rustacean, I understand that you want to write everything in Rust. The good news is it's possible, since CKB-VM supports RISC-V ISA(instruction set architecture), and recently the RISC-V target is added to Rust, which means we can directly compile our code to RISC-V. However, the bad news is that the RISC-V target is not supporting the std library yet, which means you can't use Rust as a usual way.
 
-This series of articles show you how to write a CKB contract in Rust and deploy it. We'll see that the `no_std` Rust better than our first impression.
+This series of articles show you how to write a CKB contract in Rust and deploy it. We'll see that the `no_std` Rust actually is better than our first impression.
 
 This article assumes you are familiar with Rust and have some basic knowledge of CKB. You should know the CKB transaction structure and understand what a `type` script is and what a `lock` script is. The word `contract` used to describe both `type` script and `lock` script in this article.
 
@@ -17,7 +17,7 @@ This article assumes you are familiar with Rust and have some basic knowledge of
 
 ### create a project
 
-Let's initial a project template. Firstly we create two projects: `ckb-rust-demo` and `contract`. The `ckb-rust-demo` used to put our tests code, and the `contract` used to put the contract code.
+Let's initial a project template. First, we create two projects: `ckb-rust-demo` and `contract`. The `ckb-rust-demo` used to put our tests code, and the `contract` used to put the contract code.
 
 ``` sh
 cargo new --lib ckb-rust-demo
@@ -27,7 +27,7 @@ cargo new contract
 
 ### install `riscv64imac-unknown-none-elf` target
 
-We require several unstable features from the nightly Rust version, and then we install the RISC-V target.
+We choose nightly Rust since several unstable features are required, then we install the RISC-V target.
 
 ``` sh
 # use nightly version rust
@@ -47,7 +47,7 @@ cargo build --target riscv64imac-unknown-none-elf
 
 The compiling fails because of no `std` for target `riscv64imac-unknown-none-elf`.
 
-Edit the `src/main.rs` to enable `no_std`.
+Edit the `src/main.rs` to notate `no_std` flag.
 
 ``` rust
 #![no_std]
@@ -70,7 +70,7 @@ fn panic_handler(_: &core::panic::PanicInfo) -> ! {
 extern "C" fn eh_personality() {}
 ```
 
-This is a basic `no_std` main, try compile again:
+The above code is a basic `no_std` main, try compile again:
 
 To avoid typing the `--target` every time, we can write it into a config file `contract/.cargo/config` then update the content:
 
@@ -89,10 +89,10 @@ file target/riscv64imac-unknown-none-elf/debug/contract
 
 ## Test our contract
 
-The only thing that the contract does is return `0`. It's perfect for a `lock` script (don't do this on the mainnet!).
+The only thing that the contract does is to return exit-code `0`. It's perfect for a `lock` script (it's not perfect, don't do it on the mainnet!).
 
 The basic idea to write test code is to use our contract as a cell's lock script, our contract return `0`, which means anyone can spend the cell.
-Firstly, we mock a cell with our contract as the lock script, then construct a transaction to spend the cell, if the transaction verification succeeded that means our lock script is working.
+First, we mock a cell with our contract as the lock script, then construct a transaction to spend the cell, if the transaction verification succeeded that means our lock script is working.
 
 Add `ckb-contract-tool` as dependent:
 
@@ -103,7 +103,7 @@ ckb-contract-tool = { git = "https://github.com/jjyr/ckb-contract-tool.git" }
 
 `ckb-contract-tool` contains helper methods from several crates.
 
-The test code which we put in `ckb-rust-demo/src/lib.rs` as below:
+The test code which put in `ckb-rust-demo/src/lib.rs` as below:
 
 ``` rust
 #[test]
@@ -143,13 +143,13 @@ Internal }', src/libcore/result.rs:1188:5
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ```
 
-Don't panic! The error `OutOfBound` represents our program tries to access some memory that out of bound.
+Don't panic! The error tells us our program access some memory that out of bound.
 
-The target `riscv64imac-unknown-none-elf` have a little different behavior on compiling the program entry point, use `riscv64-unknown-elf-objdump -D <binary>` to disassembly we can find out that there no `.text` section, we must write a linker script to indicates the entry point.
+The `riscv64imac-unknown-none-elf` target is little different on handling the entry point, use `riscv64-unknown-elf-objdump -D <binary>` to disassembly we can find out that there no `.text` section, we must write a linker script to indicates the entry point.
 
 ## Customize linker script
 
-A basic linker script, including the `.text`, `.sdata`, `.riscv` sections and the entry point: `ENTRY(start)`.
+We write a basic linker script, to indicate's the section `.text`, `.sdata`, `.riscv` and the entry point: `ENTRY(start)`.
 
 Put the linker script to `contract/linker.ld`
 
@@ -179,7 +179,7 @@ SECTIONS
 }
 ```
 
-Modify `contract/.cargo/config` to apply the linker script when compiling:
+Modify `contract/.cargo/config` to enable the linker script flag:
 
 ``` toml
 [target.riscv64imac-unknown-none-elf]
@@ -203,7 +203,7 @@ Script }', src/libcore/result.rs:1188:5
 
 `ExceededMaximumCycles` error occurs when the script cycles exceed the max limit. Apparently, our lock only returns a 0. It not supposed to cost many cycles.
 
-The reason is when compiling to `riscv64imac-unknown-none-elf` target. The compiler does not handle the entry point properly. If we disassemble, we find that the entry point `start` is complied as a regular function, when the function returns the `pc` jump to the `0x0` address which is the begin address of the `start` function, so the code loop and loop again until exhausted all cycles.
+The reason is as we mentined when compiling to `riscv64imac-unknown-none-elf` target. The compiler does not handle the entry point properly. If we disassemble, we find that the entry point `start` is complied as a regular function, when the function returns the `pc` jump to the `0x0` address which is the begin address of the `start` function, so the code loop and loop again until exhausted all cycles.
 
 To break the loop, we need to invoke the `exit` syscall in the `start` function.
 
@@ -223,7 +223,7 @@ pub fn start(_argc: isize, _argv: *const *const u8) -> isize {
 }
 ```
 
-To call `exit` from Rust, we need some interesting code:
+To call `exit` from Rust, we need to write some interesting code:
 
 ``` rust
 #![feature(asm)]
@@ -241,7 +241,7 @@ pub fn exit(_code: i8) {
 }
 ```
 
-The `a0` register contains our first arg `_code`, the `a7` register indicates which syscall do we want, `93` is the syscall number of exit.
+The `a0` register contains our first arg `_code` according to the C calling convention, the `a7` register indicates the syscall number, `93` is the syscall number of exit.
 
 Compile and rerun the test.
 
@@ -255,9 +255,9 @@ You may wonder why it's so complex to write a CKB contract in Rust, and it is tr
 
 The intention of this demo is trying to show you how to use `Rust` to write a contract at a low level. Since the lack of toolchain and libraries, it maybe seems not worth to use `Rust` developing CKB contract.
 
-But with the Rust ecosystem, things could be better. For example, with `cargo`, you can abstract libraries into crates, we can gain a better developing experiment if we just import a syscalls crate instead write it ourselves. More people use `Rust` on CKB, more crates we can use.
+But with the Rust ecosystem, things could be better. For example, with `cargo`, you can abstract libraries into crates, we can gain a better developing experiment if we just import a syscalls crate instead write it ourselves. More people use `Rust` on CKB, more crates we can use. Another advance to use Rust is that in CKB the contract only does verification. Aside from on-chain contracts, we also need to write an off-chain code to generate transaction data. That means we may need to write duplicated code if we use different languages for the contract and the off-chain generator, but with Rust, we can use the same library to write the contract and the generator.
 
-The other downside is that Rust target `riscv64imac-unknown-none-elf` is still on a very early stage, it can't handle entry point properly, and do not support `std` library. But it's hopeful of getting better since the RISC-V becomes more popular.
+The other downside is that Rust target `riscv64imac-unknown-none-elf` is still on a very early stage, it can't handle entry point properly, and do not support `std` library. But it's hopeful of getting better once the RISC-V becomes more popular in the future.
 
 That's it. We'll discuss more serious contracts in later articles.
 
