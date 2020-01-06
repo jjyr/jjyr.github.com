@@ -165,7 +165,24 @@ pub fn _start() -> ! {
 
 The return value of `_start` is `!`, which means this function never returns; if you try to return from this function, you get an `InvalidPermission` error, since the entry point has no place to return.
 
-Let's compile and run test again:
+Let's compile it:
+
+``` sh
+cargo build
+
+# -> rust-lld: error: undefined symbol: abort
+```
+
+We define an `abort` function to passing the compile.
+
+``` rust
+#[no_mangle]
+pub fn abort() -> ! {
+    panic!("abort!")
+}
+```
+
+Compile and run test again:
 
 ``` sh
 cargo build
