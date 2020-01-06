@@ -44,6 +44,38 @@ pub fn abort() -> ! {
 }
 ```
 
+## Makefile
+
+We compile and run test again and again in the previous article, for convenient, let's write a `Makefile` first:
+
+``` sh
+test: clean build patch
+	cargo test -- --nocapture
+
+build:
+	cd contract && cargo build
+
+clean:
+	cd contract && cargo clean
+
+C := contract/target/riscv64imac-unknown-none-elf/debug/contract
+patch:
+	ckb-binary-patcher -i $C -o $C
+
+```
+
+The `make test` is simple: rebuild the contract binary then run unit tests.
+
+It is worth to notice the `patch` task, which calls `ckb-binary-patcher` to patch the contract binary; its because even we developed the CKB-VM diligently, there no bug-free software. As the nature of blockchain, we can't just fix the VM itself without a hard-fork. A better approach is to patch binary to get across the buggy instruction. You can see [this issue](https://github.com/nervosnetwork/ckb-vm/issues/92) for details.
+
+Installing the `ckb-binary-patcher`:
+
+``` sh
+cargo install --git https://github.com/xxuejie/ckb-binary-patcher.git
+```
+
+Then type `make test` to compile and test contract.
+
 ## Hidden complexity under macro
 
 It seems too complicated for a "hello world".
@@ -138,3 +170,4 @@ References:
 * [ckb-contract-demo](https://github.com/jjyr/ckb-rust-demo/tree/part2)
 * [ckb-contract-std](https://github.com/jjyr/ckb-contract-std)
 * [alloc crate](https://doc.rust-lang.org/stable/std/alloc/index.html)
+* [ckb-binary-patcher](https://github.com/xxuejie/ckb-binary-patcher)
