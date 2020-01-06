@@ -46,7 +46,7 @@ pub fn abort() -> ! {
 
 ## Makefile
 
-We compile and run test again and again in the previous article, for convenient, let's write a `Makefile` first:
+We compile and run tests again and again in the previous article, for convenient, let's write a `Makefile` first:
 
 ``` sh
 test: clean build patch
@@ -66,7 +66,7 @@ patch:
 
 The `make test` is simple: rebuild the contract binary then run unit tests.
 
-It is worth to notice the `patch` task, which calls `ckb-binary-patcher` to patch the contract binary; its because even we developed the CKB-VM diligently, there no bug-free software. As the nature of blockchain, we can't just fix the VM itself without a hard-fork. A better approach is to patch binary to get across the buggy instruction. You can see [this issue](https://github.com/nervosnetwork/ckb-vm/issues/92) for details.
+It is worth to notice the `patch` task, which calls `ckb-binary-patcher` to patch the contract binary; Its a solution for fixing VM buggy instructions, even we developed the CKB-VM diligently, there no bug-free software. As the nature of blockchain, we can't just fix the VM itself without a hard-fork. A better approach is to patch binary to get across the buggy instruction. You can see [this issue](https://github.com/nervosnetwork/ckb-vm/issues/92) for details.
 
 Installing the `ckb-binary-patcher`:
 
@@ -78,8 +78,7 @@ Then type `make test` to compile and test contract.
 
 ## Hidden complexity under macro
 
-It seems too complicated for a "hello world".
- Let's begin with wrapping a `main` function, then call it from the `_start`.
+Now let's get back to our contract, the code is little complicated for a "hello world". Let's slim it, we begin with wrapping `_start` function:
 
 ``` rust
 #[no_mangle]
@@ -93,7 +92,7 @@ pub fn main() -> i8 {
 }
 ```
 
-That's looking more familiar, except the `_start` function is annoying; we can use a macro to hide the `_start`:
+Now we can write code in the `main` function, that's looking more comfortable,  except the `_start` function is annoying; we can use a macro to hide the `_start`:
 
 ``` rust
 #[macro_export]
