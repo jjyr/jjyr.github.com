@@ -5,11 +5,16 @@ data: 2019-12-24 10:24
 comments: true
 ---
 
+> Edited at 2020-01-06
+>
+> * Remove the linker script section since I found its unnecessary to customize linker
+> * Refactor the main function interface
+
 AFAIK, the most popular contracts that deployed on CKB is writing in C. There are 3 default contracts in the genesis block: `secp256k1 lock`, `secp256k1 multisig lock` and `Deposited DAO`, basically everyone uses CKB are using these contracts.
 
 As a rustacean, I understand that you want to write everything in Rust. The good news is it's possible, since CKB-VM supports RISC-V ISA(instruction set architecture), and recently the RISC-V target is added to Rust, which means we can directly compile our code to RISC-V. However, the bad news is that the RISC-V target is not supporting the std library yet, which means you can't use Rust as a usual way.
 
-This series of articles show you how to write a CKB contract in Rust and deploy it. We'll see that the `no_std` Rust actually is better than our first impression.
+This series of articles show you how to write a CKB contract in Rust and deploy it. We'll see that the `no_std` Rust is better than our first impression.
 
 This article assumes you are familiar with Rust and have some basic knowledge of CKB. You should know the CKB transaction structure and understand what a `type` script is and what a `lock` script is. The word `contract` used to describe both `type` script and `lock` script in this article.
 
@@ -145,48 +150,20 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 
 Don't panic! The error tells us our program access some memory that out of bound.
 
-The `riscv64imac-unknown-none-elf` target is little different on handling the entry point, use `riscv64-unknown-elf-objdump -D <binary>` to disassembly we can find out that there no `.text` section, we must write a linker script to indicates the entry point.
+The `riscv64imac-unknown-none-elf` target is little different on handling the entry point, use `riscv64-unknown-elf-objdump -D <binary>` to disassembly we can find out that there no `.text` section, we must find the other way to indicates the entry point other than using `#[start]`.
 
-## Customize linker script
+## Define the entry point and main
 
-We write a basic linker script, to indicate's the section `.text`, `.sdata`, `.riscv` and the entry point: `ENTRY(start)`.
+Let's remove the entire `#[start]` function, insteadly define a function with name `_start` as entry point:
 
-Put the linker script to `contract/linker.ld`
-
-``` sh
-MEMORY
-{
-  MEMORY : ORIGIN = 0x00000000, LENGTH = 1M
-}
-
-/* The entry point */
-ENTRY(start);
-
-SECTIONS
-{
-  .text :
-  {
-    *(.text .text.*);
-  } > MEMORY
-  .sdata :
-  {
-    *(.sdata .sdata.*);
-  } > MEMORY
-  .riscv :
-  {
-    *(.riscv .riscv.*);
-  } > MEMORY
+``` rust
+#[no_mangle]
+pub fn _start() -> ! {
+    loop{}
 }
 ```
 
-Modify `contract/.cargo/config` to enable the linker script flag:
-
-``` toml
-[target.riscv64imac-unknown-none-elf]
-rustflags = ["-C", "link-arg=-Tlinker.ld"]
-[build]
-target = "riscv64imac-unknown-none-elf"
-```
+The return value of `_start` is `!`, which means this function never returns; if you try to return from this function, you get an `InvalidPermission` error, since the entry point has no place to return.
 
 Let's compile and run test again:
 
@@ -201,29 +178,24 @@ thread 'tests::it_works' panicked at 'pass test: Error { kind: ExceededMaximumCy
 Script }', src/libcore/result.rs:1188:5
 ```
 
-`ExceededMaximumCycles` error occurs when the script cycles exceed the max limit. Apparently, our lock only returns a 0. It not supposed to cost many cycles.
+`ExceededMaximumCycles` error occurs when the script cycles exceed the max cycle limitation.
 
-The reason is as we mentined when compiling to `riscv64imac-unknown-none-elf` target. The compiler does not handle the entry point properly. If we disassemble, we find that the entry point `start` is complied as a regular function, when the function returns the `pc` jump to the `0x0` address which is the begin address of the `start` function, so the code loop and loop again until exhausted all cycles.
-
-To break the loop, we need to invoke the `exit` syscall in the `start` function.
+To exit the program, we need to invoke the `exit` syscall.
 
 ## CKB-VM syscall
 
 The CKB environment supports several [syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md).
 
-The `exit` syscall used to exit and return the exit code, we  rewrite our `start` function like below:
+We need call `exit` syscall to exit program and return a exit code:
 
 ``` rust
 #[no_mangle]
-#[start]
-pub fn start(_argc: isize, _argv: *const *const u8) -> isize {
-    exit(0);
-    // just ignore this return value, this won't work under riscv64imac-unknown-none-elf target
-    0
+pub fn _start() -> ! {
+    exit(0)
 }
 ```
 
-To call `exit` from Rust, we need to write some interesting code:
+To invoke syscall `exit` from Rust, we need to write some interesting code:
 
 ``` rust
 #![feature(asm)]
@@ -232,35 +204,39 @@ To call `exit` from Rust, we need to write some interesting code:
 
 /// Exit syscall
 /// https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md
-pub fn exit(_code: i8) {
+pub fn exit(_code: i8) -> ! {
     unsafe {
         // a0 is _code
         asm!("li a7, 93");
         asm!("ecall");
     }
+    loop {}
 }
 ```
 
-The `a0` register contains our first arg `_code` according to the C calling convention, the `a7` register indicates the syscall number, `93` is the syscall number of exit.
+The `a0` register contains our first arg `_code` according to the function calling convention, the `a7` register indicates the syscall number, `93` is the syscall number of exit. We mark the return value with `!` since `exit` should never return.
 
 Compile and rerun the test.
 
 It finally works!
 
-Now you can try to search each unstable `feature` we used and try to figure out what it means. Try to modify the exit code and the `start` function, rerun test see what happened.
+Now you can try to search each unstable `feature` we used and try to figure out what it means. Try to modify the exit code and the `_start` function, rerun the test see what happened.
 
 ## Conclusion
 
-You may wonder why it's so complex to write a CKB contract in Rust, and it is true if you choose C, the thing's become much more straightforward.
+The intention of this demo is trying to show you how to use `Rust` to write a CKB contract from a low-level sight. The real power of Rust is the abstract ability of the language and the Rust toolchain, which we do not touch in this article.
 
-The intention of this demo is trying to show you how to use `Rust` to write a contract at a low level. Since the lack of toolchain and libraries, it maybe seems not worth to use `Rust` developing CKB contract.
+For example, with `cargo`, we can abstract libraries into crates; we gain a better developing experiment if we can just import a syscalls crate instead write it ourselves. More people use `Rust` on CKB, more crates we can use.
 
-But with the Rust ecosystem, things could be better. For example, with `cargo`, you can abstract libraries into crates, we can gain a better developing experiment if we just import a syscalls crate instead write it ourselves. More people use `Rust` on CKB, more crates we can use. Another advance to use Rust is that in CKB the contract only does verification. Aside from on-chain contracts, we also need to write an off-chain code to generate transaction data. That means we may need to write duplicated code if we use different languages for the contract and the off-chain generator, but with Rust, we can use the same library to write the contract and the generator.
+Another advantage to use Rust is that in CKB, the contract only does verification. Aside from on-chain contracts, we also need to write an off-chain program to generate transaction data. That means we may need to write duplicated code if we use different languages, but with Rust, we can use the same code across the contract and the generator.
 
-The other downside is that Rust target `riscv64imac-unknown-none-elf` is still on a very early stage, it can't handle entry point properly, and do not support `std` library. But it's hopeful of getting better once the RISC-V becomes more popular in the future.
+Write a CKB contract in Rust may seem a little bit complex; you may wonder the thing could get much more straightforward if you choose C, and you are right, just for now!
 
-That's it. We'll discuss more serious contracts in later articles.
+In the next article, I'll show you how to rewrite our contract with `ckb-contract-std` library; you'll surprise how simple thing goes.
+
+That's it. We'll also discuss more serious contracts in later articles.
 
 * [ckb-rust-demo repository](https://github.com/jjyr/ckb-rust-demo)
+* [ckb-contract-std repository](https://github.com/jjyr/ckb-contract-std)
 * [CKB data structure](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0019-data-structures/0019-data-structures.md)
 * [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md)
