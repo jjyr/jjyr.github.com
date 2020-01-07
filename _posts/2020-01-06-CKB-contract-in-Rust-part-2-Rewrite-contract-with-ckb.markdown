@@ -66,7 +66,7 @@ patch:
 
 The `make test` is simple: rebuild the contract binary then run unit tests.
 
-It is worth to notice the `patch` task, which calls `ckb-binary-patcher` to patch the contract binary; Its a solution for fixing VM buggy instructions, even we developed the CKB-VM diligently, there no bug-free software. As the nature of blockchain, we can't just fix the VM itself without a hard-fork. A better approach is to patch binary to get across the buggy instruction. You can see [this issue](https://github.com/nervosnetwork/ckb-vm/issues/92) for details.
+It is worth to notice the `patch` task, which calls `ckb-binary-patcher` to patch the contract binary; Its a solution for fixing VM's buggy instructions, even we developed the CKB-VM diligently, there no bug-free software. Unfortunately, as the nature of blockchain, we can't just fix the VM without a hard-fork. A better approach is to patch binary to get across the buggy instruction. You can see [this issue](https://github.com/nervosnetwork/ckb-vm/issues/92) for details.
 
 Installing the `ckb-binary-patcher`:
 
@@ -92,7 +92,7 @@ pub fn main() -> i8 {
 }
 ```
 
-Now we can write code in the `main` function, that's looking more comfortable,  except the `_start` function is annoying; we can use a macro to hide the `_start`:
+Now we can write code in the `main` function, that's looking more comfortable, except the `_start` function is annoying; we can use a macro to hide the `_start`:
 
 ``` rust
 #[macro_export]
@@ -107,7 +107,7 @@ macro_rules! setup {
 }
 ```
 
-The `setup` macro defines the `start` function that the `_start` just calls main then exits the program with syscall `exit`; our contract is below:
+The `setup` macro defines the `_start` function which just calls main then exits the program with syscall `exit`; our contract code is below:
 
 ``` rust
 pub fn main() -> i8 {
@@ -118,7 +118,7 @@ pub fn main() -> i8 {
 setup!(main);
 ```
 
-The Rust macro system is powerful, we can hidden other annoying functions and definitions under the macro; it is the basic idea of `ckb-contrac-std`; let's rewrite the whole contract:
+The Rust macro system is powerful, we can hidden other annoying functions and definitions under the macro; this is the basic idea of `ckb-contrac-std`; let's refactor the contract with `ckb-contract-std`:
 
 ``` rust
 #![no_std]
@@ -140,7 +140,7 @@ setup!(main);
 
 This code looks suitable for a "hello world" program. The `rustc` requires the definition of the features in the file, so we still need to keep them, but we hide the other functions include a well-implemented panic handler and a global allocator in the `setup` macro.
 
-## Rewrite contract
+## ckb contract std
 
 Let's try using `Vec`, `String` from [alloc](https://doc.rust-lang.org/stable/std/alloc/index.html) crate, and use the debug syscall to output under the test environment.
 
