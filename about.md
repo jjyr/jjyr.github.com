@@ -3,7 +3,7 @@ layout: page
 title: About
 ---
 
-Just another tech nerd.
+Yet another coffee to code compiler.
 
 Recently I focus on some blockchain-related techniques to make the world more equality.
 
@@ -14,4 +14,3 @@ Feel free to reach me:
 * Twitter: [@_jjy0](https://twitter.com/_jjy0)
 * GitHub: [@jjyr](https://github.com/jjyr)
 * WeChat: fweedm (Please remark who you are)
-
