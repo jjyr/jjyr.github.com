@@ -74,11 +74,11 @@ The node structure `BranchNode { fork_height, key, node, sibling}`, can use one 
 * `key` is the key of a child's key when constructing the node. for a leaf node, the key is leaf's key.
 * `node` and `sibling` is like the `left` and `right` in the classical structure; the only difference is their position is not fixed.
 
-To get a left child of a node in the height `H`:
+To get a left child of a node in height `H`:
 
 1. check `H`-th bit of key
-2. if its `1` means the `node` is on right at height `H`, so the `sibling` is left child
-3. if the `0` means the `node` is on the left.
+2. if it is `1` means the `node` is on the right at height `H`, so `sibling` is the left child
+3. if it is `0` means the `node` is on the left
 
 ``` rust
 // get children at height
