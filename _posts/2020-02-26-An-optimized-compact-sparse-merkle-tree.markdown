@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "An optimized compact sparse merkle tree"
+title: "An optimized compacted sparse merkle tree"
 data: 2020-02-26 12:40
 comments: true
 ---
