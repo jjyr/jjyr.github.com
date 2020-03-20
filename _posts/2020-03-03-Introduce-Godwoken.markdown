@@ -22,7 +22,7 @@ There are many other differences when you compare two models, but we only talk a
 
 ## A missing piece of the cell model
 
-UTXO model is great, and Cell model inherited it's flexible. We can issue UDT(user-defined token, like ERC-20), deposit on-chain assets, play paper-rock-scissors, or atomic swap with bitcoin. Cell model can achieve many things that people don't think it is possible at first thought.
+UTXO model is great, and Cell model inherited it's flexible. We can [issue UDT](https://talk.nervos.org/t/rfc-simple-udt-draft-spec/4333)(user-defined token, like ERC-20), deposit on-chain assets, play paper-rock-scissors, or [atomic swap with bitcoin](https://talk.nervos.org/t/summa-bitcoin-spv-utils/4162). Cell model can achieve many things that people don't think it is possible at first thought.
 
 But unfortunately, here are some contracts that certainly be hard to be implemented on cell model:
 
