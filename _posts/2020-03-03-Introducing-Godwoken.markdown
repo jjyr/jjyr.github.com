@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Introduce Godwoken - A missing piece of the cell model"
+title: "Introducing Godwoken - A missing piece of the cell model"
 data: 2020-03-03 16:15
 comments: true
 ---
