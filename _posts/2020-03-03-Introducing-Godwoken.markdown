@@ -24,7 +24,7 @@ There are many other differences when you compare two models, but we only talk a
 
 UTXO model is great, and Cell model inherited it's flexible. We can [issue UDT](https://talk.nervos.org/t/rfc-simple-udt-draft-spec/4333)(user-defined token, like ERC-20), deposit on-chain assets, play paper-rock-scissors, or [atomic swap with bitcoin](https://talk.nervos.org/t/summa-bitcoin-spv-utils/4162). Cell model can achieve many things that people don't think it is possible at first thought.
 
-But unfortunately, here are some contracts that certainly be hard to be implemented on cell model:
+But unfortunately, some contracts that certainly are hard to be implemented on the cell model:
 
 * Voting
 * ICO
@@ -35,27 +35,31 @@ A common pattern of these hard-problem contracts is the requirement of a shared 
 
 In a UTXO-like model, the state is naturally separated.
 
-In CKB, we can vote in separate cells and use an off-chain actor to collect the result.
+In CKB, users can vote in separate cells. An off-chain actor collects voting cells and calculates the result.
 
 ![voting in separate cells](/assets/images/godwoken1/voting.jpg)
 
-It works fine when we only want to "see" the result. But we can't use the voting result in another contract, for example, voting based DAO contract. It's hard to verify the aggregated result of separate cells in an on-chain contract. Since we need to prove every voting exists, we must refer to every voting cell; it could be costly.
+It works fine when we only want to "see" the result. But we can't use the voting result in another contract, for example, a voting based DAO contract. It's hard to verify the aggregated result in an on-chain contract. Since we need to prove exists of voting cells, the transaction must refer to every voting cell; it could be costly.
 
 ![voting result](/assets/images/godwoken1/voting_result.jpg)
 
-For another example, let's think about an ICO contract: after sending a tx, the previous cell is consumed, and new cells are generated. Still, other users can not see the new cell until the next block, and this means that only one user can participate the ICO in a block, it's unacceptable for an ICO contract.
+For another example, let's think about an ICO contract:
 
-Like the voting example, a typical solution is to introduce an off-chain actor: users make ICO requests in individual cells, then these cells are collected by an off-chain actor, and resulted in one cell.
+A cell holds all ICO token; a user can pay CKB to get the corresponded amount of the token.
 
-We can see that since the state in cell model is naturally separated, we must rely on some off-chain actor to collect state and do prove.
+The issue is when we split the cell, the outpoint of the ICO cell is changed; other users must wait to the next block to see the new outpoint. So during a block time, only one user can participate in the ICO; it's unacceptable for an ICO contract.
+
+Like the voting example, a typical solution is to introduce an off-chain actor. Users make ICO requests in individual cells; then, these cells are collected by the off-chain actor and resulted in one cell.
+
+We can see that since the state in the cell model is naturally separated, we must rely on some off-chain actor to collect state.
 
 This solution works, but some questions still open:
 
-* How to efficiently prove the state of the result
+* How to efficiently prove the aggregated result
 * How do we guarantee the decentralize after introducing the off-chain actor
 * How does a user interacts with an off-chain actor
 
-Ok, these questions are not too hard; we can incentive off-chain actors by paying them fees; use some challenge mechanism or zk proof magically verifies the result; define few protocols to specify the interaction with the actors. We can always solve these problems.
+Ok, these questions are not too hard; we can incentive off-chain actors by paying them fees; use some challenge mechanism or zk proof magically verifies the aggregated result; define few protocols to specify the interaction with the actors. We can always solve these problems.
 
 Wait, what I want is just a voting contract. Why do I need to build these things?
 
