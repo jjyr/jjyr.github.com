@@ -82,9 +82,11 @@ Godwoken composited by the following parts:
 
 You may found this sounds like a rollup solution which popular these days, and yes it is. But we focus on the aggregation problems, rather than the scalabilities. Godwoken provides account-based programming ability to solve the aggregation problem.
 
-Godwoken contract shares the same tech stack with the native CKB contract. The only difference is that Godwoken abstract state of cells into accounts, the contract only cares about accounts, and the Godwoken handle the logic to mapping the account state to layer-1 cells.
+> Some people refer to Rollup as layer-1.5; some people think it's layer-2, or even layer-1(by trust-level). This document refers to Godwoken as layer-1.5 to distinguish it with the layer-1 CKB.
 
-For a contract developer, who wants to create a voting contract, simply create an account with a script, the script verifies the input data and the state root of accounts.
+Godwoken shares the same tech stack with the native CKB contract. The only difference is that Godwoken contract is account-based; it verifies the state of account instead of the cells. The mapping relationship between account state and layer-1 cells is handled by the Godwoken main contract, which is transparent for layer-1.5 contracts.
+
+For a developer, who wants to create a voting contract, simply create an account with a script, the script verifies the input data and account state.
 
 ``` rust
 // pseudo code
@@ -96,11 +98,11 @@ fn verify_voting(i, votes) -> bool {
 
 From the pseudo code, we can see the verification model is similar to the layer-1.
 
-The main contract uses a [sparse merkle tree] root to store the accounts and state of accounts.
+The Godwoken main contract uses a [sparse merkle tree] to store all accounts and state of accounts.
 
-So if another Godwoken contract wants to use the voting result, it can directly use the result with a merkle proof to prove the result exists in the root.
+So if we want to use a state between layer-1.5 contracts, we can simply generate a merkle proof for the state, and verify merkle proof in the contract.
 
-For a layer-1 contract to use the voting result, we can reference the main contract cell in the transaction's `cell_deps` field, and read the global state to get the merkle root, then verify the voting result with a merkle proof.
+If we want to use a layer-1.5 state in a layer-1 contract, we can refer the Godwoken main contract cell in the transaction's `cell_deps` field, and read Godwoken global state from the cell to get the merkle root, then verifies the state and merkle proof.
 
 By creating an abstract account layer, we minimize the cost of building a shared state contract on CKB.
 
