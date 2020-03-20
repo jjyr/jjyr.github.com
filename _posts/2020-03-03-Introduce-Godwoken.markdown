@@ -37,9 +37,13 @@ In a UTXO-like model, the state is naturally separated.
 
 In CKB, we can vote in separate cells and use an off-chain actor to collect the result.
 
+![voting in separate cells](/assets/images/godwoken1/voting.jpg)
+
 It works fine when we only want to "see" the result. But we can't use the voting result in another contract, for example, voting based DAO contract. It's hard to verify the aggregated result of separate cells in an on-chain contract. Since we need to prove every voting exists, we must refer to every voting cell; it could be costly.
 
-For another example, let's think about an ICO contract: after sending a tx, the previous cell is consumed, and new cells are generated. Still, other users can not see the new cell until the next block, and this means that only one user participant ICO in a block, it's unacceptable for an ICO contract.
+![voting result](/assets/images/godwoken1/voting_result.jpg)
+
+For another example, let's think about an ICO contract: after sending a tx, the previous cell is consumed, and new cells are generated. Still, other users can not see the new cell until the next block, and this means that only one user can participate the ICO in a block, it's unacceptable for an ICO contract.
 
 Like the voting example, a typical solution is to introduce an off-chain actor: users make ICO requests in individual cells, then these cells are collected by an off-chain actor, and resulted in one cell.
 
@@ -59,7 +63,7 @@ Wait, what I want is just a voting contract. Why do I need to build these things
 
 Indeed! we don't want to build these things for every contract, so we only build once:
 
-![One contract to rule them all](/assets/images/one-contract-to-rule-them-all.jpg)
+![One contract to rule them all](/assets/images/godwoken1/one-contract-to-rule-them-all.jpg)
 
 Godwoken is an account-based programming layer build upon CKB that aiming to rule them all. (them: shared state contracts)
 
@@ -69,6 +73,8 @@ Godwoken composited by the following parts:
 * Challenge contract - a type script that handles challenge requests.
 * Aggregator - an off-chain program that collects layer-1.5 transactions and submits layer-1.5 blocks to the main contract regularly.
 * Validator - an off-chain program that continuously watches the two contracts. The validator sends a challenge request when an invalid block is submitted and sends an invalid challenge request when a wrong challenge request is submitted.
+
+![Godwoken components](/assets/images/godwoken1/godwoken-components.jpg)
 
 You may found this sounds like a rollup solution which popular these days, and yes it is. But we focus on the aggregation problems, rather than the scalabilities. Godwoken provides account-based programming ability to solve the aggregation problem.
 
@@ -84,7 +90,7 @@ fn verify_voting(i, votes) -> bool {
 }
 ```
 
-From the pseudo code, we can see the verifying model is similar to the layer-1.
+From the pseudo code, we can see the verification model is similar to the layer-1.
 
 The main contract uses a [sparse merkle tree] root to store the accounts and state of accounts.
 
