@@ -27,7 +27,7 @@ UTXO model is great, and Cell model inherited it's flexible. We can [issue UDT](
 But unfortunately, some contracts that certainly are hard to be implemented on the cell model:
 
 * Voting
-* ICO
+* Crowdfunding
 * Decentralized price oracle
 * ...
 
@@ -43,13 +43,13 @@ It works fine when we only want to "see" the result. But we can't use the voting
 
 ![voting result](/assets/images/godwoken1/voting_result.jpg)
 
-For another example, let's think about an ICO contract:
+For another example, let's think about a crowdfunding contract:
 
-A cell holds all ICO token; a user can pay CKB to get the corresponded amount of the token.
+A cell holds all crowdfunding token; a user can pay CKB to get the corresponded amount of the token.
 
-The issue is when we split the cell, the outpoint of the ICO cell is changed; other users must wait to the next block to see the new outpoint. So during a block time, only one user can participate in the ICO; it's unacceptable for an ICO contract.
+The issue is when we split the cell, the outpoint of the crowdfunding cell is changed; other users must wait to the next block to see the new outpoint. So during a block time, only one user can participate in the crowdfunding; it's unacceptable.
 
-Like the voting example, a typical solution is to introduce an off-chain actor. Users make ICO requests in individual cells; then, these cells are collected by the off-chain actor and resulted in one cell.
+Like the voting example, a typical solution is to introduce an off-chain actor. Users make crowdfunding requests in individual cells; then, these cells are collected by the off-chain actor and resulted in one cell.
 
 We can see that since the state in the cell model is naturally separated, we must rely on some off-chain actor to collect state.
 
