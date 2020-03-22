@@ -4,8 +4,8 @@ author:
   name: "JJy"
   email: "jjyruby@gmail.com"
   url: "https://justjjy.com"
-
-baseurl: /
+site:
+  url: "https://justjjy.com"
 
 source: .
 destination: ./_site
