@@ -5,8 +5,9 @@ data: 2019-12-24 10:24
 comments: true
 ---
 
-> Edited at 2020-01-06
+> Edited at 2020-03-27
 >
+> * Update ckg-std link
 > * Remove the linker script section since I found its unnecessary to customize linker
 > * Refactor the main function interface
 
@@ -99,14 +100,14 @@ The only thing that the contract does is to return exit-code `0`. It's perfect f
 The basic idea to write test code is to use our contract as a cell's lock script, our contract return `0`, which means anyone can spend the cell.
 First, we mock a cell with our contract as the lock script, then construct a transaction to spend the cell, if the transaction verification succeeded that means our lock script is working.
 
-Add `ckb-contract-tool` as dependent:
+Add `ckb-tool` as dependent:
 
 ``` rust
 [dependencies]
-ckb-contract-tool = { git = "https://github.com/jjyr/ckb-contract-tool.git" }
+ckb-tool = { git = "https://github.com/jjyr/ckb-tool.git" }
 ```
 
-`ckb-contract-tool` contains helper methods from several crates.
+`ckb-tool` contains helper methods from several crates.
 
 The test code which put in `ckb-rust-demo/src/lib.rs` as below:
 
@@ -249,11 +250,12 @@ Another advantage to use Rust is that in CKB, the contract only does verificatio
 
 Write a CKB contract in Rust may seem a little bit complex; you may wonder the thing could get much more straightforward if you choose C, and you are right, just for now!
 
-In the next article, I'll show you how to rewrite our contract with `ckb-contract-std` library; you'll surprise how simple thing goes.
+In the next article, I'll show you how to rewrite our contract with `ckb-std` library; you'll surprise how simple thing goes.
 
 That's it. We'll also discuss more serious contracts in later articles.
 
+* [CKB contract in Rust - part 2](https://justjjy.com/CKB-contract-in-Rust-part-2-Rewrite-contract-with-ckb)
 * [ckb-rust-demo repository](https://github.com/jjyr/ckb-rust-demo)
-* [ckb-contract-std repository](https://github.com/jjyr/ckb-contract-std)
+* [ckb-std repository](https://github.com/jjyr/ckb-std)
 * [CKB data structure](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0019-data-structures/0019-data-structures.md)
 * [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md)

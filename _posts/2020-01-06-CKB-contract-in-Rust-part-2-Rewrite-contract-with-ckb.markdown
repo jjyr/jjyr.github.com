@@ -1,11 +1,15 @@
 ---
 layout: post
-title: "Rust contract, part 2 - Write contract with ckb-contract-std"
+title: "Rust contract, part 2 - Write contract with ckb-std"
 data: 2020-01-06 12:06
 comments: true
 ---
 
-This article introduces the `ckb-contract-std` library; and shows how to rewrite our minimal contract with `ckb-contract-std`, to enables syscalls and `Vec`, `String`.
+> Edited at 2020-03-27
+>
+> * Update `ckb-std` and `ckb-tool`
+
+This article introduces the `ckb-std` library; and shows how to rewrite our minimal contract with `ckb-std`, to enables syscalls and `Vec`, `String`.
 
 The previous contract:
 
@@ -96,18 +100,18 @@ Now we can write code in the `main` function, that's looking more comfortable, e
 
 ``` rust
 #[macro_export]
-macro_rules! setup {
+macro_rules! entry {
     ($main:path) => {
         #[no_mangle]
         pub extern "C" fn _start() -> ! {
             let f: fn() -> i8 = $main;
-            ckb_contract_std::syscalls::exit(f())
+            ckb_std::syscalls::exit(f())
         }
     }
 }
 ```
 
-The `setup` macro defines the `_start` function which just calls main then exits the program with syscall `exit`; our contract code is below:
+The `entry` macro defines the `_start` function which just calls main then exits the program with syscall `exit`; our contract code is below:
 
 ``` rust
 pub fn main() -> i8 {
@@ -115,10 +119,10 @@ pub fn main() -> i8 {
     0
 }
 
-setup!(main);
+entry!(main);
 ```
 
-The Rust macro system is powerful, we can hidden other annoying functions and definitions under the macro; this is the basic idea of `ckb-contrac-std`; let's refactor the contract with `ckb-contract-std`:
+The Rust macro system is powerful, we can hidden other annoying functions and definitions under the macro; this is the basic idea of `ckb-std`; let's refactor the contract with `ckb-std`:
 
 ``` rust
 #![no_std]
@@ -127,7 +131,7 @@ The Rust macro system is powerful, we can hidden other annoying functions and de
 #![feature(alloc_error_handler)]
 #![feature(panic_info_message)]
 
-use ckb_contract_std::setup;
+use ckb_std::{entry, default_alloc};
 
 #[no_mangle]
 pub fn main() -> i8 {
@@ -135,12 +139,14 @@ pub fn main() -> i8 {
     0
 }
 
-setup!(main);
+entry!(main);
+// define global allocator
+default_alloc!();
 ```
 
-This code looks suitable for a "hello world" program. The `rustc` requires the definition of the features in the file, so we still need to keep them, but we hide the other functions include a well-implemented panic handler and a global allocator in the `setup` macro.
+This code looks good enough for a "hello world" program. The `rustc` requires the definition of features in the file, so we still need to keep them, but we hide other functions include a well-implemented panic handler and a global allocator in macros.
 
-## ckb contract std
+## ckb std
 
 Let's try using `Vec`, `String` from [alloc](https://doc.rust-lang.org/stable/std/alloc/index.html) crate, and use the debug syscall to output under the test environment.
 
@@ -148,7 +154,7 @@ Let's try using `Vec`, `String` from [alloc](https://doc.rust-lang.org/stable/st
 /// features...
 
 use alloc::vec;
-use ckb_contract_std::{debug, setup};
+use ckb_std::{debug, entry, default_alloc};
 
 #[no_mangle]
 pub fn main() -> i8 {
@@ -157,7 +163,8 @@ pub fn main() -> i8 {
     0
 }
 
-setup!(main);
+entry!(main);
+default_alloc!();
 
 // We can see the debug output under test environment.
 // ->
@@ -166,7 +173,7 @@ setup!(main);
 
 References:
 
-* [ckb-contract-demo](https://github.com/jjyr/ckb-rust-demo/tree/part2)
-* [ckb-contract-std](https://github.com/jjyr/ckb-contract-std)
+* [ckb-rust-demo](https://github.com/jjyr/ckb-rust-demo/tree/part2)
+* [ckb-std](https://github.com/jjyr/ckb-std)
 * [alloc crate](https://doc.rust-lang.org/stable/std/alloc/index.html)
 * [ckb-binary-patcher](https://github.com/xxuejie/ckb-binary-patcher)
