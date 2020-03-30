@@ -3,13 +3,18 @@ layout: page
 title: About
 ---
 
-Yet another coffee to code compiler.
+This is JJY's blog, sharing some fun tech ideas and boring details.
 
-Recently I focus on some blockchain-related techniques to make the world more equality.
+Recently I focus on blockchain-related techniques and hope techs can make the world more equality.
 
-I had written some fun projects, [Ciri Ethereum](https://github.com/ciri-ethereum/ciri) is an Ethereum implementation written in pure Ruby, and [LightIO](https://github.com/socketry/lightio) is a user-level green thread library for Ruby. Now I turn into Rust and C; you can view my other projects on GitHub.
+Some fun projects that I have built:
 
-Feel free to reach me:
+* [buddy-alloc](https://github.com/jjyr/buddy-alloc) - buddy allocation algorithm implement in no-std Rust, used for embeded evironments.
+* [ckb-std](https://github.com/jjyr/ckb-std) - Rust basic library for Nervos CKB blockchain contract environment.
+* [Ciri Ethereum](https://github.com/ciri-ethereum/ciri) - an Ethereum implementation written in pure Ruby.
+* [LightIO](https://github.com/socketry/lightio) - a user-level green thread library for Ruby.
+
+Feel free to contact me:
 
 * Twitter: [@_jjy0](https://twitter.com/_jjy0)
 * GitHub: [@jjyr](https://github.com/jjyr)
