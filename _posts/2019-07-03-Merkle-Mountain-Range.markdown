@@ -478,8 +478,6 @@ class MerkleProof(object):
 
 Merkle Mountain Range 的结构和名字一样非常容易理解，但想要正确的实现则需要掌握一些 trick, 文中使用的坐标计算算法大部分是参考自 Grin 的文档和源码。
 
-Merkle proof 在轻节点协议中非常重要，我最近在做 Nervos CKB 轻节点的 POC 研究，后续会在博客里介绍更多 Nervos CKB 相关的技术。
-
 1. [Merkle Mountain Range][Merkle Mountain Range]
 2. [Grin MMR 文档][Grin MMR]
 3. [Grin 源码注释 根据坐标计算高度][Grin Binary Encoded Tree]
