@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Build CKB contract with Rust - part 1"
+title: "Rust contract, part 1 - Build CKB contract with Rust"
 data: 2019-12-24 10:24
 comments: true
 ---
