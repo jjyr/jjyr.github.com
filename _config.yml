@@ -1,11 +1,11 @@
 title: JJy Blog
 description: "A place to put some random thoughts"
+site_url: "https://justjjy.com"
 author:
   name: "JJy"
   email: "jjyruby@gmail.com"
   url: "https://justjjy.com"
-site:
-  url: "https://justjjy.com"
+google_analytics: "UA-39599896-2"
 
 source: .
 destination: ./_site
