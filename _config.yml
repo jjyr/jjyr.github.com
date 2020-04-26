@@ -5,7 +5,6 @@ author:
   name: "JJy"
   email: "jjyruby@gmail.com"
   url: "https://justjjy.com"
-google_analytics: "UA-39599896-2"
 
 source: .
 destination: ./_site
