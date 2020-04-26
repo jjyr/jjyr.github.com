@@ -109,15 +109,3 @@ end
 ``` 
 当我们调用`A.new.foo`时，`foo2`是在A实例的内部调用的，所以并非经过ActorProxy,此时是在原始对象内部直接调用的ruby方法，当然也不会通过mailbox(和erlang不一样),不过编程时同样不需关心这点
 
-###studying list(todo)
-blocks
-
-async
-
-future
-
-atom mode
-
-supervisor
-
-celluloid_chain_id
