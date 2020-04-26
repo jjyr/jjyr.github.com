@@ -3,7 +3,7 @@ layout: post
 title: "javascript学习笔记(二)"
 data: 2014-02-18 19:09
 comments: true
-categories:
+tags: javascript
 ---
 
 1, 函数中this的四种情况

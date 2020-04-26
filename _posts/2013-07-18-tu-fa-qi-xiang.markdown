@@ -3,7 +3,7 @@ layout: post
 title: "突发奇想, 试下celluloid + eventmachine"
 date: 2013-07-18 12:32
 comments: true
-categories: celluloid eventmachine ruby
+tags: Ruby
 ---
 
 前几天[benchmark了下ruby中比较有前途的websocket-server](https://github.com/jjyr/websocket-benchmark)(reel和em-websocket)，结果是eventmachine完胜..

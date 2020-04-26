@@ -3,7 +3,7 @@ layout: post
 title: "通过Razor管理Virtual box虚拟机"
 data: 2014-09-10 23:32
 comments: true
-categories: razor VM DHCP PXE iPXE
+tags: 云计算
 ---
 
 打算在mac上用虚拟机玩下云。之前工作中用到了[Razor](https://github.com/puppetlabs/razor-server)，于是萌生了用Razor来管理虚拟机的想法(顺便试验下最近很火的docker)。

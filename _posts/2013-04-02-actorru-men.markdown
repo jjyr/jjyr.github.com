@@ -3,7 +3,7 @@ layout: post
 title: "Actor入门"
 date: 2013-04-02 16:30
 comments: true
-categories: ruby celluloid actor
+tags: Ruby actor
 ---
 
 最近对Actor模式很有兴趣(Celluloid), 记下自己的心得和对Actor模式的理解。

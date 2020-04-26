@@ -3,7 +3,7 @@ layout: post
 title: "ruby-stdlib-delegate"
 date: 2013-05-14 22:14
 comments: true
-categories: ruby stdlib
+tags: Ruby
 ---
 
 一直对delegate效率抱有疑问(虽然从未做过牛X到需要改进这里效率的项目..)

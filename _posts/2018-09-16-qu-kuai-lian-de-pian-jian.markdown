@@ -3,6 +3,7 @@ layout: post
 title: "区块链的偏见"
 data: 2018-09-16 22:22
 comments: true
+tags: 区块链 加密货币
 ---
 
 刷知乎看到一句话，引以为戒。

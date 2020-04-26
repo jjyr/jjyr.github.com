@@ -3,6 +3,7 @@ layout: post
 title: "Mac 定时备份 GitHub 仓库"
 data: 2019-07-26 23:38
 comments: true
+tags: git mac
 ---
 
 GitHub 身为一家在美国的公司，随时有可能不出乎意料的由于不可抗原因停止对用户的服务。

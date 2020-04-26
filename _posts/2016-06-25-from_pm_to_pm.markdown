@@ -3,7 +3,7 @@ layout: post
 title: "从 PM 到 PM"
 data: 2016-06-25 13:35
 comments: true
-categories: life work
+tags: 想法
 ---
 
 打开这份四年前开始的博客，回忆起了在不安与浮躁中追求着上进的自己。

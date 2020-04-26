@@ -3,7 +3,7 @@ layout: post
 title: "ruby vs python benchmark"
 date: 2013-07-22 22:15
 comments: true
-categories: ruby python other
+tags: Ruby Python
 ---
 
 写这篇的目的是下次在看见有人认为ruby效率比python低时我可以直接贴给他链接..

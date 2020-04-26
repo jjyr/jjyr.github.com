@@ -3,7 +3,7 @@ layout: post
 title: "javascript学习笔记(一)"
 data: 2014-02-17 18:52
 comments: true
-categories: javascript
+tags: javascript
 ---
 
 以前没怎么用过javascript(仅停留在简单的dom处理与ajax上)，身为后端程序员对其印象仅有杂乱

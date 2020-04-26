@@ -3,7 +3,7 @@ layout: post
 title: "reel和eventmachine的粗略对比[更新2013年7月]"
 date: 2013-03-26 20:14
 comments: true
-categories: ruby reel celluloid eventmachine
+tags: Ruby
 ---
 
 

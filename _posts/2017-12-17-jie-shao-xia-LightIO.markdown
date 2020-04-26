@@ -3,6 +3,7 @@ layout: post
 title: "介绍下 IO loop 和 Ruby 并发网络库 LightIO"
 data: 2017-12-17 20:21
 comments: true
+tags: Ruby IO
 ---
 
 说到脚本语言与高性能， Node.js 凭 benchmark 给人留下很深印象。

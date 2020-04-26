@@ -3,6 +3,7 @@ layout: post
 title: "高性能 MySQL 驾驶笔记"
 data: 2018-03-28 21:14
 comments: true
+tags: mysql
 ---
 
 > 聊天群里看到有人复习 MySQL 准备面试，想起之前整理过《高性能MySQL》的笔记，倒是很适合面试前的准备

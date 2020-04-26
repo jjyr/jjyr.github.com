@@ -3,6 +3,7 @@ layout: post
 title: "从零设计软件"
 data: 2018-03-18 13:53
 comments: true
+tags: 读书 想法
 ---
 
 > 程序的设计是一个明确的步骤 - 代码大全

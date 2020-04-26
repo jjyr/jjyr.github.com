@@ -3,7 +3,7 @@ layout: post
 title: "Celluloid中的Atom Mode与锁"
 date: 2013-04-13 23:09
 comments: true
-categories: celluloid exclusive
+tags: Ruby
 ---
 Celluloid默认是[Atom Mode](https://github.com/celluloid/celluloid/wiki/Glossary)执行的, 这种模式下可以中断当前执行的任务 先执行下一个
 

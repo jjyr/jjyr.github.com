@@ -12,6 +12,13 @@ permalink: /:title
 paginate: 10
 paginate_path: /page/:num/
 
+jekyll-archives:
+  enabled:
+    - tags
+  layout: tag
+  permalinks:
+    tag: '/tags/:name/'
+
 defaults:
   -
     scope:
@@ -25,7 +32,8 @@ plugins:
   - jekyll-seo-tag
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-archives
 
 # Custom variables
 owner : "JJy"
-year : "2019"
+year : "2020"

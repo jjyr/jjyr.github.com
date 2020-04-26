@@ -3,7 +3,7 @@ layout: post
 title: "开发编辑器的过程中遇到的一些浏览器差异"
 data: 2014-03-28 23:34
 comments: true
-categories: javascript, browser
+tags: javascript
 ---
 
 测试新编辑器时发现在firefox下会有很高几率出现一个神奇的bug。

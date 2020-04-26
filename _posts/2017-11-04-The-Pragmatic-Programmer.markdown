@@ -3,6 +3,7 @@ layout: post
 title: "The Pragmatic Programmer 的两点感悟"
 data: 2017-11-04 11:12
 comments: true
+tags: 读书
 ---
 
 没想到 *The Pragmatic Programmer* 被翻译成了《程序员修炼之道》，副标题是“从小工到专家”，要不是原书强大的实力和名声估计很少会有人买中文版吧。

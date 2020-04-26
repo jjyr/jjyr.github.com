@@ -3,6 +3,7 @@ layout: post
 title: "用 Ruby 体验快速开发 P2P 网络程序"
 data: 2018-11-27 23:48
 comments: true
+tags: Ruby
 ---
 
 很多开发者很熟悉 Server-Client 这一套网络结构，Server-Client 是构建互联网应用的基础。

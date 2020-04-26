@@ -3,6 +3,7 @@ layout: post
 title: "Rust contract, part 1 - Build CKB contract with Rust"
 data: 2019-12-24 10:24
 comments: true
+tags: Rust CKB English
 ---
 
 > Edited at 2020-03-27

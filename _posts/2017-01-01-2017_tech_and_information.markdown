@@ -3,7 +3,7 @@ layout: post
 title: "2017 知识分享与人工智能"
 data: 2017-01-01 18:10
 comments: true
-categories: tech future
+tags: 想法
 ---
 
 ### 以人整合知识

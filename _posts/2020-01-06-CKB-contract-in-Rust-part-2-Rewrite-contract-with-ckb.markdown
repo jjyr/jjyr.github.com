@@ -3,6 +3,7 @@ layout: post
 title: "Rust contract, part 2 - Write contract with ckb-std"
 data: 2020-01-06 12:06
 comments: true
+tags: Rust CKB English
 ---
 
 > Edited at 2020-03-27

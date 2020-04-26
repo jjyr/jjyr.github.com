@@ -3,7 +3,7 @@ layout: post
 title: "fiber， goroutine/erlang process， thread的区别"
 data: 2014-01-19 18:17
 comments: true
-categories:
+tags: Ruby IO
 ---
 经常看到有人会认为fiber和thread是一类东西，或者认为fiber就是轻量级的thread，和goroutine / erlang process是同一种东西
 

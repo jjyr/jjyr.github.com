@@ -3,7 +3,7 @@ layout: post
 title: "Celluloid中的任务中断和Condition"
 date: 2013-05-18 16:24
 comments: true
-categories: celluloid ruby
+tags: Ruby
 ---
 
 

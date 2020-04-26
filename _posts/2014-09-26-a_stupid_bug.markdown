@@ -3,7 +3,7 @@ layout: post
 title: "G的悲剧"
 data: 2014-09-26 21:30
 comments: true
-categories:
+tags: git
 ---
 到公司后就被同事抓到，表示交付的软件有bug。我第一反应很惊讶，这不科学啊！**昨天还是好的**/<del>在我机器上还是好的</del> ，怎么可能莫名奇妙的出现bug？
 

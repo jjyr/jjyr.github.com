@@ -3,6 +3,7 @@ layout: post
 title: "layer 2 友好的原生代币"
 data: 2019-04-07 22:51
 comments: true
+tags: 区块链 CKB
 ---
 
 ### 矿工奖励

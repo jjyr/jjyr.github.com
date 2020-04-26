@@ -3,6 +3,7 @@ layout: post
 title: "绿色线程是如何提升服务器并发性能的"
 data: 2018-02-16 22:30
 comments: true
+tags: Ruby
 ---
 [LightIO](https://github.com/socketry/lightio) 是去年末开始写的一个库，给 Ruby 提供了低廉的绿色线程，并且可以通过 monkey patch 替代原有的 native thread。这样服务器端可以使用大量绿色线程，用较小的消耗来获得更好的并发性。经过一段时间的开发， LightIO 已经比较完善，并且 monkey patch 后可以成功和 Rails 、Puma 等共同使用。于是我开始考虑如何测试服务器使用 LightIO 后的性能，毕竟能真正的带来性能提升才有继续开发的动力和必要。
 

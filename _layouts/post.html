@@ -5,5 +5,10 @@ layout: default
 <article>
   <h2>{{ page.title }}</h2>
   <time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
+  <p> Tags:
+    {% for tag in page.tags %}
+        <a class="post-link" href="{{ tag | prepend: "tags/" | prepend: site.baseurl }}">{{ tag }}</a>
+    {% endfor %}
+  </p>
   {{ content }}
 </article>

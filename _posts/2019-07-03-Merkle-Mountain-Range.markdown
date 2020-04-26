@@ -3,6 +3,7 @@ layout: post
 title: "Merkle Mountain Range"
 data: 2019-07-03 21:55
 comments: true
+tags: merkletree cryptography
 ---
 
 ## Merkle Tree

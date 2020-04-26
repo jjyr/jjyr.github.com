@@ -3,6 +3,7 @@ layout: post
 title: "CSRF 矛与盾"
 data: 2017-09-21 01:07
 comments: true
+tags: CSRF 安全
 ---
 
 CSRF(跨站请求伪造：Cross-site request forgery) 可谓老生长谈的话题，有无数的博客和文章都在讲 CSRF 攻击与防范。

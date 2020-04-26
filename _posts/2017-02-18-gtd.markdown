@@ -3,7 +3,7 @@ layout: post
 title: "gtd"
 data: 2017-02-18 16:43
 comments: true
-categories: performance gtd
+tags: GTD
 ---
 
 习惯通过“框架”(framework)管理自己的行为，才能更高效的处理事务。

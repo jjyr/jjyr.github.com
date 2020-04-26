@@ -3,6 +3,7 @@ layout: post
 title: "Introducing Godwoken - A missing piece of the cell model"
 data: 2020-03-03 16:15
 comments: true
+tags: CKB English
 ---
 
 For developers, the cell programming model certainly is the most interesting part of Nervos CKB.

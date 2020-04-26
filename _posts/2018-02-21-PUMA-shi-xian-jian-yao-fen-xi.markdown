@@ -3,6 +3,7 @@ layout: post
 title: "PUMA 实现简要分析"
 data: 2018-02-21 23:25
 comments: true
+tags: Ruby
 ---
 之前在 [绿色线程是如何提升服务器并发性能的](http://justjjy.com/2018/02/16/how-to-improve-server-concurrency-with-green-thread/) 一文中描述了绿色线程的原理。并且讲了我的计划：使用 Discourse 来 benchmark 绿色线程对并发性能的提升。经过一番折腾后在 [LightIO](https://github.com/socketry/lightio) 下成功运行了 Discourse 的 benchmark（折腾很久后发现需要将 Discourse 使用的 hiredis gem 换成纯 ruby 实现的 redis client），但结果却是使用绿色线程和不使用时性能表现差不多。
 

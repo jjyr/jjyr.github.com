@@ -3,7 +3,7 @@ layout: post
 title: "从《失控》中进化的scrum方法论"
 data: 2016-06-26 21:19
 comments: true
-categories: scrum
+tags: 想法
 ---
 
 智能系统大致可以理解为 输入 -> 处理 -> 评估改进 -> 输出 这样流程的重复迭代

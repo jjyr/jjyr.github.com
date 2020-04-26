@@ -3,6 +3,7 @@ layout: post
 title: "保持谦逊、努力、平和"
 data: 2018-03-11 00:46
 comments: true
+tags: 想法
 ---
 
 傲慢、嫉妒、愤怒、怠惰，或许皆因目光短浅？

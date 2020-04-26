@@ -3,7 +3,7 @@ layout: post
 title: "用社区公认最佳工具链完成python测试"
 data: 2015-12-13 20:17
 comments: true
-categories: python test
+tags: Python
 ---
 
 一名有经验的开发者应该明白测试的重要性。

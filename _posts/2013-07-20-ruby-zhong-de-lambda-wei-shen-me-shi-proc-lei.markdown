@@ -3,7 +3,7 @@ layout: post
 title: "ruby中的lambda为什么是Proc类"
 date: 2013-07-20 11:33
 comments: true
-categories: ruby
+tags: Ruby
 ---
 
 当然写之前我试着在网上搜了下， 果然没有搜到类似的问题。

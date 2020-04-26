@@ -3,7 +3,7 @@ layout: post
 title: "复利和杠杆率和scalable"
 data: 2017-02-20 23:44
 comments: true
-categories: personal
+tags: 想法
 ---
 
 “High output management”(《格鲁夫给经理人的第一课》)中一直提到要多做“高杠杆率”的工作，虽然从书中收获颇多，但之前一直没能理解如何判断哪个工作是“高杠杆率”？

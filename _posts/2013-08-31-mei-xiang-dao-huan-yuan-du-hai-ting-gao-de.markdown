@@ -3,7 +3,7 @@ layout: post
 title: "Yet Another Markdown Parser, 没想到还原度还挺高的"
 date: 2013-08-31 13:48
 comments: true
-categories: ruby other
+tags: Ruby markdown
 ---
 
 最近写了个[markdown parser][minidown]练手, 发现这种有规范的东西非常适合TDD, 照着markdown语法来写spec, 然后一个一个将其通过, 之前从未试过这么彻底的TDD

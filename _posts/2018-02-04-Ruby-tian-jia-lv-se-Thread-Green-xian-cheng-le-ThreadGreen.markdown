@@ -3,6 +3,7 @@ layout: post
 title: "Ruby 又要添加绿色线程了 Thread::Green"
 data: 2018-02-04 15:27
 comments: true
+tags: Ruby
 ---
 
 翻到了 ruby-lang 的这个 issue，Eric Wong 给 Ruby 提了一个绿色线程的 PR

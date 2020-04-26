@@ -3,7 +3,7 @@ layout: post
 title: "2014年凌晨的胡思乱想"
 data: 2014-01-01 01:11
 comments: true
-categories:
+tags: 想法
 ---
 
 没有实感

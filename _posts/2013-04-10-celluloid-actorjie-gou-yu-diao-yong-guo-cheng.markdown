@@ -3,7 +3,7 @@ layout: post
 title: "Celluloid::Actor结构与调用过程"
 date: 2013-04-10 22:27
 comments: true
-categories: celluloid ruby
+tags: Ruby
 ---
 
 ruby是面向对象语言,但是Celluloid做到了无需更换代码，仅在类中`include Celluloid`就可以进行面向Actor编程
