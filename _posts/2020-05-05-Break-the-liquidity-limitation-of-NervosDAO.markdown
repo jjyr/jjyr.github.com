@@ -43,7 +43,7 @@ After the mainnet launch, I confirmed that DCKB is possible from technical; with
 
 Layer2, Defi, and other contracts based on the custodian: Recently, smart contracts are more or less rely on the custodian mechanism; if layer2 / Defi projects allow DCKB as custodian assets, the depositor can get more benefits; it will incentivize more people to participate.
 
-Crypto traders can use DCKB instead CKB to gain compensation.
+Crypto traders can use DCKB instead of CKB to gain compensation.
 
 Writers and developers who receive CKB as donating can tell their sponsor to use DCKB.
 
@@ -55,7 +55,7 @@ From some perspective, we do break the liquidity limitation; now, crypto traders
 
 But at the same time, we also give layer2 / Defi depositors more benefits, IMO for a blockchain network which slogan is 'layer1 for layer2', the layer2 depositors are also significant contributors, the system should incentivize them.
 
-From another perspective, DKCB does not break the core idea of the economic model; the core idea of the CKB economic model is to limit the on-chain data storage. DCKB does not affects this, the CKB is deposited to NervosDAO when the user gets DCKB, so obviously, a DCKB owner can not store on-chain data without occupied new CKB.
+From another perspective, DKCB does not break the core idea of the economic model; the core idea of the CKB economic model is to limit the on-chain data storage. DCKB does not affect this, the CKB is deposited to NervosDAO when the user gets DCKB, so obviously, a DCKB owner can not store on-chain data without occupied new CKB.
 
 I think DCKB keeps the core idea of the economic model while extends it's potential.
 
