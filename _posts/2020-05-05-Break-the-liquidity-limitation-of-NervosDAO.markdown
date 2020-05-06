@@ -24,7 +24,7 @@ For a holder, deposition in NervosDAO is the easiest way to resist (a part of) i
 
 NervosDAO also has an annoying design to limit the liquidity; the withdrawal must be made at `N * 180 epochs` after the deposition, which means we can only withdraw the coin at 180 epochs(~30 days), 360 epochs(~60 days), 540 epochs(~90 days) after the deposition.
 
-Unfortunately(or we should say 'fortunately'), CKB is a powerful programming platform; in a powerful platform, we should be able to do almost anything, including breaking the liquidity limitation of NervosDAO.
+Unfortunately(or should we say 'fortunately'), CKB is a powerful programming platform; in a powerful platform, we should be able to do almost anything, including breaking the liquidity limitation of NervosDAO.
 
 ## Let's break it
 
