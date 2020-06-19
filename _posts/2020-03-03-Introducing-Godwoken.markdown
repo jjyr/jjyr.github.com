@@ -8,13 +8,13 @@ tags: CKB English
 
 For developers, the cell programming model certainly is the most interesting part of Nervos CKB.
 
-There is a short description for the cell model:
+There is a short description of the cell model:
 
 * Cell is generalized UTXO.
 * A cell is a UTXO contains arbitrary data and customizable scripts.
 * When tx consume or create a cell, CKB will load and execute the cell's scripts, any error returned by scripts will fail the tx.
 
-Cell model is very different compares to account model:
+The cell model is very different compares to account model:
 
 * Contracts do verification instead of computing
 * Data is stored in separate cells instead of an account tree
@@ -36,21 +36,21 @@ A common pattern of these harder contracts is the requirement of a shared state.
 
 In a UTXO-like model, the state is naturally separated.
 
-In CKB, users can vote in separate cells; an off-chain actor to collects voting cells and calculates the result.
+In CKB, users can vote in separate cells; an off-chain actor collects voting cells and calculates the result.
 
 ![voting in separate cells](/assets/images/godwoken1/voting.jpg)
 
-It works fine if we only want to know the result off-chain. But we can't use the voting result on-chain. The reason is if we want to use the voting result, we must do verification on-chain since we need to prove all the aggregated voting cells are exist, the transaction must refer to every voting cell: it will be costly.
+It works fine if we only want to know the result off-chain. But we can't use the voting result on-chain. The reason is if we want to use the voting result, we must do verification on-chain since we need to prove all the aggregated voting cells exist, the transaction must refer to every voting cell: it will be costly.
 
 ![voting result](/assets/images/godwoken1/voting_result.jpg)
 
-Let's take a look another example, a crowdfunding contract:
+Let's take a look for another example, a crowdfunding contract:
 
 We try to use a single cell to hold all crowdfunding token; users can use CKB to exchange the corresponded amount of the token.
 
 The problem is when a user tries to exchange token, the original cell is consumed, and two new cells are created: one contains the tokens to the user, another cell holds rest crowdfunding token; then the outpoint of the crowdfunding cell is changed; other users must wait to the next block to find the new outpoint. So in every block, only one user can participate in crowdfunding; it's unacceptable.
 
-Just like the voting, a typical solution is to introduce an off-chain actor. Instead of using one single cell, users make crowdfunding requests in individual cells; then, the off-chain actor collects these cells and aggregate the result in the result cell.
+Just like voting, a typical solution is to introduce an off-chain actor. Instead of using one single cell, users make crowdfunding requests in individual cells; then, the off-chain actor collects these cells and aggregate the result in the result cell.
 
 We can see, that since the state in the cell model is naturally separated, we must rely on some off-chain actor to collect state.
 
@@ -70,7 +70,7 @@ Indeed! It's too stupid to do all bunch things just for a voting contract. We do
 
 ![One contract to rule them all](/assets/images/godwoken1/one-contract-to-rule-them-all.jpg)
 
-Godwoken is an account-based programming layer build upon CKB that aiming to rules shared state contracts.
+Godwoken is an account-based programming layer build upon CKB that is aiming to rules shared state contracts.
 
 Godwoken composited by the following parts:
 
@@ -99,9 +99,9 @@ fn verify_voting(i, votes) -> bool {
 
 The Godwoken main contract uses a [sparse merkle tree] to store all accounts and state of accounts.
 
-If we want to refer to account state in layer-1.5 contracts, we simply generate a merkle proof, and verify the proof in the contract.
+If we want to refer to account state in layer-1.5 contracts, we simply generate a merkle proof and verify the proof in the contract.
 
-If we want to refer to a layer-1.5 account state in layer-1 contract, we can refer the Godwoken main contract cell in the transaction's `cell_deps` field, and read Godwoken global state from the cell to get the merkle root, then verifies the state and merkle proof.
+If we want to refer to a layer-1.5 account state in layer-1 contracts, we can refer the Godwoken main contract cell in the transaction's `cell_deps` field, and read Godwoken global state from the cell to get the merkle root, then verifies the state and merkle proof.
 
 By creating an abstracted account layer, we minimize the work of building a shared state contract on CKB.
 
