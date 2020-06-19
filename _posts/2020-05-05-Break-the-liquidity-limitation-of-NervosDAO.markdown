@@ -37,11 +37,11 @@ The DCKB contract behaviors as following:
 * The contract creates Y DCKB (corresponds to NervosDAO compensation) to the token owner at every new block height.
 * Alice or anyone else can destroy X + Y DCKB to withdraw X + Y CKB from NervosDAO.
 
-After the mainnet launch, I confirmed that the DCKB solution is actually works; By spending some casual time, I have implemented the [DCKB] contract.
+After the mainnet launch, I confirmed that the DCKB solution actually works; By spending some casual time, I have implemented the [DCKB] contract.
 
 ## Who is the user of DCKB
 
-Layer2, Defi, and other contracts which based on the custodian: Nowadays, smart contracts are more or less rely on the custodian mechanism; if layer2 / Defi projects allow DCKB as a custodian assets, the depositor can get more benefits; it will incentivize more people to participate the deposition.
+Layer2, Defi, and other contracts which based on the custodian: Nowadays, smart contracts are more or less rely on the custodian mechanism; if layer2 / Defi projects allow DCKB as a custodian asset, the depositor can get more benefits; it will incentivize more people to participate the deposition.
 
 Crypto traders can use DCKB instead of CKB to pursue better benefits.
 
@@ -55,13 +55,13 @@ From some perspective, we do break some assumption from the original design; now
 
 But at the same time, we also give layer2 / Defi depositors more benefits, in my opinion for a blockchain which slogan is 'layer1 for layer2', the layer2 depositors are also significant contributors to the system, the system should incentivize them.
 
-From another perspective, DKCB does not break the core idea of the economic model; the core idea of the CKB economic model is to limit the on-chain data occupation. DCKB does not affect this, the same amount of CKB is deposited to NervosDAO when the user creates DCKB, so obviously, a DCKB owner can not store on-chain data without occupy new CKB coins.
+From another perspective, DKCB does not break the core idea of the economic model; the core idea of the CKB economic model is to limit the on-chain data occupation. DCKB does not affect this, the same amount of CKB is deposited to NervosDAO when the user creates DCKB, so obviously, a DCKB owner can not store on-chain data without occupying new CKB coins.
 
 I think DCKB keeps the core idea of the economic model while extends it's potential.
 
 ## How DCKB works
 
-This article is not focus on the implementation details of the DCKB contract, so I only explain the core part of it. For more information, you should check the [DCKB] source code.
+This article is not focused on the implementation details of the DCKB contract, so I only explain the core part of it. For more information, you should check the [DCKB] source code.
 
 A typical UDT contract contains a `u128` number in the cell to represent the amount of token. DCKB uses an extra `u64` number to represent a block number. So a DCKB cell contains `amount` and `block number`, which represents we have X DCKB at block number N.
 
@@ -81,9 +81,9 @@ Then Alice transfers all DCKB tokens to Bob:
 * A forked version of [ckb-cli](https://github.com/jjyr/ckb-cli/tree/DCKB/src/subcommands/dckb) that supports DCKB
 * [DCKB Wiki], document and testnet deployment status
 
-I'll continue to collect more feedbacks before decide to deploy DCKB to the mainnet.
+I'll continue to collect more feedback before I decide to deploy DCKB to the mainnet.
 
-I hope that every serious layer2 / Defi project should consider allowing DCKB as an assets.
+I hope that every serious layer2 / Defi project should consider allowing DCKB as an asset.
 
 [DCKB]: https://github.com/jjyr/DCKB "DCKB GitHub repo"
 [DCKB Wiki]: https://github.com/jjyr/DCKB/wiki "DCKB wiki"
