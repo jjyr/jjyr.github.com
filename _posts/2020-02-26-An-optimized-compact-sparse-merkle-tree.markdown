@@ -69,7 +69,7 @@ fn common_height(key1, key2) {
 }
 ```
 
-The node structure `BranchNode { fork_height, key, node, sibling}`, using one unique `node` value to express all duplicated nodes' value and plus using the `key` to express all merging order information between `[node.fork_height, 255]`.
+The node structure `BranchNode { fork_height, key, node, sibling}`, using one unique value `node` to express all duplicated nodes, plus an anditional field `key` to express all merging order information between `[node.fork_height, 255]`.
 
 * `fork_height` is the height that the node is merged; for a leaf, it is 0.
 * `key` is copied from node's one child. for a leaf node, the key is leaf's key.
