@@ -80,4 +80,3 @@ Actor 是个自动执行的实体，和对象不同，只能通过发送或接�
 
 我在实现 Server 相关逻辑时，用 200 行 ruby 实现的精简 Actor 模型 [GitHub](https://github.com/ruby-ethereum/ethruby/blob/1ceecac4152ed2ba99609bf30e0f5b88ee2d8647/lib/ethruby/devp2p/actor.rb)
 
-ethruby 项目地址 [ruby-ethereum/ethruby](https://github.com/ruby-ethereum/ethruby)

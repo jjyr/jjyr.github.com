@@ -22,7 +22,7 @@ tags: Ethereum
 
 3. 弥补生态。上述的客户端中其实 pyethereum, ruby-ethereum 已经年久失修， elixir-ethereum 还在开发，实际能用的客户端不多。有人在尝试用 python 做另外一个 ethereum 的实现(trinity)。因为比较熟悉 ruby 生态，我决定用 ruby 实现。
 
-因此我决定从头来实现一个 ethereum 客户端，代码放在 [ruby-ethereum/ethruby](https://github.com/ruby-ethereum/ethruby)，项目暂定名 ethruby (组织头像是 GitHub 自动生成的，非常有意思的图案)。
+因此我决定从头来实现一个 ethereum 客户端，代码放在 https://github.com/ciri-ethereum/ciri
 
 第一周 DevP2P::RLPX
 --------------
