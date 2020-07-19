@@ -50,5 +50,3 @@ tags: 读书 想法
 
 经过这几个步骤，我们进行了自上向下的思考，完成了从零设计软件。
 
-> 最近开始了新的 Side Project (代号: Alchemist)。思考了从零设计软件的过程，并总结成本文。欢迎评论和喷。
-> 另外推荐下 [Indie Hackers](https://www.indiehackers.com)，一个国外的 Side Project 交流社区。
