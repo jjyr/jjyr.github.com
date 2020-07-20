@@ -107,7 +107,7 @@ By creating an abstracted account layer, we minimize the work of building a shar
 
 In later articles, we will discuss the details of Godwoken, how we maintain layer-1.5 accounts and blocks, and how the account-based contract works.
 
-* [Godwoken design document](https://github.com/jjyr/godwoken/blob/master/docs/design.md)
+* [Godwoken design document](https://github.com/jjyr/godwoken-original/blob/master/docs/design.md)
 * [Sparse merkle tree](https://justjjy.com/An-optimized-compact-sparse-merkle-tree)
 
 [merkle mountain range]: https://github.com/nervosnetwork/merkle-mountain-range "merkle mountain range"
