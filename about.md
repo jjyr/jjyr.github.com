@@ -3,9 +3,16 @@ layout: page
 title: About
 ---
 
-This is JJY's blog, sharing some fun tech ideas and boring details.
+This is JJy's blog, sharing some fun tech ideas and boring details.
 
-Recently I focus on blockchain-related techniques and hope techs can make the world more equality.
+Recently I am focusing on blockchain-related techniques and hope the tech can make the world more equality.
+
+This blog is written in both English and 中文; the following tags may help you find fun articles
+
+* [English articles](/tags/english)
+* [CKB](/tags/ckb)
+* [区块链](/tags/区块链)
+* [想法](/tags/想法)
 
 Programing languages:
 

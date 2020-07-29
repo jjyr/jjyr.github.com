@@ -3,7 +3,7 @@ layout: post
 title: "ActiveSupport::Concern学习"
 date: 2012-11-16 16:27
 comments: true
-tags: rails ruby
+tags: Rails Ruby
 ---
 
 ##为什么需要使用ActiveSupport::Concern
