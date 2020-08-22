@@ -3,7 +3,7 @@ layout: page
 title: About
 ---
 
-This is JJy's blog, sharing some fun tech ideas and boring details.
+This is JJy's blog.
 
 Recently I am focusing on blockchain-related techniques and hope the tech can make the world more equality.
 
