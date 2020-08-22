@@ -12,7 +12,7 @@ layout: default
                 <a class="post-link" href="{{ tag | downcase | prepend: "tags/" | prepend: site.baseurl }}">{{ tag }}</a>
             {% endfor %}
           </p>
-          <p>{{ post.content | strip_html | truncatewords:50 }}</p>
+          <p>{{ post.content | strip_html | truncate:280 }}</p>
       </li>
     {% endfor %}
 </ul>
