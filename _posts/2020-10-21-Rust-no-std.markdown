@@ -12,7 +12,7 @@ Sometimes, we need to deploy our code to bare-metal environments. Without the PO
 
 ### What is Rust no-std?
 
-In std Rust, which is people default learned version. We can print messages to the console, read from files, and open URLs. All these features are underlayer provided by the execution environment: our operation system. Our OS support printing text to the screen, connect to the internet via socket, or increase memory when we allocate too many data structures on the heap; rust delegate these works to OS via syscalls so we can do all these.
+In std Rust, which is people default learned version. We can print messages to the console, read from files, and open URLs. All these features are underlayer provided by the execution environment: our operating system. Our OS support printing text to the screen, connect to the internet via socket, or increase memory when we allocate too many data structures on the heap; rust delegate these works to OS via syscalls so we can do all these.
 
 You can look through the [modules of std](https://doc.rust-lang.org/stable/std/#modules) and try to identify which module depends on the OS(hint: net, file, ..); if we do not have an operating system that provides these features, we can't use them.
 
