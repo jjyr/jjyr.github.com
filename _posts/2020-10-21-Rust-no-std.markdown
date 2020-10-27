@@ -46,7 +46,7 @@ By defining the *global allocator*, we can use the [alloc crate](https://doc.rus
 
 ### How to write no-std lib crate
 
-By adding #![cfg(no_std)] on the top of the *lib.rs*, we tell the rustc to compile the whole crate under *no-std* Rust; the compiler will raise errors if we try to import from *std* or use a crate that depends on the *std*. Usually, we use another compiling condition #![cfg_attr(not(test), no_std)] to tell the rustc to compile to *no-std* Rust only when the *test* flag is disabled so that we can use *std* in our tests, just like the *std* Rust.
+By adding #![no_std] on the top of the *lib.rs*, we tell the rustc to compile the whole crate under *no-std* Rust; the compiler will raise errors if we try to import from *std* or use a crate that depends on the *std*. Usually, we use another compiling condition #![cfg_attr(not(test), no_std)] to tell the rustc to compile to *no-std* Rust only when the *test* flag is disabled so that we can use *std* in our tests, just like the *std* Rust.
 
 If we need to use the *alloc* crate, we need to add another line in the *lib.rs* `extern crate alloc`; since the *alloc* is a built-in crate, rustc will link it for us automatically.
 
