@@ -5,13 +5,13 @@ layout: default
 <ul class="posts">
     {% for post in paginator.posts %}
       <li>
-          <h2><a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">{{ post.title }}</a></h2>
-          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date_to_string }}</time>
-          <p> Tags:
+          <h4><a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">{{ post.title }}</a></h2>
+          <span> Tags:
             {% for tag in post.tags %}
                 <a class="post-link" href="{{ tag | downcase | prepend: "tags/" | prepend: site.baseurl }}">{{ tag }}</a>
             {% endfor %}
-          </p>
+          </span>
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date_to_string }}</time>
           <p>{{ post.content | strip_html | truncate:280 }}</p>
       </li>
     {% endfor %}

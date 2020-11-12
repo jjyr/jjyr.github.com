@@ -15,7 +15,7 @@ body {
   margin: 0;
   padding: 0;
   background: #fdf6e3;
-  font-size: 1.1em;
+  font-size: 1em;
   line-height: 200%;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
@@ -135,6 +135,26 @@ dt {
 
 ul.posts li {
   list-style-type:none;
+  margin-bottom: 1em;
+
+  h4 {
+    margin: 0;
+  }
+
+  time {
+    margin-left: 1em;
+    font-size: 0.8em;
+  }
+
+  span {
+    font-size: 0.8em;
+  }
+
+  p {
+    font-size: 0.8em;
+    margin: 0;
+    color: gray;
+  }
 }
 
 blockquote {
@@ -229,7 +249,7 @@ hr {
 */
 
 a {
-  color: $rajah;
+  color: black;
 }
 
 a:active, a:focus {
