@@ -8,7 +8,7 @@ tags: Rust English
 
 ### Why write this?
 
-Most rustaceans(include me) start using the std library from our first hello world program. Still, in some scenarios, we need to deploy our code to bare-metal environments, and it is also a very import feature of Rust. Without the POSIX OS support, we can not use the std library, and it is usually scared peoples, so I write this article to clear the most misunderstanding impressions of Rust no-std.
+Most rustaceans(include me) using the std crate day-to-day since we learned how to write `println!("hello world")`. But it is still a very important feature of Rust: to deploy our code to bare-metal environments. Without OS support, we can not use the std crate, and it is usually scared peoples, so I write this article to clear the most misunderstanding impressions on Rust no-std.
 
 ### What is Rust no-std?
 
@@ -38,7 +38,7 @@ A suggestion is that you should always search for runtime support crate before y
 
 ### What is the alloc crate? What is the global allocator?
 
-The *alloc* crate contains heap related modules; modules in the *alloc* use the *global allocator* to allocate memory. The *std* crate defines a default *global allocator*, which depends on the POSIX environment; when heap memory is exhausted, the *std* *global allocator* invokes OS syscalls to increase the memory. So in *no-std* environments, we need to define our *global allocator*; we can use the `#[global_allocator]` attribute to define it. Typically, we use a fixed memory range as our heap; when the heap is exhausted, instead of call *brk* or *mmap*(Linux syscalls to ask for more memory from OS), we raise an out of memory error.
+The *alloc* crate contains heap related modules; modules in the *alloc* use the *global allocator* to allocate memory. The *std* crate defines a default *global allocator*, which depends on the operating system; when heap memory is exhausted, the *std* *global allocator* invokes OS syscalls to increase the memory. So in *no-std* environments, we need to define our *global allocator*; we can use the `#[global_allocator]` attribute to define it. Typically, we use a fixed memory range as our heap; when the heap is exhausted, instead of call *brk* or *mmap*(Linux syscalls to ask for more memory from OS), we raise an out of memory error.
 
 There are many global allocator implementations; for example, the simplest one is implemented as a [linked list](https://github.com/phil-opp/linked-list-allocator); here is one I wrote using [buddy allocator](https://github.com/jjyr/buddy-alloc) algorithm, it can guarantee stable response time in different scenarios.
 
