@@ -11,7 +11,7 @@ This blog is written in both English and 中文; the following tags may help you
 
 * [English articles](/tags/english)
 * [CKB](/tags/ckb)
-* [区块链](/tags/区块链)
+* [BlockChain](/tags/blockchain)
 * [想法](/tags/想法)
 
 Some fun projects:

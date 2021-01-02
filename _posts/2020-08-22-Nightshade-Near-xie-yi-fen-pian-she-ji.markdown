@@ -3,7 +3,7 @@ layout: post
 title: "Nightshade - Near 协议分片设计"
 data: 2020-08-22 20:31
 comments: true
-tags: 区块链 论文
+tags: blockchain 论文
 ---
 
 > 这篇文章是对 Nightshade 论文的摘要及总结。
