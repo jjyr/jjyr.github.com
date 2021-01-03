@@ -11,7 +11,7 @@ layout: default
                 <a class="post-link" href="{{ tag | downcase | prepend: "tags/" | prepend: site.baseurl }}">{{ tag }}</a>
             {% endfor %}
           </span>
-          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date_to_string }}</time>
+          <time datetime="{{ post.date | date: "%Y-%m-%d" }}">{{ post.date | date: "%Y-%m-%d" }}</time>
           <p>{{ post.content | strip_html | truncate:280 }}</p>
       </li>
     {% endfor %}
