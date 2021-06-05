@@ -6,56 +6,62 @@ comments: true
 tags: Merkletree Cryptography English
 ---
 
-Recently, I have designed and implemented a sparse merkle tree which has the following advantages:
+Sparse merkle tree is an advanced data structure used in the blockchain world. It can compress a large key-value map into short bytes represented merkle root and generates existence or non-existence proof for keys in the tree.
+
+In this article, I describe a construction method and several optimizations, which together make the construction of the sparse merkle tree with the following attributes:
 
 * No pre-calculated hash set
-* Support both exist proof and non-exists proof
-* Efficient storage and key updating
+* Efficient existence / non-existence proof
+* Efficient storage space
 
-I write this article to explain the construction and optimization tricks of the SMT.
-
-Before diving into details, please make sure you completely understood what sparse merkle tree is, these articles would be helpful:
+Before diving into details, please make sure you completely understood what the sparse merkle tree is. These articles would be helpful if you never heard sparse merkle tree:
 
 * [whats a sparse merkle tree]
 * [Optimizing sparse Merkle trees]
 
 -------
 
-Trick 1: Zero value optimized hash function.
+Optimization 1: Zero-value optimized hash function.
 
-We define the node merging function:
+A sparse merkle tree contains a lot of zero values. That is the reason why we call it a 'sparse' merkle tree. By optimizing these zero values, we can save a lot of calculations.
+
+We define the node merging function as following:
 
 1. if L == 0, return R
 2. if R == 0, return L
 3. otherwise return sha256(L, R)
 
-By following this rule, the root of an empty SMT is zero, and nodes contract the SMT are all zero-valued; this brings an advantage: since all nodes are zero-valued for the empty tree, we do not need a pre-calculated hash set.
+In a naive sparse merkle tree construction, we usually pre-calculate the hash set of the default SMT(a tree that all values are zeros). When we access the default sparsed nodes, instead of duplicated calculation, we fetch the result from the pre-calculated hash set. The drawback is we need to save the pre-calculated result somewhere before we can use it. It may be costly, especially when we want to use SMT in a blockchain contract.
 
-There's only one issue; this function potentially produces the same value for a different pair of leaves, for example:  `merge(N, 0) == merge(0, N)` . So in our SMT, there may be two trees with the same root but constructed from different leaves. This issue breaks the safety of SMT(an attacker can fooling verifier by pretending the root is constructed from an alternative set of leaves).
+With optimization 1, we do not need the pre-calculated hash-set. For a default SMT, all the intermediate nodes are zero values. Thus, we only need to calculate the hash for non-zero nodes and return zero for the sparsed nodes.
 
-To fix this, instead of using `hash(value)` as a leaf's value, we compute the  `hash(key, value)`  as a leaf’s value, leaves using this value to merge with their sibling.
+There's only one issue that remains. The optimized hash function produces the same value from different key-value pairs, for example:  `merge(N, 0) == merge(0, N)`. This behavior opens a weak point for the SMT. An attacker may construct a collision of merkle root from a faked key-value map.
 
-Additionally, we store `leaf_hash -> value`  in a map to keep the index of the original value.
+To fix this, we use the result of `hash(key | value)`  as a leaf’s hash, for examples: `merge(N, leaf_hash(N, 0)) == merge(0, leaf_hash(0, N))` the result is false because the `leaf_hash(N, 0)` is never equals to `leaf_hash(0, N)` if `N != 0`, the attacker can't construct a collision attacking.
 
-Let's prove the security of this construction.
+Additionally, we store `leaf_hash -> value`  in a map to keep the reference to the original value.
 
-* Since the key is included in the leaf_hash, and leaf's key is a unique value in SMT, so no matter what the   `value`  is, a leaf's hash value is unique in the tree.
-* Each node is either merged by two different hashes or merged by a hash with a zero-value. We already knew that all leaves have a unique hash, so their parent nodes also have a unique hash at the height `n`, and so on, the nodes at `n + 1` all have a unique hash, until the root.
-* For the root, if the tree is empty, we got zero, or if the tree is not empty, the root must merge from two hashes or a hash with a zero, it's still unique, any changes in the leaves will also change the root hash.
+We can prove the security of this construction.
 
-So we believe this construction is security because we can't construct a collision root hash.
+* Since the `key` is included in the leaf's hash, and `key` is unique in SMT, no matter what the `value` is, the `leaf_hash(key, value)` is unique.
+* Each node is either merged by two different hashes or merged by a hash with a zero-value. We already knew that all leaves have a unique hash, so their parent nodes also have a unique hash, and so on. The parent of these parent nodes also has a unique hash until the root of the tree.
+* We got zero value merkle root if the tree is empty. Otherwise, the root is merged from its two children nodes. Any changes in the leaves will also change the root hash.
+
+So we believe this construction is security because we can't construct a collision of merkle root.
 
 --------
 
-Trick 2: Only store unique non-zero nodes.
+Optimization 2: Compress the storage for duplicated nodes.
 
-The classical node structure for an SMT is `Node {left, right}`, it works fine if we insert every node from root of the tree to bottom, but with the zero-value optimization, mostly nodes are duplicated, we want our tree only store unique nodes.
+In the classic construction of SMT: We store a node with its two children as `Node {left, right}`, but with the zero-value optimization, mostly intermediate nodes in the tree are duplicated, these nodes occupied spaces but provide no additional information of the tree, we want our tree only stores unique-value nodes.
 
-The idea is simple: for a single leaf SMT, we only store the leaf itself, when inserting new leaves, we figure a way to extract location information from tree storage, and decide the merging order of hashes.
+The idea is simple: for a single leaf SMT, we only store the leaf itself. When inserting another new leave, the merging happens. Instead of inserting a parent at each height, we only store the parent node once, plus the merging height of the two branches from leaves.
 
-The key to this problem is the leaf's key.  Each key in the SMT can be seen as a path from the root of the tree to leaf, with the path information, we should be able to figure out the merging order of hashes, so on the insertion, we also store the leaf's key in node, and when we need to merge two nodes, we extract the location information from the key:
+The trick is that we can simulate the `Node {leaf, right}` structure and pretend that we stored all the ancestor nodes in each height of the tree if we can extract the merging order information from somewhere.
 
-We can calculate the common height of two leaves' keys, which is exactly the same height that leaves' nodes be merged.
+The key to this trick is the leaf's `key`.  Each key in the SMT can be seen as a path from the tree's root to the leaf. With the path information, we can extract the merging order of hashes at each height, so when inserting a new leaf, we also store the leaf's key in node, and when we need to merge two nodes, we extract the merging order from the key path:
+
+We can calculate the merging height of two leaves by their key(or key path):
 
 ``` rust
 fn common_height(key1, key2) {
@@ -69,11 +75,11 @@ fn common_height(key1, key2) {
 }
 ```
 
-The node structure `BranchNode { fork_height, key, node, sibling}`, using one unique value `node` to express all duplicated nodes, plus an anditional field `key` to express all merging order information between `[node.fork_height, 255]`.
+The node structure is like `BranchNode { fork_height, key, node, sibling}`, we use `node` to represent all duplicated intermediate nodes, plus an additional field `key` to store the path information, with `key`, we can calculate the merging order of nodes between height `[node.fork_height, 255]`.
 
 * `fork_height` is the height that the node is merged; for a leaf, it is 0.
-* `key` is copied from node's one child. for a leaf node, the key is leaf's key.
-* `node` and `sibling` is like the `left` and `right` in the classical structure; the only difference is their position is calculated from `key`, instead of fixed left and right.
+* `key` is copied from one of the node's children. for a leaf node, the key is the leaf's key.
+* `node` and `sibling` are like the `left` and `right` in the classic node structure. The difference is that the position of nodes depends on the merging height.
 
 To get a left child of a node in height `H`:
 
@@ -130,7 +136,7 @@ fn get(key) {
 }
 ```
 
-We use a similar algorithm to extract location information for other operations, like updating, merkle proof. It just works as expected.
+We use a similar algorithm to extract merging height information for other operations: updating and generate merkle proof. You can check the code for details.
 
 Link of the [code repo](https://github.com/jjyr/sparse-merkle-tree).
 
