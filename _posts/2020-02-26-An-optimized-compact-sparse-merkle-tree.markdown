@@ -31,9 +31,9 @@ We define the node merging function as following:
 2. if R == 0, return L
 3. otherwise return sha256(L, R)
 
-In a naive sparse merkle tree construction, we usually pre-calculate the hash set of the default SMT(a tree that all values are zeros). When we access the default sparsed nodes, instead of duplicated calculation, we fetch the result from the pre-calculated hash set. The drawback is we need to save the pre-calculated result somewhere before we can use it. It may be costly, especially when we want to use SMT in a blockchain contract.
+In a naive sparse merkle tree construction, we usually pre-calculate the hash set of the default SMT(a tree that all values are zeros). When we access the default nodes, instead of duplicated calculation, we fetch the result from the pre-calculated hash set. The drawback is we need to save the pre-calculated result somewhere before we can use it. It may be costly, especially when we want to use SMT in a blockchain contract.
 
-With optimization 1, we do not need the pre-calculated hash-set. For a default SMT, all the intermediate nodes are zero values. Thus, we only need to calculate the hash for non-zero nodes and return zero for the sparsed nodes.
+With optimization 1, we do not need the pre-calculated hash-set. For a default SMT, all the intermediate nodes are zero values. Thus, we only need to calculate the hash for non-zero nodes and return zero for the default nodes.
 
 There's only one issue that remains. The optimized hash function produces the same value from different key-value pairs, for example:  `merge(N, 0) == merge(0, N)`. This behavior opens a weak point for the SMT. An attacker may construct a collision of merkle root from a faked key-value map.
 
