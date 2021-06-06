@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Ruby 又要添加绿色线程了 Thread::Green</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Ruby 又要添加绿色线程了 Thread::Green | JJy Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Ruby 又要添加绿色线程了 Thread::Green" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="翻到了 ruby-lang 的这个 issue，Eric Wong 给 Ruby 提了一个绿色线程的 PR" />
+<meta property="og:description" content="翻到了 ruby-lang 的这个 issue，Eric Wong 给 Ruby 提了一个绿色线程的 PR" />
+<meta property="og:site_name" content="JJy Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-02-04T00:00:00+08:00" />
+<script type="application/ld+json">
+{"description":"翻到了 ruby-lang 的这个 issue，Eric Wong 给 Ruby 提了一个绿色线程的 PR","url":"/Ruby-tian-jia-lv-se-Thread-Green-xian-cheng-le-ThreadGreen","@type":"BlogPosting","headline":"Ruby 又要添加绿色线程了 Thread::Green","dateModified":"2018-02-04T00:00:00+08:00","datePublished":"2018-02-04T00:00:00+08:00","mainEntityOfPage":{"@type":"WebPage","@id":"/Ruby-tian-jia-lv-se-Thread-Green-xian-cheng-le-ThreadGreen"},"author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Ruby 又要添加绿色线程了 Thread::Green</h2>
+  <time datetime="2018-02-04" class="by-line">2018-02-04</time>
+  <p> Tags:
+    
+        <a class="post-link" href="tags/ruby">Ruby</a>
+    
+  </p>
+  <p>翻到了 ruby-lang 的这个 issue，Eric Wong 给 Ruby 提了一个绿色线程的 PR</p>
+
+<p>https://bugs.ruby-lang.org/issues/13618</p>
+
+<p>总结下:</p>
+
+<ol>
+  <li>Eric Wong 给 ruby 增加了可以自动调度的 fiber，暂命名为 Thread::Green。就是类似 go 的 goroutine 这样的轻量级线程</li>
+  <li>Queue, SizedQueue 等用于同步的类是可以和 Thread::Green 一起使用的。意味着现有的 WebServer 换成 Thread::Green 很简单可以迁移</li>
+  <li>Matz, ko1 等大佬纷纷拍手称赞，(说不定很快就能用上了)</li>
+  <li>之后 ruby 可以说摆脱异步编程模型了，直接起 Thread::Green 然后用 blocking IO 就可以和 node 的 callback hell 怼一怼</li>
+  <li>对‘应用级别’开发者意味着 Web Server 会更高效，Rails 等框架也会更高效</li>
+</ol>
+
+<p>用法大概就是和 Thread api 会兼容 所以没什么区别，比如下面示例:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"https://..."</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">urls</span><span class="p">.</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">url</span><span class="o">|</span>
+  <span class="no">Thread</span><span class="o">::</span><span class="no">Green</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">url</span><span class="o">|</span>
+    <span class="c1"># request url</span>
+    <span class="o">...</span><span class="p">.</span>
+  <span class="nf">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<hr />
+
+<p>感觉 Eric Wong 这个人很神奇啊，Unicorn 应该也是他写的。很低调、很少出境，不用非自由软件..有谁知道他的故事..</p>
+
+<hr />
+
+<p>坏消息就是我之前写的库已经失去存在意义了 (<a href="https://github.com/socketry/lightio">lightio</a>), 不过可以当作个教学示例吧，这些功能从 ruby 层面去实现大概就是这个库</p>
+
+</article>
+
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

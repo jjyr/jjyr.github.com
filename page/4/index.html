@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>JJy Blog</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Page 4 of 4 for JJy Blog | A place to put some random thoughts</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="JJy Blog" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A place to put some random thoughts" />
+<meta property="og:description" content="A place to put some random thoughts" />
+<meta property="og:site_name" content="JJy Blog" />
+<link rel="prev" href="/page/3/" />
+<script type="application/ld+json">
+{"description":"A place to put some random thoughts","url":"/page/4/","@type":"WebPage","headline":"JJy Blog","author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <ul class="posts">
+    
+      <li>
+          <h4><a href="/celluloidzhong-de-ren-wu-zhong-duan-he-condition">Celluloid中的任务中断和Condition</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2013-05-18">2013-05-18</time>
+          <p>######Celluloid有个很神奇的机制（&lt;–示例代码）
+
+Celluloid每次任务(方法调用)会用Fiber去包装
+
+当一个FiberTask因为某些代码被中断时，此时Celluloid可以回到线程执行任务的方法
+
+相当于中断的任务已经结束
+
+之后Actor线程继续的从mailbox取任务
+
+######某些代码!
+FiberTask会因某些方法被中断，上面的示例代码中中断当前Fiber的是sleep方法，这个方法由Celluloid做了覆盖
+  sleeper = Sleeper.new(@timers, interval)
+  ...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/celluloidzhong-de-atom-modeyu-suo">Celluloid中的Atom Mode与锁</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2013-04-13">2013-04-13</time>
+          <p>Celluloid默认是Atom Mode执行的, 这种模式下可以中断当前执行的任务 先执行下一个
+
+Celluloid提供了一个sleep方法，在Actor内部调用sleep时会中断当前Fiber并且用timer异步来恢复
+def before_suspend(task)
+  @timers.after(@interval) { task.resume }
+end
+
+当中断当前的TaskFiber时，Actor即可处理下一个message，被中断的message等待timer去恢复自身
+def task(task_type, method_nam...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/celluloid-actorjie-gou-yu-diao-yong-guo-cheng">Celluloid::Actor结构与调用过程</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2013-04-10">2013-04-10</time>
+          <p>ruby是面向对象语言,但是Celluloid做到了无需更换代码，仅在类中include Celluloid就可以进行面向Actor编程
+class A
+  include Celluloid
+  def foo
+    puts "bar"
+  end
+end
+
+此时A已经代表一个Actor类
+a = A.new
+a.class #A
+a.class.ancestors #[A,
+ Celluloid::InstanceMethods,
+ Celluloid,
+ Object,
+ PP::ObjectMixin,
+ Kernel,
+ BasicO...</p>
+      </li>
+    
+</ul>
+
+      </section>
+    </div>
+  </div>
+
+  
+  <div class="pagination">
+    
+    <a href="/page/3/" class="page-item">&laquo;</a>
+      
+    <a href="/" class="page-item">1</a>
+      
+    <a href="/page/2/" class="page-item">2</a>
+      
+    <a href="/page/3/" class="page-item">3</a>
+      
+    <span class="page-item">4</span>
+      
+    <span class="page-item">&raquo;</span>
+    
+  </div>
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

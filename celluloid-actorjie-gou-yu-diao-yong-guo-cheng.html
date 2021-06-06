@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Celluloid::Actor结构与调用过程</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Celluloid::Actor结构与调用过程 | JJy Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Celluloid::Actor结构与调用过程" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="ruby是面向对象语言,但是Celluloid做到了无需更换代码，仅在类中include Celluloid就可以进行面向Actor编程 class A include Celluloid def foo puts &quot;bar&quot; end end 此时A已经代表一个Actor类 ``` a = A.new a.class #A a.class.ancestors #[A, Celluloid::InstanceMethods, Celluloid, Object, PP::ObjectMixin, Kernel, BasicObject]" />
+<meta property="og:description" content="ruby是面向对象语言,但是Celluloid做到了无需更换代码，仅在类中include Celluloid就可以进行面向Actor编程 class A include Celluloid def foo puts &quot;bar&quot; end end 此时A已经代表一个Actor类 ``` a = A.new a.class #A a.class.ancestors #[A, Celluloid::InstanceMethods, Celluloid, Object, PP::ObjectMixin, Kernel, BasicObject]" />
+<meta property="og:site_name" content="JJy Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-04-10T22:27:00+08:00" />
+<script type="application/ld+json">
+{"description":"ruby是面向对象语言,但是Celluloid做到了无需更换代码，仅在类中include Celluloid就可以进行面向Actor编程 class A include Celluloid def foo puts &quot;bar&quot; end end 此时A已经代表一个Actor类 ``` a = A.new a.class #A a.class.ancestors #[A, Celluloid::InstanceMethods, Celluloid, Object, PP::ObjectMixin, Kernel, BasicObject]","url":"/celluloid-actorjie-gou-yu-diao-yong-guo-cheng","@type":"BlogPosting","headline":"Celluloid::Actor结构与调用过程","dateModified":"2013-04-10T22:27:00+08:00","datePublished":"2013-04-10T22:27:00+08:00","mainEntityOfPage":{"@type":"WebPage","@id":"/celluloid-actorjie-gou-yu-diao-yong-guo-cheng"},"author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Celluloid::Actor结构与调用过程</h2>
+  <time datetime="2013-04-10" class="by-line">2013-04-10</time>
+  <p> Tags:
+    
+        <a class="post-link" href="tags/ruby">Ruby</a>
+    
+  </p>
+  <p>ruby是面向对象语言,但是Celluloid做到了无需更换代码，仅在类中<code class="language-plaintext highlighter-rouge">include Celluloid</code>就可以进行面向Actor编程</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">A</span>
+  <span class="kp">include</span> <span class="no">Celluloid</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="nb">puts</span> <span class="s2">"bar"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>此时A已经代表一个Actor类</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a = A.new
+a.class #A
+a.class.ancestors #[A,
+ Celluloid::InstanceMethods,
+ Celluloid,
+ Object,
+ PP::ObjectMixin,
+ Kernel,
+ BasicObject]
+
+a.is_a? A #true 
+A === a #true      of course!
+a.is_a? Celluloid #true 
+Celluloid === a #false    W..T..F??
+</code></pre></div></div>
+<p>wtf?</p>
+
+<p>a是A的实例，我们的测试可以通过
+但是当我们用Celluloid来测试时<code class="language-plaintext highlighter-rouge">a.is_a?</code>和<code class="language-plaintext highlighter-rouge">Celluloid.===</code>结果不一致</p>
+
+<p>###why?</p>
+
+<p>因为a并不是A的实例</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="p">.</span><span class="nf">class</span> <span class="c1">#A</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">inspect</span> <span class="c1">#&lt;Celluloid::ActorProxy(A:0x3fecb9cfab6c)&gt;</span>
+<span class="c1">#a实际上的类是Celluloid::ActorProxy</span>
+</code></pre></div></div>
+<p>Celluloid会覆盖new方法</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+   <span class="n">proxy</span> <span class="o">=</span> <span class="no">Actor</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">allocate</span><span class="p">,</span> <span class="n">actor_options</span><span class="p">).</span><span class="nf">proxy</span>
+   <span class="n">proxy</span><span class="p">.</span><span class="nf">_send_</span><span class="p">(</span><span class="ss">:initialize</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+   <span class="n">proxy</span>
+ <span class="k">end</span>
+ <span class="kp">alias_method</span> <span class="ss">:spawn</span><span class="p">,</span> <span class="ss">:new</span>
+</code></pre></div></div>
+<p>我们得到的a是ActorProxy实例 并且Celluloid会覆盖===方法使<code class="language-plaintext highlighter-rouge">A === a</code>返回<code class="language-plaintext highlighter-rouge">ture</code></p>
+
+<p>当前的大致结构为</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="c1">#ActorProxy 用来把ruby中对对象的方法调用封装成对Actor的发送消息</span>
+
+<span class="n">a</span><span class="p">.</span><span class="nf">send</span> <span class="ss">:instance_eval</span><span class="p">,</span><span class="s2">"Thread.current[:celluloid_actor]"</span> <span class="c1">#Actor 用来表示Actor的对象，内部持有线程,  所有对Actor的操作均通过ActorProxy, 所以一般取不到此引用</span>
+
+<span class="n">a</span><span class="p">.</span><span class="nf">wrapped_object</span> <span class="c1">#&lt;WARNING: BARE CELLULOID OBJECT (A:0x3fecb9ccdfa4)&gt; 会提示警告，直接使用原始的ruby对象会破坏Actor的封装,破坏线程安全 所有方法会通过Actor的thread在此原始对象上调用</span>
+</code></pre></div></div>
+
+<p>我们调用A.new时会new一个Actor并且我们得到的是ActorProxy
+当我们调用其上的方法时 ActorProxy会把我们的调用请求封装后发送到a的Actor的邮箱，并且阻塞当前线程， 直到接收到Actor返回的消息</p>
+
+<p>具体过程如下</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="no">A</span><span class="p">.</span><span class="nf">new</span>
+<span class="c1">#1 实例化A,Actor和ActorProxy</span>
+<span class="c1">#2 Actor内部实例化ThreadHandle --这里使用了一个线程池，这样如果大量生产Actor可以直接取得提前构造的线程</span>
+<span class="c1">#3 ThreadHandle 内部的Thread开始loop检查mailbox</span>
+
+<span class="n">a</span><span class="p">.</span><span class="nf">foo</span> <span class="c1">#bar =&gt; nil</span>
+<span class="c1">#1 触发ActorProxy的method_missing 把方法调用封装到SyncCall</span>
+<span class="c1">#2 向a的mailbox发送调用消息</span>
+<span class="c1">#3 调用SyncCall#value(Celluloid#suspend -&gt; SyncCall#wait)阻塞当前线程并检查当前线程的mailbox</span>
+  <span class="c1">####loop.1 actor的thread从mailbox取出msg, 调用message_handle, 用TaskFiber封装后调用(为了实现Celluloid的Atom模式[https://github.com/celluloid/celluloid/wiki/Glossary])</span>
+  <span class="c1">####loop.2 执行成功后封装到SuccessResponse,发送到调用者的mailbox</span>
+<span class="c1">#4 收到SuccessResponse， 调用SuccessResponse#value， return</span>
+</code></pre></div></div>
+
+<p>因为ruby并非erlang这种原生支持线程的语言
+所以在分析时很容易混淆当前的调用线程</p>
+
+<p>#####容易误解的地方
+######scope
+因为ruby并非原生的支持线程消息， 调用者的当前线程和执行代码的线程很容易混淆。不过Celluloid已经很好的封装了这些，我们只要当对象为Actor直接调用即可，一般编程中不需考虑的这些</p>
+
+<p>######inner scope
+因为ruby的线程与消息并非原生支持，所以如果是下面这种情况</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">A</span>
+  <span class="kp">include</span> <span class="no">Celluloid</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="nb">puts</span> <span class="s2">"bar"</span>
+    <span class="n">foo2</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">foo2</span>
+    <span class="nb">puts</span> <span class="s2">"bar2"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>当我们调用<code class="language-plaintext highlighter-rouge">A.new.foo</code>时，<code class="language-plaintext highlighter-rouge">foo2</code>是在A实例的内部调用的，所以并非经过ActorProxy,此时是在原始对象内部直接调用的ruby方法，当然也不会通过mailbox(和erlang不一样),不过编程时同样不需关心这点</p>
+
+
+</article>
+
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

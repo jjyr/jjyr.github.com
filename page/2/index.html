@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>JJy Blog</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Page 2 of 4 for JJy Blog | A place to put some random thoughts</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="JJy Blog" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A place to put some random thoughts" />
+<meta property="og:description" content="A place to put some random thoughts" />
+<meta property="og:site_name" content="JJy Blog" />
+<link rel="prev" href="/" />
+<link rel="next" href="/page/3/" />
+<script type="application/ld+json">
+{"description":"A place to put some random thoughts","url":"/page/2/","@type":"WebPage","headline":"JJy Blog","author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <ul class="posts">
+    
+      <li>
+          <h4><a href="/yong-Ruby-ti-yan-kuai-su-kai-fa-p2p-wang-luo-cheng-xu">用 Ruby 体验快速开发 P2P 网络程序</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2018-11-27">2018-11-27</time>
+          <p>很多开发者很熟悉 Server-Client 这一套网络结构，Server-Client 是构建互联网应用的基础。
+但在区块链技术这里就有点过时了，区块链的世界普遍采用 P2P 网络。
+
+P2P network 是什么呢？
+
+
+  对等式网络（peer-to-peer， 简称P2P），又称点对点技术，是无中心服务器、依靠用户群（peers）交换信息的互联网体系，它的作用在于，减低以往网路传输中的节点，以降低资料遗失的风险。与有中心服务器的中央网络系统不同，对等网络的每个用户端既是一个节点，也有服务器的功能，任何一个节点无法直接找到其他节点，必须依靠...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/shi-xian-yi-tai-fang-di-san-yue">实现以太坊第三月</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ethereum">Ethereum</a>
+            
+          </span>
+          <time datetime="2018-07-06">2018-07-06</time>
+          <p>系列第三篇文章。转眼之间三个月过去了，还是没有实现以太坊。两个月实现以太坊是不可能的了，黄皮书又不想看，只能写写文章装逼度日。
+
+不过的确是学到了非常丰富的知识，并且对以太坊核心组件的内外有了整体概念。
+
+我在这段时间从黄皮书实现了 EVM 和 Chain (后来几个命令实在看不下去参考了 py-evm)，有时会想是不是 Gavin wood 故意把黄皮书写的如此晦涩，来根据智商过滤实现者？为什么简单的规则非要用到这么多符号？公示的解释还是层层递归？耗尽了我的调用栈。
+
+以太坊的规范化的确不是很好，Trie 等规则只有黄皮书上晦涩的公式，和 Eth...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/shi-xian-yi-tai-fang-di-er-zhou-RLPX-zi-xie-yi">实现以太坊第二周 RLPX 子协议、Actor 模型</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ethereum">Ethereum</a>
+            
+          </span>
+          <time datetime="2018-05-14">2018-05-14</time>
+          <p>根据上篇继续： 实现以太坊第一周 DEVP2P::RLPX 握手协议
+
+本周比较懒，字写的尽量少一点。
+
+
+
+上周实现了以太坊的网络协议 DevP2P 中的握手部分。DevP2P 还包括了节点发现功能，子协议传输功能，还有整合了所有以上逻辑的 Server。
+
+下一步我打算优先实现以太坊子协议，而不是继续实现 DevP2P 的其他功能。
+
+以太坊子协议定义了一整套以太坊节点间的消息格式：同步区块，获取交易信息，获取区块头等等。实现了以太坊子协议，就可以接着实现区块同步，挖矿，还有相关的 web 3 接口。这部分功能触及了区块链、以太坊的核心机制，实...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/shi-xian-yi-tai-yi-zhou-DevP2P-RLPX-DevP2PRLPX-wo-shou-xie-yi">实现以太坊第一周 DevP2P::RLPX 握手协议</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ethereum">Ethereum</a>
+            
+          </span>
+          <time datetime="2018-05-06">2018-05-06</time>
+          <p>前因
+
+《实现以太坊》是一个系列笔记。主要记叙我从头实现一个以太坊的过程，形式是每周或每两周的流水账总结，内容包括：这段时间我实现了哪些东西，这些东西是干嘛的，以太坊为什么要设计这些东西。
+因为是流水账的形式，预计到之后也极有可能出现『本周打牌，什么都没写』的情况。
+
+那么为什么又要实现个以太坊呢？难道 geth, parity, ethereumj, pyethereum, elixir-ethereum(WIP), ruby-ethereum 还不够用么？
+
+主要考虑三个原因：
+
+
+  
+    Double 工资。偶尔听到老板说谁可以从头实现...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/jia-mi-huo-bi-tao-li-xian-zhuang">加密货币套利现状</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/套利">套利</a>
+            
+                <a class="post-link" href="tags/加密货币">加密货币</a>
+            
+          </span>
+          <time datetime="2018-04-03">2018-04-03</time>
+          <p>现在谈起加密货币套利，和忽悠别人投资 ICO 一样，似乎已经太晚了（..不过真的还有人在投各种 ICO）。
+
+但仍有两个原因在诱惑着我去尝试加密货币套利：
+
+
+  时不时仍有人提起套利的神话
+  加密货币大大的降低了普通人参与投资的门槛，研究套利对我来说是个很好的低成本入门方式。
+
+
+毕竟比起做无用功，我更害怕无感觉的忽略掉身边的机会。
+
+互联网上有很多讲套利的文章，有些浅尝即止，有些作者则更为慷慨的深入了套利的原理和各种方式。
+对于加密货币来说，最简单的套利方式是利用各个交易所的差价赚取利润。比如通过观察发现交易所 A 的价格经常会比交易所 B ...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/gao-xing-neng-Mysql-jia-shi-bi-ji">高性能 MySQL 驾驶笔记</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/mysql">mysql</a>
+            
+          </span>
+          <time datetime="2018-03-28">2018-03-28</time>
+          <p>
+  聊天群里看到有人复习 MySQL 准备面试，想起之前整理过《高性能MySQL》的笔记，倒是很适合面试前的准备
+
+  内容大部分是整理自《高性能MySQL》第三版，外加少量的个人经验
+
+
+
+Schema Tips:
+
+Varchar 存储时会自动调整长度
+
+MySQL 会根据 Varchar 指定的长度预分配空间，所以用尽量小的值效率会更好
+
+Varchar 长度变大时会造成碎片和性能问题，MySQL 需要重新为其分配空间
+
+文本类型数据可以考虑是否使用 Binary，性能会比文本好
+
+关联键用 int 效率最高
+
+主键小的话表也会小，所以用 ...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/design-software-from-zero">从零设计软件</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/读书">读书</a>
+            
+                <a class="post-link" href="tags/想法">想法</a>
+            
+          </span>
+          <time datetime="2018-03-18">2018-03-18</time>
+          <p>
+  程序的设计是一个明确的步骤 - 代码大全
+
+
+从零设计软件，对程序员来说似乎不应该是件难事，毕竟程序员的工作就是设计软件并写代码去实现。
+
+但随着项目规模变得庞大，架构师、产品经理、设计师等角色加入了软件设计的流程，这些角色以自己的专业技能聚焦某一项的设计工作。软件设计被拆分为多个流程，这对于项目来说当然是好事，更多的专业性会让产品的某些特性更加出色。但设计工作的划分难免会使部分设计者一叶障目，难以从全局来观察项目，尤其是刚步入工作的人。
+
+很多人说自己喜欢编程喜欢写代码，但“写代码”这个词非常容易误解，编程 = 设计 + 写代码，而不仅仅是...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/bao-chi-qian-xun-nu-li-he-ping-he">保持谦逊、努力、平和</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/想法">想法</a>
+            
+          </span>
+          <time datetime="2018-03-11">2018-03-11</time>
+          <p>傲慢、嫉妒、愤怒、怠惰，或许皆因目光短浅？
+
+睡前翻知乎，看到有人列举了爱因斯坦、费曼、薛定谔、杨振宁等人年轻时的照片和成就。突然意识到教科书上的人物在自己的年龄段已经作出了影响全人类的贡献。这触发了我下意识的思考，从小把他们当成偶像，现在已经超过了他们拥有成就时的年龄，而我和大多数人也还是一事无成。
+
+年轻人的嫉妒和愤怒往往来自于对比，从小时候中国式教育的分数竞争，长大后的出身、教育经历，工作中的职级和薪水，中年人的房子和车。社会中鄙视链环环相扣，而这条鄙视链同时也传播着傲慢、嫉妒、愤怒、怠惰。
+
+傲慢蒙蔽人的双眼，对别人的鄙视与嘲笑远比提高自我...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/PUMA-shi-xian-jian-yao-fen-xi">PUMA 实现简要分析</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2018-02-21">2018-02-21</time>
+          <p>之前在 绿色线程是如何提升服务器并发性能的 一文中描述了绿色线程的原理。并且讲了我的计划：使用 Discourse 来 benchmark 绿色线程对并发性能的提升。经过一番折腾后在 LightIO 下成功运行了 Discourse 的 benchmark（折腾很久后发现需要将 Discourse 使用的 hiredis gem 换成纯 ruby 实现的 redis client），但结果却是使用绿色线程和不使用时性能表现差不多。
+
+我推测性能相差不多的原因是 Discourse benchmark 使用了 thin 服务器，thin 是个单线程服...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/how-to-improve-server-concurrency-with-green-thread">绿色线程是如何提升服务器并发性能的</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2018-02-16">2018-02-16</time>
+          <p>LightIO 是去年末开始写的一个库，给 Ruby 提供了低廉的绿色线程，并且可以通过 monkey patch 替代原有的 native thread。这样服务器端可以使用大量绿色线程，用较小的消耗来获得更好的并发性。经过一段时间的开发， LightIO 已经比较完善，并且 monkey patch 后可以成功和 Rails 、Puma 等共同使用。于是我开始考虑如何测试服务器使用 LightIO 后的性能，毕竟能真正的带来性能提升才有继续开发的动力和必要。
+
+在性能测试前要考虑下绿色线程的原理，以及为什么可以带来性能提升？
+
+LightIO ...</p>
+      </li>
+    
+</ul>
+
+      </section>
+    </div>
+  </div>
+
+  
+  <div class="pagination">
+    
+    <a href="/" class="page-item">&laquo;</a>
+      
+    <a href="/" class="page-item">1</a>
+      
+    <span class="page-item">2</span>
+      
+    <a href="/page/3/" class="page-item">3</a>
+      
+    <a href="/page/4/" class="page-item">4</a>
+      
+    <a href="/page/3/" class="page-item">&raquo;</a>
+    
+  </div>
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

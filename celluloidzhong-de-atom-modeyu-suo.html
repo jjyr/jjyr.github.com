@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Celluloid中的Atom Mode与锁</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Celluloid中的Atom Mode与锁 | JJy Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Celluloid中的Atom Mode与锁" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Celluloid默认是Atom Mode执行的, 这种模式下可以中断当前执行的任务 先执行下一个" />
+<meta property="og:description" content="Celluloid默认是Atom Mode执行的, 这种模式下可以中断当前执行的任务 先执行下一个" />
+<meta property="og:site_name" content="JJy Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-04-13T23:09:00+08:00" />
+<script type="application/ld+json">
+{"description":"Celluloid默认是Atom Mode执行的, 这种模式下可以中断当前执行的任务 先执行下一个","url":"/celluloidzhong-de-atom-modeyu-suo","@type":"BlogPosting","headline":"Celluloid中的Atom Mode与锁","dateModified":"2013-04-13T23:09:00+08:00","datePublished":"2013-04-13T23:09:00+08:00","mainEntityOfPage":{"@type":"WebPage","@id":"/celluloidzhong-de-atom-modeyu-suo"},"author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Celluloid中的Atom Mode与锁</h2>
+  <time datetime="2013-04-13" class="by-line">2013-04-13</time>
+  <p> Tags:
+    
+        <a class="post-link" href="tags/ruby">Ruby</a>
+    
+  </p>
+  <p>Celluloid默认是<a href="https://github.com/celluloid/celluloid/wiki/Glossary">Atom Mode</a>执行的, 这种模式下可以中断当前执行的任务 先执行下一个</p>
+
+<p>Celluloid提供了一个sleep方法，在Actor内部调用sleep时会中断当前Fiber并且用timer异步来恢复</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">before_suspend</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+  <span class="vi">@timers</span><span class="p">.</span><span class="nf">after</span><span class="p">(</span><span class="vi">@interval</span><span class="p">)</span> <span class="p">{</span> <span class="n">task</span><span class="p">.</span><span class="nf">resume</span> <span class="p">}</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>当中断当前的TaskFiber时，Actor即可处理下一个message，被中断的message等待timer去恢复自身</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def task(task_type, method_name = nil, &amp;block)
+  if...
+     ....
+  else
+    @task_class.new(task_type, &amp;block).resume#中断fiber时从此处返回
+  end
+end
+</code></pre></div></div>
+
+<p>我们在Actor上的每次调用都是一个独立Fiber</p>
+
+<p>Actor 线程是一个worker,来运行多个Fiber，个人感觉这里有点矛盾，Celluloid把多线程程序，变成了多Fiber程序，不同的Fiber很有可能并发访问同一个变量
+而<code class="language-plaintext highlighter-rouge">exclusive</code>就是Celluloid中的Fiber的锁。actor本身就是消除锁的，而现在却又引入了一个新的锁。</p>
+
+<p>不过实际写过Celluloid程序后，感觉还是不要对这个锁太担心的，实际中只有中断时(调用sleep)才会插入新的fiber，而我们在写需要同步执行的代码时 一般的正常人类是不会在其中插入个sleep的，如果必须确定代码的同步 则要把代码写在<code class="language-plaintext highlighter-rouge">exclusive</code>块中(一般不需要，exclusive作用是阻止在本块中Fiber的中断)</p>
+
+<p>这种机制虽然带来了少许的复杂性但是</p>
+
+<ol>
+  <li>绝大多数情况下我们无需知道这种机制也可正常的运作程序</li>
+  <li>即使用到<code class="language-plaintext highlighter-rouge">exclusive</code>， 也只是很简单的应用</li>
+  <li>可以更加有效率的利用线程</li>
+</ol>
+
+<p>Celluloid把任务和worker之间隔离开，之后可能会把<a href="https://github.com/celluloid/celluloid/wiki/GSoC-Ideas#executing-actors-in-a-thread-pool-ben-langfeld">thread和actor也进行抽象分离</a>，这样增加了灵活性和效率， 不过随之也带来了复杂性， 其中得失还是很难说清的</p>
+
+</article>
+
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

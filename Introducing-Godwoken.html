@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Introducing Godwoken - A missing piece of the cell model</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Introducing Godwoken - A missing piece of the cell model | JJy Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Introducing Godwoken - A missing piece of the cell model" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="For developers, the cell programming model certainly is the most interesting part of Nervos CKB." />
+<meta property="og:description" content="For developers, the cell programming model certainly is the most interesting part of Nervos CKB." />
+<meta property="og:site_name" content="JJy Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-03-03T00:00:00+08:00" />
+<script type="application/ld+json">
+{"description":"For developers, the cell programming model certainly is the most interesting part of Nervos CKB.","url":"/Introducing-Godwoken","@type":"BlogPosting","headline":"Introducing Godwoken - A missing piece of the cell model","dateModified":"2020-03-03T00:00:00+08:00","datePublished":"2020-03-03T00:00:00+08:00","mainEntityOfPage":{"@type":"WebPage","@id":"/Introducing-Godwoken"},"author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Introducing Godwoken - A missing piece of the cell model</h2>
+  <time datetime="2020-03-03" class="by-line">2020-03-03</time>
+  <p> Tags:
+    
+        <a class="post-link" href="tags/ckb">CKB</a>
+    
+        <a class="post-link" href="tags/english">English</a>
+    
+  </p>
+  <p>For developers, the cell programming model certainly is the most interesting part of Nervos CKB.</p>
+
+<p>There is a short description of the cell model:</p>
+
+<ul>
+  <li>Cell is generalized UTXO.</li>
+  <li>A cell is a UTXO contains arbitrary data and customizable scripts.</li>
+  <li>When tx consume or create a cell, CKB will load and execute the cell’s scripts, any error returned by scripts will fail the tx.</li>
+</ul>
+
+<p>The cell model is very different compares to account model:</p>
+
+<ul>
+  <li>Contracts do verification instead of computing</li>
+  <li>Data is stored in separate cells instead of an account tree</li>
+</ul>
+
+<p>There are many other differences when you compare two models, but we focus on today’s topic, you can find more discussions about cell model vs account model on <a href="https://talk.nervos.org" title="nervos talk forum">nervos talk</a>.</p>
+
+<h2 id="a-missing-piece-of-the-cell-model">A missing piece of the cell model</h2>
+
+<p>UTXO model is a very flexible model, and the Cell model inherited directly from it plus turing-complete programming ability. We can <a href="https://talk.nervos.org/t/rfc-simple-udt-draft-spec/4333">issue UDT</a>(user-defined token, like ERC-20), deposite on-chain assets, play paper-rock-scissors, or do <a href="https://talk.nervos.org/t/summa-bitcoin-spv-utils/4162">atomic swap with bitcoin</a>. Cell model can achieve many things that people don’t think it is able to at first thought.</p>
+
+<p>But unfortunately, some contracts are certainly harder to be implemented on the cell model:</p>
+
+<ul>
+  <li>Voting</li>
+  <li>Crowdfunding</li>
+  <li>Decentralized price oracle</li>
+  <li>…</li>
+</ul>
+
+<p>A common pattern of these harder contracts is the requirement of a shared state.</p>
+
+<p>In a UTXO-like model, the state is naturally separated.</p>
+
+<p>In CKB, users can vote in separate cells; an off-chain actor collects voting cells and calculates the result.</p>
+
+<p><img src="/assets/images/godwoken1/voting.jpg" alt="voting in separate cells" /></p>
+
+<p>It works fine if we only want to know the result off-chain. But we can’t use the voting result on-chain. The reason is if we want to use the voting result, we must do verification on-chain since we need to prove all the aggregated voting cells exist, the transaction must refer to every voting cell: it will be costly.</p>
+
+<p><img src="/assets/images/godwoken1/voting_result.jpg" alt="voting result" /></p>
+
+<p>Let’s take a look for another example, a crowdfunding contract:</p>
+
+<p>We try to use a single cell to hold all crowdfunding token; users can use CKB to exchange the corresponded amount of the token.</p>
+
+<p>The problem is when a user tries to exchange token, the original cell is consumed, and two new cells are created: one contains the tokens to the user, another cell holds rest crowdfunding token; then the outpoint of the crowdfunding cell is changed; other users must wait to the next block to find the new outpoint. So in every block, only one user can participate in crowdfunding; it’s unacceptable.</p>
+
+<p>Just like voting, a typical solution is to introduce an off-chain actor. Instead of using one single cell, users make crowdfunding requests in individual cells; then, the off-chain actor collects these cells and aggregate the result in the result cell.</p>
+
+<p>We can see, that since the state in the cell model is naturally separated, we must rely on some off-chain actor to collect state.</p>
+
+<p>This solution works, but some questions still open:</p>
+
+<ul>
+  <li>How to efficiently prove the aggregated result</li>
+  <li>How do we guarantee the decentralize after introducing the off-chain actor</li>
+  <li>How does a user interacts with an off-chain actor</li>
+</ul>
+
+<p>Ok, we can incentive off-chain actors by paying them fees; use some challenge mechanism or zk proof to magically verifies the aggregated result; define protocols to specify the interaction interface. We can always solve these problems.</p>
+
+<p>Wait, if what I want is just a voting contract. Do I really need to do all these things?</p>
+
+<h2 id="one-contract-to-rule-them-all">One contract to rule them all</h2>
+
+<p>Indeed! It’s too stupid to do all bunch things just for a voting contract. We don’t want to build these things for every contract, so we only build once:</p>
+
+<p><img src="/assets/images/godwoken1/one-contract-to-rule-them-all.jpg" alt="One contract to rule them all" /></p>
+
+<p>Godwoken is an account-based programming layer build upon CKB that is aiming to rules shared state contracts.</p>
+
+<p>Godwoken composited by the following parts:</p>
+
+<ul>
+  <li>Main contract - a type script maintains the global state of all accounts and all layer-1.5 blocks.</li>
+  <li>Challenge contract - a type script that handles challenge requests.</li>
+  <li>Aggregator - an off-chain program collects layer-1.5 transactions and ‘mine’ layer-1.5 blocks.</li>
+  <li>Validator - an off-chain program that continuously watches the contract states. The validator sends a challenge request when an invalid block is submitted.</li>
+</ul>
+
+<p><img src="/assets/images/godwoken1/godwoken-components.jpg" alt="Godwoken components" /></p>
+
+<p>You may found this sounds like a rollup solution which popular these days, and yes it is. But we focus on the aggregation problems rather than the scalabilities. Godwoken provides account-based programming ability to solve the aggregation problem.</p>
+
+<blockquote>
+  <p>Some people refer to Rollup as layer-1.5; some people think it’s layer-2, or even layer-1(by trust-level). In this article we refer Godwoken as layer-1.5 to distinguish it with the layer-1 concepts.</p>
+</blockquote>
+
+<p>Godwoken shares the same tech stack with the native CKB contract. The only difference is that Godwoken contracts are built upon account-based APIs; Godwoken verifies the state of account instead of the cell. The mapping relationship between account state and layer-1 cells is handled by the Godwoken main contract, which is transparent to layer-1.5 contracts.</p>
+
+<p>For a developer who wants to create a voting contract, can simply create an account with a script, the script verifies the input data and account state.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// pseudo code</span>
+<span class="k">fn</span> <span class="nf">verify_voting</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">votes</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">bool</span> <span class="p">{</span>
+    <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">votes</span><span class="p">;</span>
+    <span class="nf">merkle_root</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="n">next_account_root</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The Godwoken main contract uses a <a href="https://github.com/jjyr/sparse-merkle-tree" title="sparse merkle tree">sparse merkle tree</a> to store all accounts and state of accounts.</p>
+
+<p>If we want to refer to account state in layer-1.5 contracts, we simply generate a merkle proof and verify the proof in the contract.</p>
+
+<p>If we want to refer to a layer-1.5 account state in layer-1 contracts, we can refer the Godwoken main contract cell in the transaction’s <code class="language-plaintext highlighter-rouge">cell_deps</code> field, and read Godwoken global state from the cell to get the merkle root, then verifies the state and merkle proof.</p>
+
+<p>By creating an abstracted account layer, we minimize the work of building a shared state contract on CKB.</p>
+
+<p>In later articles, we will discuss the details of Godwoken, how we maintain layer-1.5 accounts and blocks, and how the account-based contract works.</p>
+
+<ul>
+  <li><a href="https://github.com/jjyr/godwoken-original/blob/master/docs/design.md">Godwoken design document</a></li>
+  <li><a href="https://justjjy.com/An-optimized-compact-sparse-merkle-tree">Sparse merkle tree</a></li>
+</ul>
+
+
+</article>
+
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

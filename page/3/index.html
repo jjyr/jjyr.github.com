@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>JJy Blog</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Page 3 of 4 for JJy Blog | A place to put some random thoughts</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="JJy Blog" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A place to put some random thoughts" />
+<meta property="og:description" content="A place to put some random thoughts" />
+<meta property="og:site_name" content="JJy Blog" />
+<link rel="prev" href="/page/2/" />
+<link rel="next" href="/page/4/" />
+<script type="application/ld+json">
+{"description":"A place to put some random thoughts","url":"/page/3/","@type":"WebPage","headline":"JJy Blog","author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <ul class="posts">
+    
+      <li>
+          <h4><a href="/Ruby-tian-jia-lv-se-Thread-Green-xian-cheng-le-ThreadGreen">Ruby 又要添加绿色线程了 Thread::Green</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2018-02-04">2018-02-04</time>
+          <p>翻到了 ruby-lang 的这个 issue，Eric Wong 给 Ruby 提了一个绿色线程的 PR
+
+https://bugs.ruby-lang.org/issues/13618
+
+总结下:
+
+
+  Eric Wong 给 ruby 增加了可以自动调度的 fiber，暂命名为 Thread::Green。就是类似 go 的 goroutine 这样的轻量级线程
+  Queue, SizedQueue 等用于同步的类是可以和 Thread::Green 一起使用的。意味着现有的 WebServer 换成 Thread::Green 很简单可...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/jie-shao-xia-LightIO">介绍下 IO loop 和 Ruby 并发网络库 LightIO</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+                <a class="post-link" href="tags/io">IO</a>
+            
+          </span>
+          <time datetime="2017-12-17">2017-12-17</time>
+          <p>说到脚本语言与高性能， Node.js 凭 benchmark 给人留下很深印象。
+
+Node.js 的高性能来自于异步 IO。Node 本身提供了 IO loop 和大量的异步接口，而其臭名昭著的 callback hell 也是源于此。
+
+IO loop，顾名思义就是一个循环，用来处理响应 IO 的代码。一般此类库的接口会允许注册一些 callback 用来处理 IO 结果。
+
+类似的语言或库大同小异，用 Ruby 的 EventMachine 库做比方：
+
+# echo server 经过简化
+class EchoServer &lt; EM...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/The-Pragmatic-Programmer">The Pragmatic Programmer 的两点感悟</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/读书">读书</a>
+            
+          </span>
+          <time datetime="2017-11-04">2017-11-04</time>
+          <p>没想到 The Pragmatic Programmer 被翻译成了《程序员修炼之道》，副标题是“从小工到专家”，要不是原书强大的实力和名声估计很少会有人买中文版吧。
+
+此书中印象最深的是对思考（书中 Think 魔咒）所举的例子：
+
+一般程序员在开会时会想，这太浪费时间了！开会时间用来写代码可以提升很多效率。
+而两位作者在想 为什么会有这个会议？ 可否避免或更高效的完成会议？
+两位作者在思考工作本身，他们在对工作编程！
+
+这个例子很好的展示了两位作者几十年从业中坚持思考，把思考变为习惯（Think 魔咒），通过思考对工作与生活不断改善，使他们的思...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/ru-he-yong-wei-fu-wu-zhi-zao-wen-ti">如何用微服务制造问题</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/微服务">微服务</a>
+            
+          </span>
+          <time datetime="2017-10-06">2017-10-06</time>
+          <p>
+  如何使用微服务制造问题
+  微服务成本
+  理想的微服务平台
+
+
+声称使用微服务架构的公司越来越多，一方面是云服务商的炒作，另一方面也的确是微服务带来好处的影响。
+无论如何理解，在 twitter 上可以看到越来越多的程序员在吐槽微服务..
+
+
+
+一方面，理论上微服务通过大事化小分而治之，可以解决开发周期长，旧项目难以维护等一系列问题，看起来非常万能。
+
+另一方面很多人忽略了微服务的隐含成本，在实际实施后反而感觉处处不便。
+
+实行微服务所需要的额外工作大致如下几类：
+
+  部署困难：需要搭建如 K8s, CloudFoundry 等应用平台来...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/suan-fa-can-bu-ren-du-bei-bao">算法惨不忍睹-背包</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/算法">算法</a>
+            
+          </span>
+          <time datetime="2017-09-25">2017-09-25</time>
+          <p>看了道 leetcode 题目
+https://leetcode.com/problems/ones-and-zeroes/description/
+
+这其实是一道背包问题，使用背包的状态转移方程可以简单解决
+
+轻轻松松试了下手，果断翻车了…
+
+我发现并不是题目难，而是我一直没能真正理解背包算法为何会这样来设计？
+每次看到解答都会感觉反直觉，无法将直觉思路联系到这种解法，而网上的解题过程也大多由结果出发，没有掌握到 why
+
+看题目时我的直觉是对每一个字符串判断需不需要，然后利用递归计算，算法如下。
+
+def find_max_form(strs,...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/CSRF-mao-yu-dun">CSRF 矛与盾</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/csrf">CSRF</a>
+            
+                <a class="post-link" href="tags/安全">安全</a>
+            
+          </span>
+          <time datetime="2017-09-21">2017-09-21</time>
+          <p>CSRF(跨站请求伪造：Cross-site request forgery) 可谓老生长谈的话题，有无数的博客和文章都在讲 CSRF 攻击与防范。
+
+近日感觉自己知识点之间存在着裂缝，无法做到了如指掌。于是弥补了下知识裂缝，并写成文章，贡献了 yet another CSRF 博文..
+
+摘要
+
+  CSRF 实践
+  POST 比 GET 安全？
+  为什么还要 CSRF protect token?
+  前后端分离和 CORS
+
+
+CSRF 实践
+顾名思义，一句话概括跨站请求伪造(CSRF)就是：在用户浏览 A 站(恶意网站)时，伪造用户向 ...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/some-cross-broswer-problems-during-my-richtext-editor-developing">开发编辑器的过程中遇到的一些浏览器差异</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/javascript">javascript</a>
+            
+          </span>
+          <time datetime="2014-03-28">2014-03-28</time>
+          <p>测试新编辑器时发现在firefox下会有很高几率出现一个神奇的bug。
+
+当光标在block元素(blockquote, pre, etc..)中时，按‘下’或‘右’或‘回车’键后，光标会选中block元素中第一段文本。刚开始怀疑是在FF下rangy设置selection的bug，但在注释所有js中keydown的处理事件后，还是会有此bug。
+
+之后百思不得其解，甚至想到用scribe重写编辑器…
+
+在观察scribe的demo在FF下的表现后，终于找出了这个很愚蠢的bug…
+
+在blockquote中我特地的把p标签转换成text + &lt;...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/javascript-tips-during-my-studying-2">javascript学习笔记(二)</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/javascript">javascript</a>
+            
+          </span>
+          <time datetime="2014-02-18">2014-02-18</time>
+          <p>1, 函数中this的四种情况
+
+//1. 函数绑定到对象上时, this为对象
+a = {func: function(){ console.log(this)}}
+a.func() // this是a
+
+//2. 没有绑定到对象时，this为全局对象
+(function(){ console.log(this) })()
+//上面的this在浏览器中是window(全局对象)
+
+//3. 用new调用时this绑定到新构造的对象
+
+//4. 函数对象的apply方法
+(function(){console.log(this)}).apply("...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/javascript-tips-during-my-studying-1">javascript学习笔记(一)</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/javascript">javascript</a>
+            
+          </span>
+          <time datetime="2014-02-17">2014-02-17</time>
+          <p>以前没怎么用过javascript(仅停留在简单的dom处理与ajax上)，身为后端程序员对其印象仅有杂乱
+
+完成简书新richtext编辑器的基本功能后，感到js也没这么不堪，反而基于原型的模型能很轻易的应对反射，动态定义Function/Object等‘元编程任务’
+
+并且和ruby中的’元编程’不同，在js中这些就是通常编程
+
+“原型”的表达力不弱于OO，并且复杂程度远小于OO。当然在javascript中的实现还是略微杂乱..虽然这门语言很多细节部分的设计让人匪夷所思，但是其核心的原型功能还是兼具了精简与好用这两处优点
+
+遂打算好好学习下j...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/ruby-zhong-de-lambda-wei-shen-me-shi-proc-lei">ruby中的lambda为什么是Proc类</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ruby">Ruby</a>
+            
+          </span>
+          <time datetime="2013-07-20">2013-07-20</time>
+          <p>当然写之前我试着在网上搜了下， 果然没有搜到类似的问题。
+
+lambda为什么不是Function, Method 而是Proc ?
+
+这个问题当然没有标准答案，于是我做了一番推(猜)测
+
+lambda和proc都是Proc类，这样已经可以看出一些端倪，proc既然叫proc当然是Proc类的主角，所以lambda只是Proc的一个附属，因为已经实现了proc，所以就顺手实现了lambda。
+
+proc是用来代表block的(双飞燕中的话是proc更接近block), 如果我们在参数中用&amp;block，我们会得到一个代表block的proc对...</p>
+      </li>
+    
+</ul>
+
+      </section>
+    </div>
+  </div>
+
+  
+  <div class="pagination">
+    
+    <a href="/page/2/" class="page-item">&laquo;</a>
+      
+    <a href="/" class="page-item">1</a>
+      
+    <a href="/page/2/" class="page-item">2</a>
+      
+    <span class="page-item">3</span>
+      
+    <a href="/page/4/" class="page-item">4</a>
+      
+    <a href="/page/4/" class="page-item">&raquo;</a>
+    
+  </div>
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

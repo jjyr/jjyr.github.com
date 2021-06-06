@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>ruby中的lambda为什么是Proc类</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>ruby中的lambda为什么是Proc类 | JJy Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="ruby中的lambda为什么是Proc类" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="当然写之前我试着在网上搜了下， 果然没有搜到类似的问题。" />
+<meta property="og:description" content="当然写之前我试着在网上搜了下， 果然没有搜到类似的问题。" />
+<meta property="og:site_name" content="JJy Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-07-20T11:33:00+08:00" />
+<script type="application/ld+json">
+{"description":"当然写之前我试着在网上搜了下， 果然没有搜到类似的问题。","url":"/ruby-zhong-de-lambda-wei-shen-me-shi-proc-lei","@type":"BlogPosting","headline":"ruby中的lambda为什么是Proc类","dateModified":"2013-07-20T11:33:00+08:00","datePublished":"2013-07-20T11:33:00+08:00","mainEntityOfPage":{"@type":"WebPage","@id":"/ruby-zhong-de-lambda-wei-shen-me-shi-proc-lei"},"author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>ruby中的lambda为什么是Proc类</h2>
+  <time datetime="2013-07-20" class="by-line">2013-07-20</time>
+  <p> Tags:
+    
+        <a class="post-link" href="tags/ruby">Ruby</a>
+    
+  </p>
+  <p>当然写之前我试着在网上搜了下， 果然没有搜到类似的问题。</p>
+
+<p>lambda为什么不是Function, Method 而是Proc ?</p>
+
+<p>这个问题当然没有标准答案，于是我做了一番推(猜)测</p>
+
+<p>lambda和proc都是Proc类，这样已经可以看出一些端倪，proc既然叫proc当然是Proc类的主角，所以lambda只是Proc的一个附属，因为已经实现了proc，所以就顺手实现了lambda。</p>
+
+<p>proc是用来代表block的(双飞燕中的话是proc更接近block), 如果我们在参数中用<code class="language-plaintext highlighter-rouge">&amp;block</code>，我们会得到一个代表block的proc对象, 并且proc和block在各种行为上几乎都是一致的。</p>
+
+<p>再来看下lambda，双飞燕中说lambda更接近method
+当然…其实他们的区别是很大的，ruby中method必须bind到一个object上才可以调用，method(消息)必有接收者</p>
+
+<p>而lambda就很异端了，仅仅是一段可执行代码，没有什么可与之对应的(python中的method可以对应为第一个参数为self的lambda)</p>
+
+<p>而与proc的区别仅仅是传参和上下文跳转上更像method，并且在block的压力之下几乎没有任何用处..</p>
+
+<blockquote>
+  <p>“虽然很鸡肋， 但是实现上很简单(把proc稍微改下？) 干脆一起实现了，说不定谁可以用得上” <br />
+-————————-（我猜测的实现lambda时matz的想法)</p>
+</blockquote>
+
+<p>于是就同归于Proc类了</p>
+
+</article>
+
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>

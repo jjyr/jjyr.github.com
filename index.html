@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>JJy Blog</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>JJy Blog | A place to put some random thoughts</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="JJy Blog" />
+<meta name="author" content="JJy" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A place to put some random thoughts" />
+<meta property="og:description" content="A place to put some random thoughts" />
+<meta property="og:site_name" content="JJy Blog" />
+<link rel="next" href="/page/2/" />
+<script type="application/ld+json">
+{"description":"A place to put some random thoughts","url":"/","@type":"WebSite","headline":"JJy Blog","name":"JJy Blog","author":{"@type":"Person","name":"JJy"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>jjy@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <ul class="posts">
+    
+      <li>
+          <h4><a href="/Offchain-determinism">Off-chain determinism</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ckb">CKB</a>
+            
+                <a class="post-link" href="tags/blockchain">blockchain</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2021-01-02">2021-01-02</time>
+          <p>How to obtain the current block number
+
+I have heard developers repeatedly complain about why they can’t read the current block number in their CKB scripts(smart contract)?
+
+As every blockchain developer knows, reading the current block number from a smart contract is a fundam...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/Rust-no-std">Rust no-std FAQ</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/rust">Rust</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2020-10-21">2020-10-21</time>
+          <p>Why write this?
+
+Most rustaceans(including me) using the std crate day-to-day since we learned how to write println!("hello world"). But it is still a very important feature of Rust: to deploy our code to bare-metal environments. Without OS support, we can not use the std crat...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/Nightshade-Near-xie-yi-fen-pian-she-ji">Nightshade - Near 协议分片设计</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/blockchain">blockchain</a>
+            
+                <a class="post-link" href="tags/论文">论文</a>
+            
+          </span>
+          <time datetime="2020-08-22">2020-08-22</time>
+          <p>
+  这篇文章是对 Nightshade 论文的摘要及总结。
+
+
+分片是区块链扩容的一个重要方向。
+
+传统的区块链如以太坊每秒仅能处理 20 个左右的交易。主要原因是以太坊中每个交易都要在每个节点上执行一遍, 单台机器的处理能力限制了以太坊的最大 TPS。
+
+分片的思路是把所有节点进行分组，每个节点不再参与全部交易的验证，而是仅验证一部分的交易，因此可以突破单台机器处理能力的限制。
+
+这篇文章介绍的夜影协议(Nightshade) 是 Near protocol 提出的分片方案。
+
+分片的基本设计
+
+区块链依靠在所有节点 Replica 所有交易来...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/Break-the-liquidity-limitation-of-NervosDAO">Break the liquidity limitation of NervosDAO</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ckb">CKB</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2020-05-05">2020-05-05</time>
+          <p>I always wonder about breaking the liquidity limitation of NervosDAO since I first learned it from the CKB economic paper.
+
+NervosDAO’s liquidity limitation
+
+For readers who do not know what the NervosDAO is:
+
+NervosDAO is a builtin contract that allows people to deposit CKB i...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/Introducing-Godwoken">Introducing Godwoken - A missing piece of the cell model</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ckb">CKB</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2020-03-03">2020-03-03</time>
+          <p>For developers, the cell programming model certainly is the most interesting part of Nervos CKB.
+
+There is a short description of the cell model:
+
+
+  Cell is generalized UTXO.
+  A cell is a UTXO contains arbitrary data and customizable scripts.
+  When tx consume or create a ce...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/An-optimized-compact-sparse-merkle-tree">An optimized compacted sparse merkle tree</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/merkletree">Merkletree</a>
+            
+                <a class="post-link" href="tags/cryptography">Cryptography</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2020-02-26">2020-02-26</time>
+          <p>Sparse merkle tree is an advanced data structure used in the blockchain world. It can compress a large key-value map into short bytes represented merkle root and generates existence or non-existence proof for keys in the tree.
+
+In this article, I describe a construction method...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/CKB-contract-in-Rust-part-2-Rewrite-contract-with-ckb">Rust contract, part 2 - Write contract with ckb-std</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/rust">Rust</a>
+            
+                <a class="post-link" href="tags/ckb">CKB</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2020-01-06">2020-01-06</time>
+          <p>
+  Edited at 2020-03-27
+
+  
+    Update ckb-std and ckb-tool
+  
+
+
+This article introduces the ckb-std library; and shows how to rewrite our minimal contract with ckb-std, to enables syscalls and Vec, String.
+
+The previous contract:
+
+#![no_std]
+#![no_main]
+#![feature(asm)]
+#![fe...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/Build-CKB-contract-with-Rust-part-1">Rust contract, part 1 - Build CKB contract with Rust</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/rust">Rust</a>
+            
+                <a class="post-link" href="tags/ckb">CKB</a>
+            
+                <a class="post-link" href="tags/english">English</a>
+            
+          </span>
+          <time datetime="2019-12-24">2019-12-24</time>
+          <p>
+  Edited at 2020-03-27
+
+  
+    Update ckg-std link
+    Remove the linker script section since I found its unnecessary to customize linker
+    Refactor the main function interface
+  
+
+
+AFAIK, the most popular contracts that deployed on CKB is writing in C. There are 3 default ...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/Merkle-Mountain-Range">Merkle Mountain Range</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/merkletree">Merkletree</a>
+            
+                <a class="post-link" href="tags/cryptography">Cryptography</a>
+            
+          </span>
+          <time datetime="2019-07-03">2019-07-03</time>
+          <p>Merkle Tree
+
+Merkle Tree 是区块链中经常（或者说必须？）会用到结构。
+
+// 比特币交易列表的 Merkle Tree
+
+            A
+          /   \
+        B       C
+       / \     / \
+      D   E   F   G
+     / \ / \ / \ / \
+     1 2 3 4 5 6 7 8
+
+
+树的叶子节点（图中的 1,2,3,4,5,6,7,8）是插入的元素，在图例中是比特币的 txid。
+非叶子节点是对左右子节点的 hash 摘要如 ...</p>
+      </li>
+    
+      <li>
+          <h4><a href="/layer-2-you-hao-de-kuang-gong-jiang-li-she-ji">layer 2 友好的原生代币</a></h2>
+          <span> Tags:
+            
+                <a class="post-link" href="tags/ckb">CKB</a>
+            
+                <a class="post-link" href="tags/blockchain">blockchain</a>
+            
+          </span>
+          <time datetime="2019-04-07">2019-04-07</time>
+          <p>矿工奖励
+
+矿工奖励是个很有意思的话题，目前大部分公链如 Bitcoin 的出块奖励主要由增发构成。
+
+
+  矿工出块奖励 = 交易手续费 + 增发奖励
+
+
+Bitcoin 以及其他大多数加密货币都有总发行量，
+增发奖励会逐年减少，直到货币供应达到总发行量，
+这时矿工奖励完全由交易费构成。
+
+完全以交易费维护矿工的想法招致了质疑, 
+很多人担心增发奖励变少后，
+交易费无法满足矿工的收益，
+矿工会流失导致网络失去安全性，
+毕竟在现实中 Bitcoin 和 Ethereum 的矿工收入主要来自增发部分。
+
+完全用手续费作为矿工奖励是否合理？能否满足加密...</p>
+      </li>
+    
+</ul>
+
+      </section>
+    </div>
+  </div>
+
+  
+  <div class="pagination">
+    
+    <span class="page-item">&laquo;</span>
+      
+    <span class="page-item">1</span>
+      
+    <a href="/page/2/" class="page-item">2</a>
+      
+    <a href="/page/3/" class="page-item">3</a>
+      
+    <a href="/page/4/" class="page-item">4</a>
+      
+    <a href="/page/2/" class="page-item">&raquo;</a>
+    
+  </div>
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>JJy</b>
+    </span>
+    
+    <span>© 2021</span>
+  </a>
+</footer>
+</body>
+
+</html>
