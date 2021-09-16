@@ -1,5 +1,5 @@
-title: JJy Blog
-description: "A place to put some random thoughts"
+title: Yet another coffee to code compiler
+description: "Yet another coffee to code compiler"
 site_url: "https://justjjy.com"
 author:
   name: "JJy"
@@ -36,4 +36,4 @@ plugins:
 
 # Custom variables
 owner : "JJy"
-year : "2020"
+year : "2021"
