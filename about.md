@@ -14,7 +14,6 @@ A blockchain developer, beginner of cryptography. Love challenging projects, cof
 * [Ciri Ethereum](https://github.com/ciri-ethereum/ciri) - An Ethereum implementation written in pure Ruby (passes all EVM tests).
 * Find more on my GitHub: [@jjyr](https://github.com/jjyr)
 
-#### Contact me:
+#### Links:
 
 * Twitter: [@_jjy0](https://twitter.com/_jjy0)
-* WeChat: fweedm (Please remark who you are)
