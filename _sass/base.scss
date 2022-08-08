@@ -52,7 +52,6 @@ li {
 */
 
 header {
-  background: #eee8d5;
   border-bottom: 1px dashed $rajah; //header;
   padding: 20px;
   margin: 0 0 40px 0;
@@ -252,7 +251,7 @@ hr {
 */
 
 a {
-  color: black;
+  color: $raw-sienna;
 }
 
 a:active, a:focus {

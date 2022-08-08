@@ -77,6 +77,3 @@ Actor 是个自动执行的实体，和对象不同，只能通过发送或接�
 初接触 Actor 模型时没感觉和 CSP 有太大差别，现在看 Actor 抽象程度更高。
 
 我发现 Actor 的最大优势就是在于使用消息的交互方式。这种交互方式可以对用户屏蔽更多的信息。调用传统库我们需要关心代码是否线程安全，而 Actor 的消息接口则对用户屏蔽了这一点，我们只需对 Actor 发送消息，等待回复，而具体代码由 Actor 执行，自然调用者不需要考虑并发、多线程安全等等问题，细节部分对调用者完全屏蔽。
-
-我在实现 Server 相关逻辑时，用 200 行 ruby 实现的精简 Actor 模型 [GitHub](https://github.com/ruby-ethereum/ethruby/blob/1ceecac4152ed2ba99609bf30e0f5b88ee2d8647/lib/ethruby/devp2p/actor.rb)
-
