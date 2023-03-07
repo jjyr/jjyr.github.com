@@ -5,7 +5,7 @@ title: About
 
 ### About me:
 
-A programmer, reader, board game player, love to sharing ideas.
+A programmer, book reader, board game player, love to sharing ideas.
 
 #### Social account:
 

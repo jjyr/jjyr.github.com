@@ -1,5 +1,4 @@
-title: Yet another coffee to code compiler
-description: "Yet another coffee to code compiler"
+title: JJy
 site_url: "https://justjjy.com"
 author:
   name: "JJy"
@@ -36,4 +35,4 @@ plugins:
 
 # Custom variables
 owner : "JJy"
-year : "2022"
+year : "2023"
