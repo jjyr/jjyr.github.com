@@ -3,12 +3,14 @@ layout: default
 ---
 
 <article>
-  <h2>{{ page.title }}</h2>
-  <time datetime="{{ page.date | date: "%Y-%m-%d" }}" class="by-line">{{ page.date | date: "%Y-%m-%d" }}</time>
-  <p> Tags:
-    {% for tag in page.tags %}
-        <a class="post-link" href="{{ tag | downcase | prepend: "tags/" | prepend: site.baseurl }}">{{ tag }}</a>
-    {% endfor %}
-  </p>
+  <header>
+    <h2>{{ page.title }}</h2>
+    <time datetime="{{ page.date | date: " %Y-%m-%d" }}" class="post-meta">{{ page.date | date: "%Y-%m-%d" }}</time>
+    <p>
+      {% for tag in page.tags %}
+      <a class="post-link" href="{{ tag | downcase | prepend: " tags/" | prepend: site.baseurl }}">{{ tag }}</a>
+      {% endfor %}
+    </p>
+  </header>
   {{ content }}
 </article>
