@@ -15,18 +15,31 @@ body p {
 }
 
 body li {
-  line-height: 200%;
+  line-height: 240%;
+}
+
+main .posts {
+  list-style-type: none;
+  padding-left: 0;
+
+  time {
+    margin-right: 16px;
+  }
+}
+
+body time {
+  color: #8c8484;
+  font: -webkit-mini-control
+}
+
+body a {
+  color: #252020;
 }
 
 header {
-  padding: 20px;
-  border-bottom: 1px solid #999;
+  padding-top: 64px;
   text-align: center;
   /* Center the child elements */
-}
-
-.post-link {
-  color: darkgrey;
 }
 
 nav {
@@ -75,7 +88,6 @@ h1 {
 
 footer {
   padding: 20px;
-  border-top: 1px solid #999;
 
   a {
     color: #999;
