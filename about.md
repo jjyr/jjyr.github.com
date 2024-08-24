@@ -3,7 +3,12 @@ layout: page
 title: About
 ---
 
-A programmer, reader, board game player, love to sharing ideas.
+I build things for fun.
 
-* Twitter: [@_jjy0](https://twitter.com/_jjy0)
-* GitHub: [@jjyr](https://github.com/jjyr)
+* [Roast2D](https://github.com/jjyr/roast2d) is a rapid development 2D game engine written in Rust.
+* [JonesForth RISC-V port](https://github.com/jjyr/jonesforth_riscv) a forth implementation written in RISC-V assembly.
+
+Social media account:
+
+* [X](https://twitter.com/_jjy0)
+* [GitHub](https://github.com/jjyr)
