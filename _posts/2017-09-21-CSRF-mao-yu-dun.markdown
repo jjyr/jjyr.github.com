@@ -1,20 +1,12 @@
 ---
 layout: post
-title: "CSRF 矛与盾"
+title: "CSRF, Protect token 与 CORS"
 data: 2017-09-21 01:07
 comments: true
-tags: CSRF 安全
+tags: CSRF Web
 ---
 
 CSRF(跨站请求伪造：Cross-site request forgery) 可谓老生长谈的话题，有无数的博客和文章都在讲 CSRF 攻击与防范。
-
-近日感觉自己知识点之间存在着裂缝，无法做到了如指掌。于是弥补了下知识裂缝，并写成文章，贡献了 yet another CSRF 博文..
-
-摘要
-* CSRF 实践
-* POST 比 GET 安全？
-* 为什么还要 CSRF protect token?
-* 前后端分离和 CORS
 
 CSRF 实践
 --------------
@@ -23,8 +15,6 @@ CSRF 实践
 我们用 ruby sinatra 简单的模拟下这个过程，从而更好的理解这种攻击手段。
 
 用 a.rb, b.rb 两个脚本来模拟 A, B 站点，并修改 `/etc/hosts` 为两个站点提供不同的域名。
-
-如果不明白可以先略过这两个脚本，之后回来再看。
 
 ``` ruby
 # a.rb
@@ -261,8 +251,6 @@ CSRF 和前后端分离有什么关系呢？是不是前后端分离的架构中
 
 这话对也不对，对于服务器来说，CSRF 和前后端是否分离没太大关系，只要服务器端接受 form 请求还是有跨站提交的问题，目前基本都是使用 json 来通信，所以服务器端只要限制仅接受 **Content-Type** 为 **application/json** 格式的数据就可以避免 CSRF，至于为什么可以避免就要先介绍下 CORS。
 
-实践过前后端分离的读者基本都会听说过 CORS 这个东西。
-
 CORS 是在前端复杂化、后端 API 化后，为了避免类似 CSRF 攻击的悲剧而加入的限制策略。浏览器在发出真正请求前会先使用 'OPTION' 请求询问服务器接受哪种 'Method'，哪些 'Headers'，如果发现 js 发出的请求不被服务器接受，则会禁止发送并报错。
 
 ![No 'Access-Control-Allow-Origin' header](/images/posts/CSRF/CSRF-3.jpg)
@@ -277,4 +265,4 @@ https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS
 
 这也就解释了 CORS 的控制边界，之前示范的表单提交属于简单请求，所以跨域不受浏览器限制。而前后端分离时大多使用 json 交互，这时就进入了 CORS 的保护范围。
 
-至于 form 提交，作为最基本的数据提交方式，跟随 Web 标准发展了几十年，仍因兼容性而允许跨站提交。幸好 Web 生态圈有社区推动的各种解决方案来不断的完善，才会有 csrf protect token 等方案让 Web 平台更加安全开放。
+至于 form 提交，作为最基本的数据提交方式，跟随 Web 标准发展了几十年，仍因兼容性而允许跨站提交。因此才会有 csrf protect token 等补充方案来修复 Web 平台安全性。
