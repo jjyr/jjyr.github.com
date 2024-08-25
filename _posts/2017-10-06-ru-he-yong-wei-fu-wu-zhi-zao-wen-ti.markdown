@@ -3,7 +3,7 @@ layout: post
 title: "如何用微服务制造问题"
 data: 2017-10-06 17:42
 comments: true
-tags: 微服务
+tags: 微服务 中文
 ---
 
 * 如何使用微服务制造问题

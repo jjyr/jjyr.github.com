@@ -18,13 +18,17 @@ body li {
   line-height: 240%;
 }
 
-main .posts {
+.posts {
   list-style-type: none;
   padding-left: 0;
 
   time {
     margin-right: 16px;
   }
+}
+
+div.lang-tags {
+  margin-bottom: 32px;
 }
 
 body time {
