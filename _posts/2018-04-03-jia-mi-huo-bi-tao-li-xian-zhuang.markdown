@@ -2,7 +2,6 @@
 layout: post
 title: "加密货币套利现状"
 data: 2018-04-03 23:38
-comments: true
 tags: 套利 加密货币 中文
 ---
 

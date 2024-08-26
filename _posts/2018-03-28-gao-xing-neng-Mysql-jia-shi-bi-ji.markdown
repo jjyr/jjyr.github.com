@@ -2,7 +2,6 @@
 layout: post
 title: "高性能 MySQL 驾驶笔记"
 data: 2018-03-28 21:14
-comments: true
 tags: mysql 中文
 ---
 

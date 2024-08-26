@@ -2,7 +2,6 @@
 layout: post
 title: "The Pragmatic Programmer 的两点感悟"
 data: 2017-11-04 11:12
-comments: true
 tags: 读书 中文
 ---
 

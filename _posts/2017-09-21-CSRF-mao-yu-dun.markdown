@@ -2,7 +2,6 @@
 layout: post
 title: "CSRF, Protect token 与 CORS"
 data: 2017-09-21 01:07
-comments: true
 tags: CSRF Web 中文
 ---
 

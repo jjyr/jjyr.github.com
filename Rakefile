@@ -54,7 +54,7 @@ task :new_post, :title, :filename do |t, args|
 layout: post
 title: "#{args[:title]}"
 data: #{time.strftime "%Y-%m-%d %H:%M"}
-comments: true
+tags: 中文 English
 ---
 HEAD
   end

@@ -2,7 +2,6 @@
 layout: post
 title: "Rust no-std FAQ"
 data: 2020-10-21 02:52
-comments: true
 tags: Rust English
 ---
 
