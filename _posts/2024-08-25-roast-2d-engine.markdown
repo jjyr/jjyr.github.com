@@ -43,11 +43,9 @@ Demo Brick
 
 high_impact 简单的设计，以及作者对使用简单技术的追求触动了我。我反复看了多遍，意识到远星物语正是使用文章中提到的原版 impact 引擎开发的。我正好玩过这款游戏，这让我产生了更多的兴趣去阅读 high_impact 的代码。
 
-high_impact 代码比我想象的简单很多，但也包含了一些我不熟悉的 C 语言技巧。
+high_impact 代码比我想象的简单很多，但也包含了一些让我惊讶的 C 语言技巧。
 
-high_impact 提供 Entity 结构来表示游戏中的对象，结构中包含 velocity, accel, gravity, pos, health 等字段，这些字段定义了大部分的游戏对象都需要的属性。引擎会根据 Entity 这些属性去更新位置，检查碰撞逻辑，调用回调方法等等。
-
-游戏代码需要通过一个巨大的 union 类型来定义所有的 Entity Type，如玩家，敌人，投射物等等。
+在游戏开发中常用 Entity 来表示游戏中的对象，比如 Player，Enemy，Item，Projectile 等。high_impact 中需要把所有的 Entity 定义为一个巨大的 union 类型，就像这样：
 
 ``` c
 // https://github.com/phoboslab/high_biolab/blob/master/src/high_impact.h#L114
@@ -66,21 +64,28 @@ union {
 		bool has_hit;
 		bool flip;
 	} projectile;	
+
+    struct {
+		bool activated;
+	} respawn_pod;
+
+	struct {
+		float shoot_wait_time;
+		float shoot_time;
+		bool can_shoot;
+		bool flip;
+	} spike;
     // ...
 }
 ```
 
-就像这样，把 player, projectile 以及其他的 Entity 都定义在这个巨大的 union 结构中，而这个 union 结构会被保存在 Entity struct 的最后一个字段中。
+这样处理简单粗暴，但确实有效，所有的 Entity 都被定义在同一个 union 类型中，这样数据在内存中具有同样的大小，可以把所有 Entities 保存在一个数组中。我欣赏这种粗旷而又简单的处理方式，用一个超大的 union 定义 Entity 的做法任何编程语言教程都不会推荐，但是这样做可以使引擎的内存管理非常简单。
 
-这样处理看起来粗糙，但确实是一个简单的做法，所有的 Entity Type 都是通过 union 定义的，他们具有同样的大小，可以把所有 Entities 保存在一个数组中。
-
-我虽然不是专业的游戏开发者，但我了解过 ECS，我知道这样做的性能会打折扣，Entity 结构字段太多了，数据没法全部放进 CPU cache 中，在引擎更新 Entity 时 CPU 需要多次的从内存中重新加载数据，对性能会有影响...而 ECS 可以把数据存储的更紧凑！
-
-但我欣赏这种简单易懂的代码，我可以直接去看 Player 或者 Enemy 中定义的 `update` 逻辑以及 `draw` 逻辑，而不是先去了解 Query, Stage 等等概念再去 Systems 中翻找真正起作用的代码。用一个超大的 union 定义 Entity 的做法任何编程语言教程都不会推荐，但是这样做可以使引擎的逻辑非常简单。
+当我们打开引擎盖时希望看到的是一个简单的系统，我可以直接去检查 Engine 的 update 逻辑或碰撞检测的处理方式。我不希望打开引擎盖后看到一团乱麻，先学习 scheduler, stage, pipeline 等概念，再去翻找真正起作用的代码。
 
 我发现过去的时间我迷失在了学习种种的抽象概念，但是从未接近我真正想要做的事情。
 
-或者复杂的技术有独特的价值，但是确实不是我需要的。我需要使用简单的，我能理解的技术去参加一次 Game Jam，而不是投入到我无法完全掌握的复杂技术中。我喜欢 high_impact 的简单直接，可以直接去阅读，修改代码，而不是在一层层抽象中迷失。
+或者复杂的技术有独特的价值，但是确实不是我目前需要的。我需要使用简单的，我能理解的技术去支持我参加 Game Jam，而不是投入到我无法完全掌握的复杂技术中。我喜欢 high_impact 的简单直接，可以直接去阅读，修改代码，而不是在一层层抽象中迷失。
 
 我决定开发一款类似的引擎。
 
@@ -98,11 +103,9 @@ union {
 
 ## 定义 Entity
 
-Entity 代表游戏中的实体，比如主角，敌人，道具，陷阱都是 Entity。
+像 high_impact 一样，Roast2D 中也定义了一个通用的 Entity struct，里面有 velocity, accerate, pos, health 等通用的属性， 引擎在游戏的 loop update 中会读取这些值，更新 Entity 位置,根据物理特性去检查碰撞，移除 health 小于或等于 0 的 Entity 等。
 
-Roast2D 中也定义了一个通用的 Entity 结构体，里面有 velocity, accerate, pos, health 等属性， 引擎在游戏的 loop update 中会读取这些值，更新 Entity 位置,根据物理特性去检查碰撞，移除 health 为 0 的 Entity 等。
-
-前文提到 high_impact 使用 union 结构去扩展 Entity，这样不同类型的 Entity 大小一致，可以统一的保存在数组中。而在 Roast2D 中我们使用 trait object 来实现目的, 内存由 Rust global allocator 管理，并没有本质上的不同。
+前文提到 high_impact 使用 union 结构去定义 Entity，这样所有 Entity 大小一致，可以统一的保存在数组中。而在 Roast2D 中我们使用 trait object 来实现目的, 内存由 Rust global allocator 管理，不需要我们自己管理，并没有本质上的不同。
 
 Entity 结构中的 `instance` 字段用来保存 trait object。Rust 中的 trait object 有点类似 OOP 语言中的对象，可以理解成数据加上 vtable，我们通过 `instance` 可以调用 EntityType 中定义的方法。
 

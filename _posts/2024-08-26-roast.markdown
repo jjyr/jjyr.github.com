@@ -1,0 +1,364 @@
+---
+layout: post
+title: "I Developed a 2D Game Engine and Made a Game with it in GMTK Game Jam"
+data: 2024-08-26 22:53
+tags: English Roast2D
+---
+
+> This article was translated from Chinese using AI, with manual modifications.
+
+## Roast2D
+
+[Roast2D][roast-2d] is a 2D game engine written in Rust, inspired by the [high_impact][high_impact] engine. Roast2D has built-in simple physics collision detection, supports [LDTK][ldtk] level editor, and can be compiled to WASM to run in the browser.
+
+[Roast2D source code][roast-2d]
+
+## Example Games
+
+Balloon Game
+
+<img src="/assets/images/Roast2D/balloon-2.gif" width="240" height="240" />
+
+*   [Game on itch.io][balloon-game]
+*   [Source code on GitHub][balloon-repo]
+
+Demo Brick
+
+<img src="/assets/images/Roast2D/brick-1.gif" width="240" height="240" />
+
+*   [Source code on GitHub][brick-demo]
+
+This article shares my experience of developing Roast2D and using it to make a game in GMTK Game Jam.
+
+## The Dream of Game Development
+
+Every programmer who likes playing games has thought about developing their own games. When this idea came up again, I decided to at least participate in a Game Jam. If I like playing games and have my own taste and understanding of games, why not try making one?
+
+I started searching for "Rust game engine" on GitHub.
+
+I opened the Bevy tutorial and started learning about Sprite, Tilemap, UINode, and other concepts. I downloaded Aseprite and LDTK, and other game development tools. As time passed, I gained a deeper understanding of game development and engine technology. I tried drawing simple 2D sprites and adding movement and other operations. I tried making a tilemap in LDTK, but I never made a decent game demo, and I never participated in a Game Jam.
+
+## Inspired by high_impact
+
+Just when I was about to forget about the goal of making a game in a Game Jam, I saw an article about the [high_impact engine][high_impact_article]. The author introduced how to rewrite the ten years old impact engine in C.
+
+The simplicity of high_impact’s design and the author’s pursuit of straightforward technology struck a chord with me. After reading the article several times, I realized that the game CrossCode was developed using the original impact engine mentioned. Having played this game myself, I became even more interested in high_impact’s source code.
+
+The code was much simpler than I expected, though it also included some surprising C language techniques.
+
+In game development, an Entity typically represents objects within the game, such as Players, Enemies, Items, or Projectiles. In high_impact, all Entity types are defined using an union, like this:
+
+``` c
+// https://github.com/phoboslab/high_biolab/blob/master/src/high_impact.h#L114
+union {
+    // ...
+	struct {
+		float high_jump_time;
+		float idle_time;
+		bool flip;
+		bool can_jump;
+		bool is_idle;
+	} player;
+
+	struct {
+		anim_def_t *anim_hit;
+		bool has_hit;
+		bool flip;
+	} projectile;	
+
+    struct {
+		bool activated;
+	} respawn_pod;
+
+	struct {
+		float shoot_wait_time;
+		float shoot_time;
+		bool can_shoot;
+		bool flip;
+	} spike;
+    // ...
+}
+```
+
+This approach is crude but effective. Defining all Entities within the same union ensures that they have the same size in memory, allowing them to be stored together in a single array. I appreciated this rough yet straightforward method. While no programming tutorial would recommend defining Entities with such a large union, but it does simplify memory management within the engine.
+
+When looking under the hood of an engine, I want to see a simple system where I can directly examine the update logic or collision detection methods. I don't want to be met with a tangled mess requiring me to understand concepts like scheduler, stage, or pipeline before I can find the actual code that works.
+
+I realized that I had lost myself in learning various abstract concepts without ever approaching what I truly wanted to create.
+
+Complex technologies may have their unique value, but they aren't what I need right now. I need straightforward, understandable technology to help me making a game in Game Jam, not complex technologies I can’t fully grasp. I admired high_impact’s simplicity and directness, which allowed me to read and modify the code without getting lost in layers of abstraction.
+
+I decided to develop a similar engine.
+
+## Good Programmers Copy
+
+So why do I need to develop my own engine instead of using high_impact directly? Is it just because of the "Rewrite everything in Rust" ideology?
+
+First, let me defend myself. I appreciate C's simplicity, fast compilation, and portability. If C programs had array bounds checking and a module system, and a tool like cargo, I would be happy to use it. However, I don't have long-term experience with C, and I don't want to spend time learning Makefile writing and debugging segment faults with unfamiliar tools.
+
+Compared to C, I dislike Rust's verbosity and meaningless fights with the compiler, but cargo is easy to use and can manage dependencies conveniently. With my familiarity with Rust, I believe I can complete this task faster.
+
+Another reason is more convincing: I just want to write an engine.
+
+I plan to roughly imitate high_impact's design and implementation, incorporating my preferences to quickly make a simple 2D engine, [Roast2D][roast-2d].
+
+## Defining Entity
+
+Just like high_impact, Roast2D also defines an Entity structure, which contains velocity, acceleration, position, health, and other common attributes. The engine reads these values in the game loop update, updates the Entity position, checks collisions, and removes Entities with health equal or less than 0.
+
+We don't need to define game entities as a large union type in Rust, we can use trait and trait object to approch it. The `instance` field in the Entity structure is used to store a trait objects which represents game-defined entities. Rust's trait objects are similar to objects in OOP languages, which can be understood as data plus a vtable.
+
+```rust
+pub struct Entity {
+    pub ent_ref: EntityRef,
+    pub ent_type: EntityTypeId,
+    /// ... ignore some fields
+    pub(crate) instance: Option<Box<dyn EntityType>>,
+}
+
+pub trait EntityType: DynClone {
+    /// Load an entity type
+    fn load(_eng: &mut Engine) -> Self
+    where
+        Self: Sized;
+
+    /// Initialize an entity
+    fn init(&mut self, _eng: &mut Engine, _ent: &mut Entity) {}
+
+    /// Update callback is called before the entity_base_update
+    fn update(&mut self, _eng: &mut Engine, _ent: &mut Entity) {}
+
+    // Draw entity anim
+    fn draw(&self, eng: &mut Engine, ent: &mut Entity, viewport: Vec2) {
+        if let Some(anim) = ent.anim.as_mut() {
+            anim.draw(&mut eng.render, (ent.pos - viewport) - ent.offset);
+        }
+    }
+
+    // ... some functions are ignored
+}
+```
+
+The game needs to define a struct for each type of Entity and implement `EntityType` for that struct.
+
+We pass `Engine` and `Entity` as parameters to the interface, so the implementation can directly read and write the current Entity. It is similar to implementing OOP methods in C, where `self` is passed as a parameter to the method. In Rust, this is not a common practice, but it is simple and easy to understand.
+
+```rust
+#[derive(Clone)]
+pub struct Player {
+    score: usize,
+    texture: Handle,
+}
+
+impl EntityType for Player {
+    fn load(eng: &mut Engine) -> Self {
+        let texture = eng.load("player.png");
+        Player { score: 0, texture }
+    }
+
+    fn init(_eng: &mut Engine, ent: &mut Entity) {
+        // setup entity
+        ent.size = Vec2::spalt(32.0);
+        //...
+    }
+
+    //...
+}
+```
+
+The `load` method is only called once to load the assets and construct an instance. I chose to save the instance returned by `load` for later use. When generating an Entity, it is actually cloning the instance returned by `load`. This approach is a bit lazy, another option is to implement Rust struct reflection like Bevy, which means I need to work continuously for several months. From the interface, it doesn't look like there's a difference, so I think the current approach is good enough.
+
+```rust
+/// Add Entity Type, Player#load is called
+eng.add_entity_type::<Player>();
+/// Spawn player instance, Player#init is called
+eng.spawn::<Player>(Vec2::splat(40.0));
+```
+
+## Collision Detection
+
+Collision detection is basically just modifying high_impact's C code to Rust, without changing the logic. There is an article that explains the [sweep and prune algorithm][sweep-and-prune] very well.
+
+The code for the slope part is too complex, and I don't need it for now, so I skipped it and only support flat surfaces.
+
+## SDL2 and WASM
+
+The platform-related code is much simpler. The core requirement is to draw rectangles on different platforms and display pixels. We use a simple trait to abstract these methods.
+
+```rust
+pub trait Platform {
+    /// Return seconds since game started
+    fn now(&mut self) -> f32;
+    fn prepare_frame(&mut self);
+    fn end_frame(&mut self);
+    fn cleanup(&mut self);
+    fn draw(
+        &mut self,
+        texture: &Handle,
+        color: Color,
+        pos: Vec2,
+        size: Vec2,
+        uv_offset: Vec2,
+        uv_size: Option<Vec2>,
+        angle: f32,
+        flip_x: bool,
+        flip_y: bool,
+    );
+    fn create_texture(&mut self, handle: Handle, data: Vec<u8>, size: UVec2);
+    fn remove_texture(&mut self, handle_id: HandleId);
+    #[allow(async_fn_in_trait)]
+    async fn run<Setup: FnOnce(&mut Engine)>(
+        title: String,
+        width: u32,
+        height: u32,
+        vsync: bool,
+        setup: Setup,
+    ) -> Result<()>
+    where
+        Self: Sized;
+}
+```
+
+Initially, I decided to only support the SDL2 backend, but then I found that the sdl2 rust crate has many small problems, such as not being able to compile to the `wasm32-unknown-unknown` target, which means our game cannot run in the browser.
+
+So I decided to add Web backend support, using Web canvas interfaces to implement `Platform`.
+
+In Rust, we can directly call canvas interfaces through the `wasm-bindgen` crate, which is a great experience. Basically, anything that can be done in JavaScript can be done directly in Rust, without even considering lifetime! All Dom objects are internal mutable!
+
+The Web backend is essentially calling the canvas's drawImage interface to draw images. I spent a lot of time dealing with the mysterious white lines that appear on the edges of tiles in Canvas, and the rest of the work went smoothly.
+
+When implementing the Web backend, I already had some game code that could run, and I could see the game gradually coming together as I implemented the simple interfaces. high_impact doesn't use canvas API, so I couldn't copy this part of the code and had to think about it myself. It was like riding a bike for the first time without training wheels.
+
+## Asset Loading
+
+Because I added Web support, loading images and other assets couldn't be done with simple file I/O. I decided to imitate Bevy's asset loading method, providing an AssetManager and a load interface. The interface immediately returns a Handle instance representing a reference to the asset. The Handle only saves an ID.
+
+```rust
+#[derive(Debug)]
+pub enum AssetType {
+    Raw,
+    Texture,
+}
+
+impl AssetManager {
+    pub fn load<P: AsRef<Path>>(&mut self, path: P, asset_type: AssetType) -> Handle {
+        //...
+    }
+    pub fn get_raw(&self, handle: &Handle) -> Option<&Vec<u8>> {
+        //...
+    }
+    pub(crate) async fn fetch(&mut self) -> Result<Vec<FetchedTask>> {
+        //...
+    }
+}
+```
+
+When calling `load` to load a Texture, after the asset is loaded, the engine will automatically call `Platform#create_texture` to create a texture on different platforms. In SDL2, it will create an `SDLTexture`, and in Web, it will create an `OffscreenCanvas`.
+
+When calling `load` to load a Raw asset, we simply save it as a `Vec<u8>`. The game code needs to get the result through the `get_raw` interface and continue processing the asset.
+
+AssetManager's `fetch` will be called every frame to check if there are any requested assets. If there are, it will try to load them. In Web, fetching assets is done through web workers, and in non-Web environments, it is done through standard library file I/O.
+
+The game code needs to save the Handle returned by `load` to reference the asset.
+
+```rust
+let handle = eng.assets.load_texture("demo.png");
+let sprite = Sprite::new(handle, UVec2::splat(32));
+```
+
+When all references to the Handle are dropped, AssetManager will release the asset. If it's a texture, it will call `Platform#remove_texture`.
+
+```rust
+impl Drop for StrongHandle {
+    fn drop(&mut self) {
+        let _ = self.drop_sender.send(DropEvent(self.id));
+    }
+}
+
+impl AssetManager {
+    pub(crate) async fn fetch(&mut self) -> Result<Vec<FetchedTask>> {
+        // ...
+        // remove dropped assets
+        while let Ok(event) = self.receiver.try_recv() {
+            self.assets.remove(&event.0);
+            let fetched_task = FetchedTask::RemoveTexture { handle: event.0 };
+            tasks.push(fetched_task);
+        }
+        // ...
+    }
+}
+```
+
+The code is largely inspired by Bevy, but I only implemented a simplified version, removing the parts related to reflection and reducing unnecessary abstraction layers.
+
+## Audio Interface
+
+I'm not familiar with how to design an audio playback interface, so I chose not to integrate audio into the engine. However, game code can directly use the [kira][kira] crate to support audio across platforms. The game can use the AssetManager interface provided by [Roast2D][roast-2d] to load audio resources and then hand them over to kira for processing after the resources are loaded.
+
+Here is an [example code][kira-example] that checks if there is a cached file every time it plays audio. If not, it checks if the asset is loaded in AssetManager.
+
+```rust
+match self.sounds_data.get(handle) {
+    Some(data) => {
+        log::debug!("Get sound {sound:?} cached");
+        Some(data.to_owned())
+    }
+    None => {
+        let Some(raw) = eng.assets.get_raw(handle).cloned() else {
+            log::debug!("Get sound {sound:?} not ready");
+            return None;
+        };
+        log::debug!("Get sound {sound:?} done");
+        let data = StaticSoundData::from_media_source(Cursor::new(raw)).unwrap();
+        self.sounds_data.insert(handle.to_owned(), data.clone());
+        Some(data)
+    }
+}
+```
+
+## LDTK Level Editor
+
+[LDTK][ldtk] is an open-source game level editor. I tried LDTK and felt good about it, so I decided to make Roast2D support LDTK.
+
+LDTK is not bound to a specific game engine. It supports defining Entity, World, Level, Layer, and other common concepts and importing tilesets and other assets. LDTK ultimately outputs a JSON file with a `.ldtk` extension.
+
+We parse this JSON file and make Roast2D correctly understand the entities, tilesets, and tile positions that need to be loaded.
+
+When using Roast2D and LDTK, there are several conventions:
+
+1.  Each level can create a Collision layer. If the layer type is IntGrid and the name is `Collision`, Roast2D will try to parse it as a Collision Map. `0` represents a tile without collision, and `1` represents a tile with collision.
+2.  Each level can create an Entities layer. The layer type is Entity, and the name is `Entities`. The Entity names in the layer must match the type names defined in Roast2D, so Roast2D can correctly spawn the corresponding Entity.
+
+<img src="/assets/images/Roast2D/level-editing.png" width="600" />
+
+## GMTK-2024 Game Jam
+
+The theme of GMTK 2024 is scale, which can be simply understood as a change in size.
+
+After some thought, I decided to use a platformer game to interpret the theme. The main charactor is a balloon, and the player can control the inflation and deflation. When inflated, the balloon can float up, and the weight becomes lighter, allowing for higher jumps. When deflated, the balloon will be blown away by the airflow.
+
+I quickly completed the coding of the mechanism and drew pixel art. On the day of submission, I designed signages to guide player.
+
+<img src="/assets/images/Roast2D/balloon-3.gif" width="240" height="240" />
+
+As of the current time, my game has received 6 reviews.
+
+My goal was 10 reviews. When I saw that there were over 7,000 games submitted to GMTK-2024, I lowered my expectations. Having 5 reviews would be satisfactory, and I've reached my goal.
+
+## Conclusion
+
+Quickly copying code from open-source projects is a very efficient way to learn. Previously, I would stare at the code, but it's far less efficient than copying the code, modifying it, and trying to compile it. When encountering problems, re-reading the code is more efficient.
+
+Participating in Game Jam and quickly designing and making game prototypes is a lot of fun. This kind of Code Rush makes me feel productive. I will continue to participate in Game Jam. Next time I will choose a smaller Game Jam. I guess that in a smaller Game Jam, submitting a game will have a higher chance of being reviewed.
+
+[roast-2d]: <https://github.com/jjyr/roast2d>
+[high_impact]: <https://github.com/phoboslab/high_impact>
+[high_impact_article]: <https://phoboslab.org/log/2024/08/high_impact>
+[ldtk]: <https://ldtk.io/>
+[sweep-and-prune]: <https://leanrada.com/notes/sweep-and-prune/>
+[kira-example]: <https://github.com/jjyr/balloon-game/blob/835ea2f0fb768d944484fe33b8f662a4a1e4daf7/src/lib.rs#L643-L759>
+[itch]: <https://itch.io/>
+[kira]: <https://github.com/tesselode/kira>
+[balloon-game]: <https://jijiy.itch.io/gmtk-2024-balloon-advanture>
+[balloon-repo]: <https://github.com/jjyr/balloon_game>
+[brick-demo]: <https://github.com/jjyr/roast2d/blob/master/examples/demo.rs>
