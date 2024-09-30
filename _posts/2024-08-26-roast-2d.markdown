@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "I Developed a 2D Game Engine and Made a Game with it in GMTK Game Jam"
-data: 2024-08-26 22:53
+title: "Roast2D - How to Fall Into and Escape the Game Engine trap"
+data: 2024-09-30 22:45
 tags: English Roast2D
 ---
 
@@ -9,177 +9,146 @@ tags: English Roast2D
 
 ## Roast2D
 
-[Roast2D][roast-2d] is a 2D game engine written in Rust, inspired by the [high_impact][high_impact] engine. Roast2D has built-in simple physics collision detection, supports [LDTK][ldtk] level editor, and can be compiled to WASM to run in the browser.
+[Roast2D][roast2d] is a rapid development 2D game engine inspired by [high_impact][high_impact] and written in Rust. It comes with basic physics collision detection, supports the [LDTK][ldtk] level editor, and can be compiled to WASM for running in browsers.
 
-[Roast2D source code][roast-2d]
+[Roast2D source code][roast2d]
 
-## Example Games
+## Examples
 
-Balloon Game
-
-<img src="/assets/images/Roast2D/balloon-2.gif" width="240" height="240" />
-
-*   [Game on itch.io][balloon-game]
-*   [Source code on GitHub][balloon-repo]
-
-Demo Brick
+Brick Out
 
 <img src="/assets/images/Roast2D/brick-1.gif" width="240" height="240" />
 
-*   [Source code on GitHub][brick-demo]
+* [Source code on GitHub][brickout]
 
-This article shares my experience of developing Roast2D and using it to make a game in GMTK Game Jam.
+Balloon platformer
 
-## The Dream of Game Development
+<img src="/assets/images/Roast2D/balloon-2.gif" width="240" height="240" />
 
-Every programmer who likes playing games has thought about developing their own games. When this idea came up again, I decided to at least participate in a Game Jam. If I like playing games and have my own taste and understanding of games, why not try making one?
+* [Game on itch.io][balloon-game]
+* [Source code on GitHub][balloon-repo]
 
-I started searching for "Rust game engine" on GitHub.
+## About this post
 
-I opened the Bevy tutorial and started learning about Sprite, Tilemap, UINode, and other concepts. I downloaded Aseprite and LDTK, and other game development tools. As time passed, I gained a deeper understanding of game development and engine technology. I tried drawing simple 2D sprites and adding movement and other operations. I tried making a tilemap in LDTK, but I never made a decent game demo, and I never participated in a Game Jam.
+This post introduces [Roast2D][roast2d], a 2D engine I developed after falling into the game engine trap.
 
-## Inspired by high_impact
+> The game engine development trap refers to a common state that amateur game developers often find themselves in: They start out wanting to make a game, but end up spending all their time developing a game engine, and ultimately never make the game itself.
 
-Just when I was about to forget about the goal of making a game in a Game Jam, I saw an article about the [high_impact engine][high_impact_article]. The author introduced how to rewrite the ten years old impact engine in C.
+Originally, this post was titled "I developed a 2D game engine and used it in the GMTK Game Jam", but I found it a bit too clickbait. I changed the title and move the focus, I decided to continuously update this post with new features of Roast2D, until the day I abandon its development.
 
-The simplicity of high_impact’s design and the author’s pursuit of straightforward technology struck a chord with me. After reading the article several times, I realized that the game CrossCode was developed using the original impact engine mentioned. Having played this game myself, I became even more interested in high_impact’s source code.
+## Inspiration
 
-The code was much simpler than I expected, though it also included some surprising C language techniques.
+I’m an indie game and board game enthusiast, and I’m more drawn to intricate game mechanics than fantasy visuals. I wanted to create games similar to Into the Breach or Slay the Spire, which captivate through their mechanics, or like Tower of the Sorcerer and Cave Story, which don’t have complex mechanics but are highly engaging.
 
-In game development, an Entity typically represents objects within the game, such as Players, Enemies, Items, or Projectiles. In high_impact, all Entity types are defined using an union, like this:
+Given my experience with Rust, I naturally started learning the Bevy engine. But it turned out to be the wrong choice. While Bevy might be a great engine for experienced developers, it’s not as easy for beginners to grasp, especially when you "lift the hood" and see a complex integrated system that's hard to comprehend. Bevy is a fantastic engine that solves many problems in Rust game development, and I borrowed a lot from Bevy's ECS design. However, when learning something new, it's often best to open the hood and understand things, not rely on black boxes. Bevy’s abstraction was too complex for me, and it felt like a black box. While I created some game prototypes with it, I still didn’t feel fully in control, and those prototypes were abandoned due to lack of playability.
 
-``` c
-// https://github.com/phoboslab/high_biolab/blob/master/src/high_impact.h#L114
-union {
-    // ...
-	struct {
-		float high_jump_time;
-		float idle_time;
-		bool flip;
-		bool can_jump;
-		bool is_idle;
-	} player;
+When I hit a dead end with Bevy, I stumbled upon an [article about the high_impact engine][high_impact_article], in which the author described how they rewrote a 10-year-old JavaScript-based engine called Impact using C. The article was simple yet informative, explaining the design of high_impact. It also mentioned that Cross Code was developed using the JavaScript version of the Impact engine, which interest me. I spent some time going through the parts of source code that interested me and quickly learn the implementation.
 
-	struct {
-		anim_def_t *anim_hit;
-		bool has_hit;
-		bool flip;
-	} projectile;	
+The simplicity of high_impact’s design hit me hard. Simple technology can support such a complex game like Cross Code, and I realized that I should start with simple technology, not complex ones.
 
-    struct {
-		bool activated;
-	} respawn_pod;
+I decided to develop my own simple 2D engine.
 
-	struct {
-		float shoot_wait_time;
-		float shoot_time;
-		bool can_shoot;
-		bool flip;
-	} spike;
-    // ...
-}
-```
+## Rust needs a bit of ECS
 
-This approach is crude but effective. Defining all Entities within the same union ensures that they have the same size in memory, allowing them to be stored together in a single array. I appreciated this rough yet straightforward method. While no programming tutorial would recommend defining Entities with such a large union, but it does simplify memory management within the engine.
+The initial design of Roast2D was influenced by high_impact, using structs to define Entities and traits to define callbacks for Entities.
 
-When looking under the hood of an engine, I want to see a simple system where I can directly examine the update logic or collision detection methods. I don't want to be met with a tangled mess requiring me to understand concepts like scheduler, stage, or pipeline before I can find the actual code that works.
-
-I realized that I had lost myself in learning various abstract concepts without ever approaching what I truly wanted to create.
-
-Complex technologies may have their unique value, but they aren't what I need right now. I need straightforward, understandable technology to help me making a game in Game Jam, not complex technologies I can’t fully grasp. I admired high_impact’s simplicity and directness, which allowed me to read and modify the code without getting lost in layers of abstraction.
-
-I decided to develop a similar engine.
-
-## Good Programmers Copy
-
-So why do I need to develop my own engine instead of using high_impact directly? Is it just because of the "Rewrite everything in Rust" ideology?
-
-First, let me defend myself. I appreciate C's simplicity, fast compilation, and portability. If C programs had array bounds checking and a module system, and a tool like cargo, I would be happy to use it. However, I don't have long-term experience with C, and I don't want to spend time learning Makefile writing and debugging segment faults with unfamiliar tools.
-
-Compared to C, I dislike Rust's verbosity and meaningless fights with the compiler, but cargo is easy to use and can manage dependencies conveniently. With my familiarity with Rust, I believe I can complete this task faster.
-
-Another reason is more convincing: I just want to write an engine.
-
-I plan to roughly imitate high_impact's design and implementation, incorporating my preferences to quickly make a simple 2D engine, [Roast2D][roast-2d].
-
-## Defining Entity
-
-Just like high_impact, Roast2D also defines an Entity structure, which contains velocity, acceleration, position, health, and other common attributes. The engine reads these values in the game loop update, updates the Entity position, checks collisions, and removes Entities with health equal or less than 0.
-
-We don't need to define game entities as a large union type in Rust, we can use trait and trait object to approch it. The `instance` field in the Entity structure is used to store a trait objects which represents game-defined entities. Rust's trait objects are similar to objects in OOP languages, which can be understood as data plus a vtable.
-
-```rust
-pub struct Entity {
-    pub ent_ref: EntityRef,
-    pub ent_type: EntityTypeId,
-    /// ... ignore some fields
-    pub(crate) instance: Option<Box<dyn EntityType>>,
-}
-
-pub trait EntityType: DynClone {
-    /// Load an entity type
-    fn load(_eng: &mut Engine) -> Self
-    where
-        Self: Sized;
-
-    /// Initialize an entity
-    fn init(&mut self, _eng: &mut Engine, _ent: &mut Entity) {}
-
-    /// Update callback is called before the entity_base_update
-    fn update(&mut self, _eng: &mut Engine, _ent: &mut Entity) {}
-
-    // Draw entity anim
-    fn draw(&self, eng: &mut Engine, ent: &mut Entity, viewport: Vec2) {
-        if let Some(anim) = ent.anim.as_mut() {
-            anim.draw(&mut eng.render, (ent.pos - viewport) - ent.offset);
-        }
-    }
-
-    // ... some functions are ignored
-}
-```
-
-The game needs to define a struct for each type of Entity and implement `EntityType` for that struct.
-
-We pass `Engine` and `Entity` as parameters to the interface, so the implementation can directly read and write the current Entity. It is similar to implementing OOP methods in C, where `self` is passed as a parameter to the method. In Rust, this is not a common practice, but it is simple and easy to understand.
-
-```rust
+``` rust
 #[derive(Clone)]
 pub struct Player {
-    score: usize,
-    texture: Handle,
+    can_jump: bool,
+    high_jump_time: f32,
+    normal: Vec2,
+    anim: Animation,
+    size: Vec2,
 }
 
 impl EntityType for Player {
-    fn load(eng: &mut Engine) -> Self {
-        let texture = eng.load("player.png");
-        Player { score: 0, texture }
-    }
-
-    fn init(_eng: &mut Engine, ent: &mut Entity) {
-        // setup entity
-        ent.size = Vec2::spalt(32.0);
-        //...
-    }
-
-    //...
+    fn load(eng: &mut Engine) -> Self;
+    fn init(&mut self, eng: &mut Engine, ent: &mut Entity);
+    fn update(&mut self, eng: &mut Entity);
+    // ...
 }
 ```
 
-The `load` method is only called once to load the assets and construct an instance. I chose to save the instance returned by `load` for later use. When generating an Entity, it is actually cloning the instance returned by `load`. This approach is a bit lazy, another option is to implement Rust struct reflection like Bevy, which means I need to work continuously for several months. From the interface, it doesn't look like there's a difference, so I think the current approach is good enough.
+Just like high_impact, Roast2D has simple built-in physics and collision detection. The Player receives an Entity in the callback, which the Entity contains common attributes like velocity, accelerate, pos, and health. The engine reads these values in the game loop update, then update the entity's position, check collisions, etc.
 
-```rust
-/// Add Entity Type, Player#load is called
-eng.add_entity_type::<Player>();
-/// Spawn player instance, Player#init is called
-eng.spawn::<Player>(Vec2::splat(40.0));
+This setup is sufficient for simple logic, but Rust presents some challenges. Rust is a memory-safe language that ensures only one mutable reference can be held at a time. For example, when the engine calls Player’s update method, since update receives `&mut self`, no other code can simultaneously obtain a reference to this player. So, how do we handle cases where we need to iterate through all players in the update method?
+
+* Option 1: Temporarily remove the object from the state before update, so that the current player being updated is not included in the iteration.
+* Option 2: Use Borrow to wrap the object, allowing the developer to dynamically check if the player is already being referenced and skip it if so.
+
+Both options work similarly, but either one can be cumbersome to handle.
+
+Using ECS (Entity Component System) solves this issue. An entity is just an ID, and callback methods don’t hold references to any state. Instead, components are accessed through the Entity ID only when needed, and references are kept as short-lived as possible to avoid lifetime conflicts. While ECS wasn’t specifically designed to address Rust’s borrow checker, its flexibility and modularity naturally avoid complex state access issues.
+
+Roast2D’s ECS design is similar to Bevy’s, but with a much simpler implementation.
+
+``` rust
+#[derive(Component)]
+pub struct Player {
+    color: Color,
+}
+
+impl Player {
+    pub fn init(w: &mut World, pos: Vec2) -> Ent {
+        let size = Vec2::new(128.0, 48.0);
+        let color = Color::rgb(0x37, 0x94, 0x6e);
+        let ent = w
+            .spawn()
+            .add(Transform::new(pos, size))
+            .add(Physics {
+                friction: Vec2::splat(FRICTION),
+                check_against: EntGroup::PROJECTILE,
+                physics: EntPhysics::ACTIVE,
+                ..Default::default()
+            })
+            .add(Player { color })
+            .add(Hooks::new(PlayerHooks))
+            .id();
+        w.get_resource_mut::<CollisionSet>().unwrap().add(ent);
+        ent
+    }
+}
+
+#[derive(Default)]
+pub struct PlayerHooks;
+
+impl EntHooks for PlayerHooks {
+    fn update(&self, eng: &mut Engine, w: &mut World, ent: Ent);
+    // ...
+}
 ```
 
-## Collision Detection
+All entities, components, and resources are stored in World.
 
-Collision detection is basically just modifying high_impact's C code to Rust, without changing the logic. There is an article that explains the [sweep and prune algorithm][sweep-and-prune] very well.
+We use `World#spawn` to create a new entity and then call `add` to add components. Roast2D provides basic components like `Transform`, `Physics`, and `Hooks`. Most entities require these components. `Hooks` accepts a trait that defines callbacks for the entity. The user-defined `Player` component is mostly just a marker.
 
-The code for the slope part is too complex, and I don't need it for now, so I skipped it and only support flat surfaces.
+`Resources` are similar to singleton objects in OOP. In the example above, we add an entity to the `CollisionSet`, and the engine checks for collisions between entities in the `CollisionSet`.
+
+The [ECS implementation code][ecs-pr] is extremely simple, just using `HashMap` to implement components and resources. This ECS design solves the reference issue mentioned earlier, I call it the Poor Man's ECS.
+
+For more on ECS, I recommend the article [Archetypal ECS Considered Harmful?][archetypal-harmful], which discusses archetype and sparse tables, which is general methods to implement effecient ECS.
+
+## LDTK level editor
+
+[LDTK][ldtk] is an open-source game level editor.
+
+LDTK is not tied to any specific game engine. It supports defining entities, worlds, levels, layers, and other common concepts, and allows importing tilesets and other assets. It exports a JSON file with the .ldtk extension.
+
+Roast2D supports reading LDTK JSON files and automatically loading entities and tilemaps.
+
+There are a few conventions when using Roast2D with LDTK:
+
+* Collision layer: If the layer type is IntGrid and its name is Collision, Roast2D will parse it as a collision map, where 0 represents no collision, and 1 represents a tile with collision.
+* Entities layer: If the layer type is Entity and its name is Entities, the entities in the layer must have names matching the component types defined in Roast2D. Roast2D will automatically spawn the entities and components.
+
+<img src="/assets/images/Roast2D/level-editing.png" width="600"/>
+
+## Collision detection
+
+The collision detection in Roast2D is essentially the same as high_impact, just rewritten in Rust with no changes to the logic. Here's a great article explaining the [sweep and prune algorithm][sweep-and-prune].
+
+The engine only checks for collisions between entities in the `CollisionSet`, and the entities must have `Transform` and `Physics` components.
 
 ## SDL2 and WASM
 
@@ -316,40 +285,9 @@ match self.sounds_data.get(handle) {
 }
 ```
 
-## LDTK Level Editor
+## Ending?
 
-[LDTK][ldtk] is an open-source game level editor. I tried LDTK and felt good about it, so I decided to make Roast2D support LDTK.
-
-LDTK is not bound to a specific game engine. It supports defining Entity, World, Level, Layer, and other common concepts and importing tilesets and other assets. LDTK ultimately outputs a JSON file with a `.ldtk` extension.
-
-We parse this JSON file and make Roast2D correctly understand the entities, tilesets, and tile positions that need to be loaded.
-
-When using Roast2D and LDTK, there are several conventions:
-
-1.  Each level can create a Collision layer. If the layer type is IntGrid and the name is `Collision`, Roast2D will try to parse it as a Collision Map. `0` represents a tile without collision, and `1` represents a tile with collision.
-2.  Each level can create an Entities layer. The layer type is Entity, and the name is `Entities`. The Entity names in the layer must match the type names defined in Roast2D, so Roast2D can correctly spawn the corresponding Entity.
-
-<img src="/assets/images/Roast2D/level-editing.png" width="600" />
-
-## GMTK-2024 Game Jam
-
-The theme of GMTK 2024 is scale, which can be simply understood as a change in size.
-
-After some thought, I decided to use a platformer game to interpret the theme. The main charactor is a balloon, and the player can control the inflation and deflation. When inflated, the balloon can float up, and the weight becomes lighter, allowing for higher jumps. When deflated, the balloon will be blown away by the airflow.
-
-I quickly completed the coding of the mechanism and drew pixel art. On the day of submission, I designed signages to guide player.
-
-<img src="/assets/images/Roast2D/balloon-3.gif" width="240" height="240" />
-
-As of the current time, my game has received 6 reviews.
-
-My goal was 10 reviews. When I saw that there were over 7,000 games submitted to GMTK-2024, I lowered my expectations. Having 5 reviews would be satisfactory, and I've reached my goal.
-
-## Conclusion
-
-Quickly copying code from open-source projects is a very efficient way to learn. Previously, I would stare at the code, but it's far less efficient than copying the code, modifying it, and trying to compile it. When encountering problems, re-reading the code is more efficient.
-
-Participating in Game Jam and quickly designing and making game prototypes is a lot of fun. This kind of Code Rush makes me feel productive. I will continue to participate in Game Jam. Next time I will choose a smaller Game Jam. I guess that in a smaller Game Jam, submitting a game will have a higher chance of being reviewed.
+No, princess is in another castle!
 
 [roast-2d]: <https://github.com/jjyr/roast2d>
 [high_impact]: <https://github.com/phoboslab/high_impact>
