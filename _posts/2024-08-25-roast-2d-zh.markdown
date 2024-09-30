@@ -1,185 +1,155 @@
 ---
 layout: post
-title: "我开发了一款 2D 游戏引擎并用它参加 GMTK Game Jam"
-data: 2024-08-25 17:24
+title: "Roast2D - 如何陷入及爬出游戏引擎陷阱"
+data: 2024-09-30 22:09
 tags: 中文 Roast2D
 ---
 
 ## Roast2D
 
-[Roast2D][roast-2d] 是一款受 [high_impact][high_impact] 引擎启发，由 Rust 编写的适合快速开发的 2D 游戏引擎。 Roast2D 内置简单的物理碰撞检测，支持 [LDTK][ldtk] 关卡编辑器，并且支持编译为 WASM 在浏览器中运行。
+[Roast2D][roast2d] 是一款受 [high_impact][high_impact] 引擎启发，由 Rust 编写的适合快速开发的 2D 游戏引擎。 Roast2D 内置简单的物理碰撞检测，支持 [LDTK][ldtk] 关卡编辑器，并且支持编译为 WASM 在浏览器中运行。
 
-[Roast2D source code][roast-2d]
+[Roast2D source code][roast2d]
 
-## 示例游戏
+## Examples
 
-Baloon Game
+Brick Out
+
+<img src="/assets/images/Roast2D/brick-1.gif" width="240" height="240" />
+
+* [Source code on GitHub][brickout]
+
+
+Baloon platformer
 
 <img src="/assets/images/Roast2D/balloon-2.gif" width="240" height="240" />
 
 * [Game on itch.io][balloon-game]
 * [Source code on GitHub][balloon-repo]
 
-Demo Brick
+## 这篇文章
 
-<img src="/assets/images/Roast2D/brick-1.gif" width="240" height="240" />
+这篇文章介绍了 Roast2D，一款因为我陷入了 *游戏引擎陷阱* 而开发出的 2D 引擎。
 
-* [Source code on GitHub][brick-demo]
+> *游戏引擎开发陷阱* 是指业余游戏开发者经常陷入的一个状态：最初想要开发游戏，结果却变成了一直在开发游戏引擎，而且最终也没做出游戏。
 
+文章最初叫 "我开发了一款 2D 游戏引擎并用它参加 GMTK Game Jam"，有点偏向于噱头，于是我更改了名字，并且决定持续维护这个文章更新 Roast2D 的特性，直到我放弃 Roast2D 的开发。
 
-这篇文章分享了我开发 Roast2D 的初衷以及使用该引擎参加 GMTK Game Jam 的过程。
+## 启发
 
-## 游戏开发之梦
+我是个独立游戏以及桌游玩家，相比精美的画面，精巧的游戏机制对我吸引力更大。我想要制作类似陷阵之志、杀戮尖塔这种以机制吸引人的游戏，或者是类似魔塔、洞窟物语，没有复杂的机制但是让人欲罢不能的游戏。
 
-每个喜欢打游戏的程序员都想过要自己开发游戏，当这个想法再次浮现时，我决定参加一次 Game Jam。如果我喜欢玩游戏，对游戏有自己的品味和理解，为什么不试着做一款呢？
+基于使用 Rust 的经验，我自然的选择去学习 Bevy 引擎，但最终证明这是个错误的选择，对一个熟练的游戏开发者 Bevy 或许是个好的选择，但是对于新手来说，Bevy 不是这么容易掌握，尤其是当你想要打开引擎盖时，你看到的是复杂的集成电路，让人无从下手。Bevy 是个优秀的引擎，解决了 Rust 游戏开发中的很多问题，我借鉴了很多 Bevy ECS 的实现思路以及设计，但在学习一个新东西时最佳的方式是直接打开引擎盖看明白，而不是使用黑盒，Bevy 的抽象很复杂，对我来说和黑盒一样。我创建了一些游戏 prototypes, 但仍感觉无法完整掌握 Bevy，这些原型也因为可玩性不高被抛弃了。
 
-我开始在 GitHub 搜索 "Rust game engine"。
+在 Bevy 上的进展停滞不前时，我看到了 [high_impact 引擎的文章][high_impact_article] ，作者介绍了如何用 C 去重写 10 多年前 JavaScript 实现的 impact 引擎。这篇文章写的非常简单，但足够解释 high_impact 的设计，而且文章中提到远星物语是使用 js 版本的 impact 引擎开发的，这让我更感兴趣了。我花了些时间看了感兴趣的部分并很快弄懂了实现。
 
-打开了 Bevy 教程，开始学习 Sprite，Tilemap, UINode 等概念，下载 Aseprite 以及 LDTK 等游戏制作工具。随着时间过去了一年，我更加的了解了游戏开发以及引擎技术，我尝试绘制出简单的 2D sprite 并增加移动等操作，我尝试过在 LDTK 中用 tilemap 制作地图，但从来没有做出像样的游戏 Demo，也没有参加过 Game Jam。
+high_impact 的简单设计让我受到冲击，简单的技术也可以支持远星物语这么复杂的游戏，我意识到我应该从简单的技术开始，而非复杂的技术。
 
-## 受到 high_impact 的启发
+我决定自己开发一款简单的 2D 引擎。
 
-就在我快要忘记参加一次 Game Jam 这个想法时，我看到了一篇关于 [high_impact 引擎的文章][high_impact_article] ，作者介绍了如何用 C 去重写 10 多年前 JavaScript 实现的 impact 引擎。
+## Rust 需要一点点 ECS
 
-high_impact 简单的设计，以及作者对使用简单技术的追求触动了我。我反复看了多遍，意识到远星物语正是使用文章中提到的原版 impact 引擎开发的。我正好玩过这款游戏，这让我产生了更多的兴趣去阅读 high_impact 的代码。
-
-high_impact 代码比我想象的简单很多，但也包含了一些让我惊讶的 C 语言技巧。
-
-在游戏开发中常用 Entity 来表示游戏中的对象，比如 Player，Enemy，Item，Projectile 等。high_impact 中需要把所有的 Entity 定义为一个巨大的 union 类型，就像这样：
-
-``` c
-// https://github.com/phoboslab/high_biolab/blob/master/src/high_impact.h#L114
-union {
-    // ...
-	struct {
-		float high_jump_time;
-		float idle_time;
-		bool flip;
-		bool can_jump;
-		bool is_idle;
-	} player;
-
-	struct {
-		anim_def_t *anim_hit;
-		bool has_hit;
-		bool flip;
-	} projectile;	
-
-    struct {
-		bool activated;
-	} respawn_pod;
-
-	struct {
-		float shoot_wait_time;
-		float shoot_time;
-		bool can_shoot;
-		bool flip;
-	} spike;
-    // ...
-}
-```
-
-这样处理简单粗暴，但确实有效，所有的 Entity 都被定义在同一个 union 类型中，这样数据在内存中具有同样的大小，可以把所有 Entities 保存在一个数组中。我欣赏这种粗旷而又简单的处理方式，用一个超大的 union 定义 Entity 的做法任何编程语言教程都不会推荐，但是这样做可以使引擎的内存管理非常简单。
-
-当我们打开引擎盖时希望看到的是一个简单的系统，我可以直接去检查 Engine 的 update 逻辑或碰撞检测的处理方式。我不希望打开引擎盖后看到一团乱麻，先学习 scheduler, stage, pipeline 等概念，再去翻找真正起作用的代码。
-
-我发现过去的时间我迷失在了学习种种的抽象概念，但是从未接近我真正想要做的事情。
-
-或者复杂的技术有独特的价值，但是确实不是我目前需要的。我需要使用简单的，我能理解的技术去支持我参加 Game Jam，而不是投入到我无法完全掌握的复杂技术中。我喜欢 high_impact 的简单直接，可以直接去阅读，修改代码，而不是在一层层抽象中迷失。
-
-我决定开发一款类似的引擎。
-
-## 好的程序员偷代码
-
-那么为什么需要自己开发一个引擎，而不是直接用 high_impact？仅仅是 Rewrite everything in Rust 主义？
-
-首先容我辩解下，我欣赏 C 的简单明了，快速的编译，可移植性。如果 C 程序有数组越界检查以及 module 系统，最好再加上一个类似 cargo 的工具，我会很愿意使用。但我并没有长期的使用 C 的经验，我不希望花费时间去学习 Makefile 写法以及去用我不熟悉的工具 debug 段错误。
-
-相比 C ，我厌恶 Rust 的繁琐以及与编译器无意义的搏斗，但是 cargo 很好用，可以方便的管理依赖。而且凭借我对 Rust 的熟悉，我相信可以更快的完成这个任务。
-
-另一个理由更可信一点：我就是想要写一个引擎。
-
-我打算大致上模仿 high_impact 的设计与实现，融入我的偏好来快速的制作一个简单的 2D 引擎 [Roast2D][roast-2d]。
-
-## 定义 Entity
-
-像 high_impact 一样，Roast2D 中也定义了一个通用的 Entity struct，里面有 velocity, accerate, pos, health 等通用的属性， 引擎在游戏的 loop update 中会读取这些值，更新 Entity 位置,根据物理特性去检查碰撞，移除 health 小于或等于 0 的 Entity 等。
-
-前文提到 high_impact 使用 union 结构去定义 Entity，这样所有 Entity 大小一致，可以统一的保存在数组中。而在 Roast2D 中我们使用 trait object 来实现目的, 内存由 Rust global allocator 管理，不需要我们自己管理，并没有本质上的不同。
-
-Entity 结构中的 `instance` 字段用来保存 trait object。Rust 中的 trait object 有点类似 OOP 语言中的对象，可以理解成数据加上 vtable，我们通过 `instance` 可以调用 EntityType 中定义的方法。
-
-``` rust
-pub struct Entity {
-    pub ent_ref: EntityRef,
-    pub ent_type: EntityTypeId,
-    /// ... ignore some fields
-    pub(crate) instance: Option<Box<dyn EntityType>>,
-}
-
-pub trait EntityType: DynClone {
-    /// Load an entity type
-    fn load(_eng: &mut Engine) -> Self
-    where
-        Self: Sized;
-
-    /// Initialize an entity
-    fn init(&mut self, _eng: &mut Engine, _ent: &mut Entity) {}
-
-    /// Update callback is called before the entity_base_update
-    fn update(&mut self, _eng: &mut Engine, _ent: &mut Entity) {}
-
-    // Draw entity anim
-    fn draw(&self, eng: &mut Engine, ent: &mut Entity, viewport: Vec2) {
-        if let Some(anim) = ent.anim.as_mut() {
-            anim.draw(&mut eng.render, (ent.pos - viewport) - ent.offset);
-        }
-    }
-
-    // ... some functions are ignored
-}
-```
-
-定义代码如下，游戏需要为每种 Entity 定义 struct 结构，并对 struct 实现 `EntityType`。
-
-我们把 `Engine` 以及 `Entity` 作为参数传到了接口中，这样方法实现中可以直接读写当前的 Entity。效果很像是在 C 中实现 OOP 方法时需要把 `self` 作为参数传递到方法中，在 Rust 中并不常用，但是简单，而且易于理解。
+[Roast2D](roast2d) 最初设计受到 high_impact 的影响，使用 struct 来定义 Entity, 并通过 trait 来表示定义 Entity 的回调。
 
 ``` rust
 #[derive(Clone)]
 pub struct Player {
-    score: usize,
-    texture: Handle,
+    can_jump: bool,
+    high_jump_time: f32,
+    normal: Vec2,
+    anim: Animation,
+    size: Vec2,
 }
 
 impl EntityType for Player {
-    fn load(eng: &mut Engine) -> Self {
-        let texture = eng.load("player.png");
-        Player{ score: 0, texture }
-    }
-
-    fn init(_eng: &mut Engine, ent: &mut Entity) {
-        ent.size = Vec2::spalt(32.0);
-        //... setup entity
-    }
-
-    //...
+    fn load(eng: &mut Engine) -> Self;
+    fn init(&mut self, eng: &mut Engine, ent: &mut Entity);
+    fn update(&mut self, eng: &mut Engine, ent: &mut Entity);
+    // ...
 }
 ```
 
-`load` 方法只会被调用一次，用来加载 Entity 需要的资源并构造实例。我选择把 `load` 返回的实例保存下载。当生成 Entity 时，其实是在 clone `load` 返回的实例。这种做法比较偷懒，另一个选择是类似 Bevy 那样用宏实现 Rust struct 的 reflect 功能，那意味着我需要连续在半夜工作几个月。从接口上看不出什么区别，因此我觉得目前的方式已经足够好了。
+像 high_impact 一样，Roast2D 中内置简单的 physics 和碰撞检测，因此 `Player` 在回调中会接收一个 `Entity` 的结构，这个结构中有 `velocity`, `accerate`, `pos`, `health` 等通用的属性， 引擎在游戏的 loop update 中会读取这些值，更新 Entity 位置，根据物理特性去检查碰撞等。
+
+这样足以实现简单的逻辑，但是 Rust 带来了很多特殊情况。 Rust 是个内存安全语言，语言保证同时只能持有一个可变引用。举个例子，引擎调用 `Player` 的 `update` 方法，那么这个时候因为 `update` 获取了 `&mut self`，其他的代码就无法同时获取这个玩家的引用，那么假设我们需要在 `update` 中遍历所有的玩家该如何做？
+
+1. 选项 1，update 前把对象临时从状态中移除，这样在遍历 Player 时不包含当前 update 的 Player
+2. 选项 2，用 `Borrow` 包装对象，开发者可以动态检查是否已经被引用，如果被引用可以跳过对象
+
+两个选项实际效果差不多，无论选择哪个处理方式都比较麻烦。
+
+如果使用 ECS 则可以解决这个问题，Entity 仅是 id，回调方法不会保持对任何状态的引用，在处理回调时再去通过 Entity 获取 Component 数据的引用，引用也可以保持的尽可能短，避免 lifetime 冲突。ECS 本意并不是为了解决 Rust 生命周期，但是这种灵活的可组合行和模块化设计恰好可以避免复杂的状态访问。
+
+Roast2D 的 ECS 设计类似 Bevy，但是实现非常简单。
 
 ``` rust
-/// Add Entity Type, Player#load is called
-eng.add_entity_type::<Player>();
-/// Spawn player instance, Player#init is called
-eng.spawn::<Player>(Vec2::splat(40.0));
+#[derive(Component)]
+pub struct Player {
+    color: Color,
+}
+
+impl Player {
+    pub fn init(w: &mut World, pos: Vec2) -> Ent {
+        let size = Vec2::new(128.0, 48.0);
+        let color = Color::rgb(0x37, 0x94, 0x6e);
+        let ent = w
+            .spawn()
+            .add(Transform::new(pos, size))
+            .add(Physics {
+                friction: Vec2::splat(FRICTION),
+                check_against: EntGroup::PROJECTILE,
+                physics: EntPhysics::ACTIVE,
+                ..Default::default()
+            })
+            .add(Player { color })
+            .add(Hooks::new(PlayerHooks))
+            .id();
+        w.get_resource_mut::<CollisionSet>().unwrap().add(ent);
+        ent
+    }
+}
+
+#[derive(Default)]
+pub struct PlayerHooks;
+
+impl EntHooks for PlayerHooks {
+    fn update(&self, eng: &mut Engine, w: &mut World, ent: Ent);
+    // ...
+}
 ```
+
+所有的 Entity, Component, Resource 等状态都保存在 `World` 中。
+
+使用 `World#spawn` 方法创建一个新的 `Entity`, 然后调用 `add` 增加 Components，Roast2D 提供了 `Transform`, `Physics` 以及 `Hooks` 等基础 Component 实现。大部分的 Entity 都需要这几个 Component。`Hooks` 接受 `EntHooks` trait 实现，这个 trait 定义了引擎对 Entity 的回调方法。`Player` Component 没有实际作用，仅作为一个标记使用。
+
+`Resource` 类似 OOP 中的单例对象，在上面示例中，我们把 Entity 增加到 `CollisionSet`, 引擎会检查 `CollisionSet` 中的 Entities 是否碰撞。
+
+而实现这个 [ECS 系统的代码][ecs-pr]非常简单，仅仅是 HashMap。
+
+这个 ECS 系统看起来像模像样，足够解决上面提到的引用问题。我把这个实现叫做 Poor Man's ECS。
+
+关于 ECS 常见的 arche-type 实现以及 sparse table 的实现我推荐阅读 [Archetypal ECS Considered Harmful?][archetypal-harmful] 这篇文章。
+
+## LDTK 关卡编辑器
+
+[LDTK][ldtk] 是一个开源的游戏关卡编辑器。
+
+LDTK 并不和特定的游戏引擎绑定，在 LDTK 中支持定义 Entity，World, Level, Layer 等常用的概念，并支持导入 tileset 等资源，LDTK 最终输出一个后缀为 `ldtk` 的 JSON 文件。
+
+Roast2D 支持读取 LDTK JSON 文件并自动加载 entity, tilemap。
+
+使用 Roast2D 和 LDTK 时有几个约定：
+
+1. Collision layer, 如果 layer 类型为 IntGrid, 名称为 `Collision`。Roast2D 会尝试将其作为 Collision Map 解析，`0` 代表 tile 无碰撞，`1` 代表 tile 会产生碰撞。
+2. Entities layer, layer 的类型为 Entity, 名称为 `Entities`，layer 中包含的 Entity 名称必须和 Roast2D 中定义的 Component 类型名称一致，这样 Roast2D 会自动 spawn Entity 及 Component。
+
+<img src="/assets/images/Roast2D/level-editing.png" width="600"/>
 
 ## Collision detection
 
 Collision detection 基本只是把 high_impact 的代码改成 Rust，没有修改逻辑，这里有篇文章很好的解释了 [sweep and prune 算法][sweep-and-prune]
 
-关于斜坡部分的代码太复杂，而且暂时用不上，于是我跳过了这一部分，只支持平面。
+引擎仅会检查 `CollisionSet` 中的 Entity，且 Entity 必须拥有 `Transform`, `Physics`
 
 ## SDL2 和 WASM
 
@@ -227,7 +197,7 @@ pub trait Platform {
 
 Web backend 本质是在调用 canvas 的 drawImage 接口去绘制图像，我花了很多时间处理 Canvas 中出现在 tile 边缘的神秘白线，剩下的事情都比较顺利。
 
-在实现 Web backend 时，我已经有了一部分可以运行游戏代码，一边实现简单的接口一边可以看着游戏逐渐跑起来，是一种很神奇的体验。high_impact 没有使用 canvas API，所以这部分代码无法 copy，需要我自己思考，有种骑自行车第一次拿掉了辅助轮的新鲜感。
+在实现 Web backend 时，我已经有了一部分可以运行游戏代码，一边实现简单的接口一边可以看着游戏逐渐跑起来，是一种很神奇的体验。
 
 ## Asset loading 资源管理
 
@@ -293,7 +263,7 @@ impl AssetManager {
 
 ## Sound 音频接口
 
-我不熟悉播放音频的接口该如何设计，因此选择不把音频集成到引擎中，不过游戏代码中可以直接使用 [kira][kira] crate 来跨平台支持音频。游戏中可以通过 [Roast2D][roast-2d] 提供的 AssetManager 接口加载音频资源，并在资源加载完毕后交给 kira 处理。
+我不熟悉播放音频的接口该如何设计，因此选择不把音频集成到引擎中，不过游戏代码中可以直接使用 [kira][kira] crate 来跨平台支持音频。游戏中可以通过 [Roast2D][roast2d] 提供的 AssetManager 接口加载音频资源，并在资源加载完毕后交给 kira 处理。
 
 这里留下了[示例代码][kira-example]，在每次播放音频会去检查是否已经有缓存文件，如果没有则尝试检查 AssetManager 中资源是否加载。
 
@@ -316,42 +286,12 @@ match self.sounds_data.get(handle) {
 }
 ```
 
-## LDTK 关卡编辑器
+## Ending?
 
-[LDTK][ldtk] 是一个开源的游戏关卡编辑器，我尝试过 LDTK 并感觉良好，因此我决定让 Roast2D 支持 LDTK。
+No, 公主仍在另外一个城堡
 
-LDTK 并不和特定的游戏引擎绑定，在 LDTK 中支持定义 Entity，World, Level, Layer 等常用的概念，并支持导入 tileset 等资源，LDTK 最终输出一个后缀为 `ldtk` 的 JSON 文件。
 
-我们解析这个 JSON 文件并让 Roast2D 正确的理解需要加载的 entity, tileset, tile 位置即可。
-
-使用 Roast2D 和 LDTK 时有几个约定：
-
-1. 每个关卡可以创建一个 Collision layer, 如果 layer 类型为 IntGrid, 名称为 `Collision`。Roast2D 会尝试将其作为 Collision Map 解析，`0` 代表 tile 无碰撞，`1` 代表 tile 会产生碰撞。
-2. 每个关卡可以创建一个 Entities layer, layer 的类型为 Entity, 名称为 `Entities`，layer 中包含的 Entity 名称必须和 Roast2D 中定义的类型名称一致，这样 Roast2D 才可以正确的 spawn 对应 Entity。
-
-<img src="/assets/images/Roast2D/level-editing.png" width="600"/>
-
-## GMTK-2024 Game Jam
-
-GMTK 2024 的主题是 scale, 最简单的理解是尺寸上的变化。
-
-经过了一段时间的思考，我决定用平台跳跃游戏来阐释，主角的形象是一个气球，玩家可以控制充气以及放气，当充气时主角可以浮起来，体重变轻跳的更高，当放气时主角会被气流吹动或者很大的加速度。
-
-我很快完成了机制的编码，并画了像素图形。在提交结束当天，我设计了提示玩家操作的提示牌。
-
-<img src="/assets/images/Roast2D/balloon-3.gif" width="240" height="240"/>
-
-截止到当前的时间，我的游戏获得了 6 个 review。
-
-我的目标是 10 个 review，在看到 GMTK-2024 提交数有 7K 多款游戏时，我下调了预期，有 5 个 review 就满意了，算是达成了目标。
-
-## 总结
-
-快速的从开源项目 copy 代码是非常高效的学习方式，我之前读代码时会盯着代码看，但远不如直接把代码复制过来，修改并尝试编译，遇到问题时重新阅读来的高效。
-
-参加 Game Jam 并且快速的设计、制作游戏原型很有意思，这种 Code Rush 会让人感觉到充满了生产力，我会继续参加 Game Jam，当然下次会选择规模更小的 Game Jam，我猜测在小型的 Game Jam 中提交游戏会有更多概率被 Review 到。
-
-[roast-2d]: https://github.com/jjyr/roast2d
+[roast2d]: https://github.com/jjyr/roast2d
 [high_impact]: https://github.com/phoboslab/high_impact
 [high_impact_article]: https://phoboslab.org/log/2024/08/high_impact
 [ldtk]: https://ldtk.io/
@@ -361,4 +301,6 @@ GMTK 2024 的主题是 scale, 最简单的理解是尺寸上的变化。
 [kira]: https://github.com/tesselode/kira
 [balloon-game]: https://jijiy.itch.io/gmtk-2024-balloon-advanture
 [balloon-repo]: https://github.com/jjyr/balloon_game
-[brick-demo]: https://github.com/jjyr/roast2d/blob/master/examples/demo.rs
+[brickout]: https://github.com/jjyr/roast2d/blob/master/examples/demo.rs
+[ecs-pr]: https://github.com/jjyr/roast2d/pull/14/files#diff-417d46472f7f4d2d93a4a38fda64c631a103dcdd2f7c30c6e42d600a19bfe9b0R23
+[archetypal-harmful]: https://moonside.games/posts/archetypal-ecs-considered-harmful/
