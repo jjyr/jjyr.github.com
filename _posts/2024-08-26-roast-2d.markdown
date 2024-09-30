@@ -262,7 +262,7 @@ The code is largely inspired by Bevy, but I only implemented a simplified versio
 
 ## Audio Interface
 
-I'm not familiar with how to design an audio playback interface, so I chose not to integrate audio into the engine. However, game code can directly use the [kira][kira] crate to support audio across platforms. The game can use the AssetManager interface provided by [Roast2D][roast-2d] to load audio resources and then hand them over to kira for processing after the resources are loaded.
+I'm not familiar with how to design an audio playback interface, so I chose not to integrate audio into the engine. However, game code can directly use the [kira][kira] crate to support audio across platforms. The game can use the AssetManager interface provided by [Roast2D][roast2d] to load audio resources and then hand them over to kira for processing after the resources are loaded.
 
 Here is an [example code][kira-example] that checks if there is a cached file every time it plays audio. If not, it checks if the asset is loaded in AssetManager.
 
@@ -289,7 +289,7 @@ match self.sounds_data.get(handle) {
 
 No, princess is in another castle!
 
-[roast-2d]: <https://github.com/jjyr/roast2d>
+[roast2d]: <https://github.com/jjyr/roast2d>
 [high_impact]: <https://github.com/phoboslab/high_impact>
 [high_impact_article]: <https://phoboslab.org/log/2024/08/high_impact>
 [ldtk]: <https://ldtk.io/>
