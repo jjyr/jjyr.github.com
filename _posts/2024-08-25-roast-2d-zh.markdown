@@ -147,9 +147,13 @@ Roast2D 支持读取 LDTK JSON 文件并自动加载 entity, tilemap。
 
 ## Collision detection
 
-Collision detection 基本只是把 high_impact 的代码改成 Rust，没有修改逻辑，这里有篇文章很好的解释了 [sweep and prune 算法][sweep-and-prune]
+Entity 通过设置 `Transform`, `Physics` Components, 并把 ID 增加到 `CollisionSet` 来启用碰撞检测。
 
-引擎仅会检查 `CollisionSet` 中的 Entity，且 Entity 必须拥有 `Transform`, `Physics`
+Roast2D 引擎在 game loop 中，会遍历 `CollisionSet` 中所有 Entities 并执行 [Sweep and prune 算法][sweep-and-prune]，该算法减少无效的碰撞检测，仅对 x 轴或者 y 轴重合的 Entities 执行碰撞检测。
+
+Roast2D 引擎仅支持正方形的碰撞检测，根据 `Transform#angle` 值我们使用两种碰撞检测：
+* `angle` 为默认值，或者为直角。此时 Entity 可以被视为一个不旋转的正方形，Entity 使用 AABB 碰撞检测
+* `angle` 为其他角度。此时 Entity 被视为一个旋转的正方形，Entity 使用 [Separating Axis Theorem][sat] 碰撞检测，SAT 支持检测斜面是否碰撞。
 
 ## SDL2 和 WASM
 
@@ -297,10 +301,10 @@ No, 公主仍在另外一个城堡
 [ldtk]: https://ldtk.io/
 [sweep-and-prune]: https://leanrada.com/notes/sweep-and-prune/
 [kira-example]: https://github.com/jjyr/balloon-game/blob/835ea2f0fb768d944484fe33b8f662a4a1e4daf7/src/lib.rs#L643-L759
-[itch]: https://itch.io/
 [kira]: https://github.com/tesselode/kira
 [balloon-game]: https://jijiy.itch.io/gmtk-2024-balloon-advanture
 [balloon-repo]: https://github.com/jjyr/balloon_game
 [brickout]: https://github.com/jjyr/roast2d/blob/master/examples/brickout.rs
 [ecs-pr]: https://github.com/jjyr/roast2d/pull/14/files#diff-417d46472f7f4d2d93a4a38fda64c631a103dcdd2f7c30c6e42d600a19bfe9b0R23
 [archetypal-harmful]: https://moonside.games/posts/archetypal-ecs-considered-harmful/
+[sat]: https://dyn4j.org/2010/01/sat/

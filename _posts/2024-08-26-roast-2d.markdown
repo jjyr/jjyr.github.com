@@ -5,8 +5,6 @@ data: 2024-09-30 22:45
 tags: English Roast2D
 ---
 
-> This article was translated from Chinese using AI, with manual modifications.
-
 ## Roast2D
 
 [Roast2D][roast2d] is a rapid development 2D game engine inspired by [high_impact][high_impact] and written in Rust. It comes with basic physics collision detection, supports the [LDTK][ldtk] level editor, and can be compiled to WASM for running in browsers.
@@ -146,9 +144,14 @@ There are a few conventions when using Roast2D with LDTK:
 
 ## Collision detection
 
-The collision detection in Roast2D is essentially the same as high_impact, just rewritten in Rust with no changes to the logic. Here's a great article explaining the [sweep and prune algorithm][sweep-and-prune].
+Collision detection can be enabled for an entity by adding `Transform`, `Physics` components, and inserting the Entity ID into the `CollisionSet`, 
 
-The engine only checks for collisions between entities in the `CollisionSet`, and the entities must have `Transform` and `Physics` components.
+During the game loop, engine iterates through all entities within the `CollisionSet`, and executes the [sweep and prune algorithm][sweep-and-prune], which reduces unneccesary collision checks by only considering entities that overlap on the x-axis or y-axis.
+
+The Roast2D engine only supports rectangle collision detection. We use two different methods depending on wether the entity is rotated:
+
+* Unrotated, when `Transform#angle` is set to the default value or a right angle, the entity is an unrotated rectangle, so we just use AABB (Axis-Aligned Bounding Box) for collision detection.
+* Rotated, when `Transform#angle` is a non-right angle, the Entity is a rotated rectangle, so we use the [seperating axis theorem][sat] for collision detection.
 
 ## SDL2 and WASM
 
@@ -196,7 +199,7 @@ In Rust, we can directly call canvas interfaces through the `wasm-bindgen` crate
 
 The Web backend is essentially calling the canvas's drawImage interface to draw images. I spent a lot of time dealing with the mysterious white lines that appear on the edges of tiles in Canvas, and the rest of the work went smoothly.
 
-When implementing the Web backend, I already had some game code that could run, and I could see the game gradually coming together as I implemented the simple interfaces. high_impact doesn't use canvas API, so I couldn't copy this part of the code and had to think about it myself. It was like riding a bike for the first time without training wheels.
+When implementing the Web backend, I already had some game code that could run, and I could see the game gradually coming together as I implemented the simple interfaces, which is an amazing experience.
 
 ## Asset Loading
 
@@ -301,3 +304,4 @@ No, princess is in another castle!
 [brickout]: https://github.com/jjyr/roast2d/blob/master/examples/brickout.rs
 [ecs-pr]: https://github.com/jjyr/roast2d/pull/14/files#diff-417d46472f7f4d2d93a4a38fda64c631a103dcdd2f7c30c6e42d600a19bfe9b0R23
 [archetypal-harmful]: https://moonside.games/posts/archetypal-ecs-considered-harmful/
+[sat]: https://dyn4j.org/2010/01/sat/
