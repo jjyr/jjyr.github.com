@@ -289,14 +289,15 @@ match self.sounds_data.get(handle) {
 
 No, princess is in another castle!
 
-[roast2d]: <https://github.com/jjyr/roast2d>
-[high_impact]: <https://github.com/phoboslab/high_impact>
-[high_impact_article]: <https://phoboslab.org/log/2024/08/high_impact>
-[ldtk]: <https://ldtk.io/>
-[sweep-and-prune]: <https://leanrada.com/notes/sweep-and-prune/>
-[kira-example]: <https://github.com/jjyr/balloon-game/blob/835ea2f0fb768d944484fe33b8f662a4a1e4daf7/src/lib.rs#L643-L759>
-[itch]: <https://itch.io/>
-[kira]: <https://github.com/tesselode/kira>
-[balloon-game]: <https://jijiy.itch.io/gmtk-2024-balloon-advanture>
-[balloon-repo]: <https://github.com/jjyr/balloon_game>
-[brick-demo]: <https://github.com/jjyr/roast2d/blob/master/examples/demo.rs>
+[roast2d]: https://github.com/jjyr/roast2d
+[high_impact]: https://github.com/phoboslab/high_impact
+[high_impact_article]: https://phoboslab.org/log/2024/08/high_impact
+[ldtk]: https://ldtk.io/
+[sweep-and-prune]: https://leanrada.com/notes/sweep-and-prune/
+[kira-example]: https://github.com/jjyr/balloon-game/blob/835ea2f0fb768d944484fe33b8f662a4a1e4daf7/src/lib.rs#L643-L759
+[kira]: https://github.com/tesselode/kira
+[balloon-game]: https://jijiy.itch.io/gmtk-2024-balloon-advanture
+[balloon-repo]: https://github.com/jjyr/balloon_game
+[brickout]: https://github.com/jjyr/roast2d/blob/master/examples/brickout.rs
+[ecs-pr]: https://github.com/jjyr/roast2d/pull/14/files#diff-417d46472f7f4d2d93a4a38fda64c631a103dcdd2f7c30c6e42d600a19bfe9b0R23
+[archetypal-harmful]: https://moonside.games/posts/archetypal-ecs-considered-harmful/
