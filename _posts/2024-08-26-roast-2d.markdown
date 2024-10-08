@@ -13,11 +13,11 @@ tags: English Roast2D
 
 ## Examples
 
-Brick Out
+Breakout
 
 <img src="/assets/images/Roast2D/brick-1.gif" width="240" height="240" />
 
-* [Source code on GitHub][brickout]
+* [Source code on GitHub][breakout]
 
 Balloon platformer
 
@@ -301,7 +301,7 @@ No, princess is in another castle!
 [kira]: https://github.com/tesselode/kira
 [balloon-game]: https://jijiy.itch.io/gmtk-2024-balloon-advanture
 [balloon-repo]: https://github.com/jjyr/balloon_game
-[brickout]: https://github.com/jjyr/roast2d/blob/master/examples/brickout.rs
+[breakout]: https://github.com/jjyr/roast2d/blob/master/examples/breakout.rs
 [ecs-pr]: https://github.com/jjyr/roast2d/pull/14/files#diff-417d46472f7f4d2d93a4a38fda64c631a103dcdd2f7c30c6e42d600a19bfe9b0R23
 [archetypal-harmful]: https://moonside.games/posts/archetypal-ecs-considered-harmful/
 [sat]: https://dyn4j.org/2010/01/sat/
