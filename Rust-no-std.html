@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJy | Rust no-std FAQ</title>
+  <link rel="stylesheet" href=" /css/main.css">
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <!-- and it's easy to individually load additional languages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  
+  <script>hljs.highlightAll();</script>
+</head>
+
+
+<body>
+  <header>
+  <nav>
+    <ul>
+        <li><a href=" /">All</a></li>
+        <li><a href=" /about">@JJy</a></li>
+        <li><a href=" /atom.xml">RSS</a></li>
+    </ul>
+</nav>
+
+</header>
+
+  <main class="container">
+    <article>
+  <header>
+    <h2>Rust no-std FAQ</h2>
+    <time datetime=" 2020-10-21" class="post-meta">2020-10-21</time>
+    <p>
+      
+      <a class="post-link" href=" tags/rust">Rust</a>
+      
+      <a class="post-link" href=" tags/english">English</a>
+      
+    </p>
+  </header>
+  <h3 id="why-write-this">Why write this?</h3>
+
+<p>Most rustaceans(including me) using the std crate day-to-day since we learned how to write <code class="language-plaintext highlighter-rouge">println!("hello world")</code>. But it is still a very important feature of Rust: to deploy our code to bare-metal environments. Without OS support, we can not use the std crate, and it is usually scares people, so I write this article to clear most misunderstandings about Rust no-std.</p>
+
+<h3 id="what-is-rust-no-std">What is Rust no-std?</h3>
+
+<p>In std Rust, which is the default learned version. We can do many operations to interact with the machine and the internet, such as print messages to the console, read from files, and open URLs. All these features are provided by the underlying execution environment: our operating system. Our OS provides several syscalls to support IO, network, file systems, and process; rust delegates these features to OS via these syscalls.</p>
+
+<p>You can look through the <a href="https://doc.rust-lang.org/stable/std/#modules">modules of std</a> and try to identify which modules depends on the OS. Of course, we can’t use these features if we do not have an operating system that provides the underlayer implementation. A feature called no-std is used for these bare-metal environments. In no-std Rust, we can only use the core features that do not depend on the operating system. Look at the <a href="https://doc.rust-lang.org/stable/core/index.html">core crate</a>; The core crate is a subset of std crate; you can find many familiar modules in the core that implement memory operations, arithmetic, or commonly used type structure.</p>
+
+<p>The differences between std and no-std are tiny:</p>
+
+<ol>
+  <li>In no-std, you can’t use <em>std</em> crate, however, you can import mostly modules from <em>core</em>.</li>
+  <li>You can’t use heap related modules(box, collections, string, etc.) because the default Rust memory allocator depends on OS syscalls to increase heap memory; unless you implement your own version <em>global allocator</em>.</li>
+  <li>If you write a bin crate, you must implement a few <em>lang items</em>.</li>
+</ol>
+
+<p>Don’t be scared by these unfamiliar terms; to understand these, you need to know a few rustc concepts like <em>lang item</em> or <em>global allocator</em> which have been hidden from us in the std environment.</p>
+
+<h3 id="what-is-lang-item">What is lang item?</h3>
+
+<p>The short version: rustc is designed as pluggable; instead of builtin all operations in the compiler, rustc allows users to customize the language features via <em>lang items</em>.</p>
+
+<p>The long version: <a href="https://doc.rust-lang.org/unstable-book/language-features/lang-items.html">lang-items document</a></p>
+
+<p>Mostly lang items are defined in the <em>core</em> crate; however, some are defined in the <em>std</em> crate. For example, <em>eh_personality</em> is used by the failure mechanism. If you are writing a <em>no-std bin</em> crate, you need to implement these lang items to make the compiler work; but if you are writing a <em>lib</em> crate, you can assume the <em>bin</em> crate defined these lang items, so you don’t need to do it.</p>
+
+<p>The <em>lang items</em> feature is unstable, which means we can only define lang items in nightly Rust. The Rust team exposes some lang items via the compiler attribute; it allows us to define them in the stable Rust, for example: <code class="language-plaintext highlighter-rouge">#[panic_handler]</code> defines <em>panic_impl</em> lang item, and <code class="language-plaintext highlighter-rouge">#[alloc_error_handle]</code> defines <em>oom</em> <a href="https://github.com/rust-lang/rust/issues/51540">lang item</a>.</p>
+
+<p>A suggestion is that you should always search for a runtime support crate before you try to implement them from scratch. The <a href="https://github.com/rust-embedded">Rust embedded work group</a> is an excellent place to start. They provide crates to define lang items for different embedded environments; by using these crates, you can forget lang items and get a better life.</p>
+
+<h3 id="what-is-the-alloc-crate-what-is-the-global-allocator">What is the alloc crate? What is the global allocator?</h3>
+
+<p>The <em>alloc</em> crate contains heap related modules; modules in the <em>alloc</em> use the <em>global allocator</em> to allocate memory. The <em>std</em> crate defines a default <em>global allocator</em>, which depends on the operating system; when heap memory is exhausted, the <em>std</em> <em>global allocator</em> invokes OS syscalls to increase the memory. So in <em>no-std</em> environments, we need to define our <em>global allocator</em>; we can use the <code class="language-plaintext highlighter-rouge">#[global_allocator]</code> attribute to define it. Typically, we use a fixed memory range as our heap; when the heap is exhausted, instead of calling <em>brk</em> or <em>mmap</em>(Linux syscalls to ask for more memory from OS), we raise an out of memory error.</p>
+
+<p>There are many global allocator implementations; for example, the simplest one is implemented as a <a href="https://github.com/phil-opp/linked-list-allocator">linked list</a>; here is one I wrote using <a href="https://github.com/jjyr/buddy-alloc">buddy allocator</a> algorithm, it can guarantee stable response time in different scenarios.</p>
+
+<p>By defining the <em>global allocator</em>, we can use the <a href="https://doc.rust-lang.org/stable/alloc/index.html#modules">alloc crate</a> in our <em>no-std</em> program. The <em>alloc</em> contains very frequently used modules such as string, box, collections, etc. The <em>core</em> and the <em>alloc</em> crates almost covered my most frequently used modules in the <em>std</em>.</p>
+
+<h3 id="how-to-write-no-std-lib-crate">How to write no-std lib crate</h3>
+
+<p>By adding #![no_std] on the top of the <em>lib.rs</em>, we tell the rustc to compile the whole crate under <em>no-std</em> Rust; the compiler will raise errors if we try to import from <em>std</em> or use a crate that depends on the <em>std</em>. Usually, we use another compiling condition #![cfg_attr(not(test), no_std)] to tell the rustc to compile to <em>no-std</em> Rust only when the <em>test</em> flag is disabled so that we can use <em>std</em> in our tests, just like the <em>std</em> Rust.</p>
+
+<p>If we need to use the <em>alloc</em> crate, we need to add another line in the <em>lib.rs</em> <code class="language-plaintext highlighter-rouge">extern crate alloc</code>; since the <em>alloc</em> is a built-in crate, rustc will link it for us automatically.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">//! lib.rs</span>
+<span class="nd">#![cfg_attr(not(test),</span> <span class="nd">no_std)]</span>
+
+<span class="cd">/// Add this line if you need to use alloc modules</span>
+<span class="k">extern</span> <span class="k">crate</span> <span class="n">alloc</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="how-to-support-both-std-and-the-no-std-environment-in-my-crate">How to support both std and the no-std environment in my crate?</h3>
+
+<p>The idiomatic way is to use <a href="https://doc.rust-lang.org/cargo/reference/features.html#features">cargo features</a>.</p>
+
+<p>We add a feature <em>std</em> in the <em>Cargo.toml</em>, and enable it as default:</p>
+
+<div class="language-toml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Cargo.toml</span>
+<span class="nn">[features]</span>
+<span class="py">default</span> <span class="p">=</span> <span class="nn">["std"]</span>
+<span class="py">std</span> <span class="p">=</span> <span class="p">[]</span>
+</code></pre></div></div>
+
+<p>Then in the <em>lib.rs</em> we use <em>std</em> feature as compiling condition:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">//! lib.rs</span>
+<span class="nd">#![cfg_attr(not(feature</span> <span class="nd">=</span> <span class="s">"std"</span><span class="nd">),</span> <span class="nd">no_std)]</span>
+
+<span class="cd">/// different implementations under std or no-std</span>
+
+<span class="nd">#[cfg_attr(feature</span> <span class="nd">=</span> <span class="s">"std"</span><span class="nd">)]</span>
+<span class="k">fn</span> <span class="nf">a</span> <span class="p">()</span> <span class="p">{</span> <span class="c1">// std implementation }</span>
+
+<span class="nd">#[cfg_attr(not(feature</span> <span class="nd">=</span> <span class="s">"std"</span><span class="nd">))]</span>
+<span class="k">fn</span> <span class="nf">a</span> <span class="p">()</span> <span class="p">{</span> <span class="c1">// no-std implementation }</span>
+</code></pre></div></div>
+
+<p>Because we define <em>std</em> as default features, so our tests are still compiling in the <em>std</em> Rust.</p>
+
+<p>We can also control dependencies to enable <em>std</em> feature:</p>
+
+<div class="language-toml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Cargo.toml</span>
+<span class="nn">[features]</span>
+<span class="py">default</span> <span class="p">=</span> <span class="nn">["std"]</span>
+<span class="py">std</span> <span class="p">=</span> <span class="p">[</span><span class="s">"crate-a/std"</span><span class="p">,</span> <span class="s">"crate-b/std"</span><span class="p">]</span>
+
+<span class="nn">[dependencies]</span>
+<span class="nn">crate-a</span> <span class="o">=</span> <span class="p">{</span> <span class="py">version</span> <span class="p">=</span> <span class="s">"0.1"</span><span class="p">,</span> <span class="py">default-features</span> <span class="p">=</span> <span class="kc">false</span> <span class="p">}</span>
+<span class="nn">crate-b</span> <span class="o">=</span> <span class="p">{</span> <span class="py">version</span> <span class="p">=</span> <span class="s">"0.1"</span><span class="p">,</span> <span class="py">default-features</span> <span class="p">=</span> <span class="kc">false</span> <span class="p">}</span>
+</code></pre></div></div>
+
+</article>
+
+  </main>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+      JJy
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+</body>
+
+</html>
