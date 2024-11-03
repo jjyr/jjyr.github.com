@@ -1,5 +1,5 @@
 site_dir = "_site"
-deploy_repo = "https://github.com/jjyr/jjyr.github.com.git"
+deploy_repo = "git@github.com:jjyr/jjyr.github.com.git"
 deploy_branch = "master"
 
 desc "Default deploy task"
