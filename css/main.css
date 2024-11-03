@@ -1,0 +1,56 @@
+/* original: https://github.com/pages-themes/hacker  */
+body { font-size: 1em; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; margin: 0; text-align: center; padding: 0; }
+
+body p { line-height: 200%; }
+
+body li { line-height: 240%; }
+
+.posts { list-style-type: none; padding-left: 0; }
+
+.posts time { margin-right: 16px; }
+
+div.lang-tags { margin-bottom: 32px; }
+
+body time { color: #8c8484; font: -webkit-mini-control; }
+
+body a { color: #252020; text-decoration-line: none; border-bottom: 1px dashed; }
+
+header { padding-top: 64px; text-align: center; /* Center the child elements */ }
+
+nav { display: inline-block; /* Make the nav element inline-block */ }
+
+nav ul { margin: 0; padding: 0; list-style: none; display: flex; justify-content: center; /* Center the nav links horizontally */ }
+
+nav ul li { margin-left: 20px; }
+
+nav ul li:first-child { margin-left: 0; }
+
+nav a { text-decoration: none; color: #333; }
+
+article { margin-bottom: 30px; }
+
+article header { margin-bottom: 10px; }
+
+h1 { font-size: 36px; }
+
+.post-meta { font-size: 14px; color: #999; }
+
+footer { padding: 20px; }
+
+footer a { color: #999; }
+
+/* General & 'Reset' Stuff */
+.container { width: 90%; margin: 40px auto; max-width: 640px; text-align: left; font-variant-numeric: tabular-nums; }
+
+.container p { line-height: 200%; }
+
+.container img { max-width: 640px; }
+
+section { display: block; margin: 0 0 20px 0; }
+
+h1, h2, h3, h4, h5, h6 { color: darkslategrey; margin-top: 3em; margin-bottom: 1em; }
+
+/* Make footer stick to bottom */
+.pagination { height: 50px; line-height: 50px; text-align: center; }
+
+/*# sourceMappingURL=main.css.map */

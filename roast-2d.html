@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJy | Roast2D - How to Fall Into and Escape the Game Engine trap</title>
+  <link rel="stylesheet" href=" /css/main.css">
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <!-- and it's easy to individually load additional languages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  
+  <script>hljs.highlightAll();</script>
+</head>
+
+
+<body>
+  <header>
+  <nav>
+    <ul>
+        <li><a href=" /">All</a></li>
+        <li><a href=" /about">@JJy</a></li>
+        <li><a href=" /atom.xml">RSS</a></li>
+    </ul>
+</nav>
+
+</header>
+
+  <main class="container">
+    <article>
+  <header>
+    <h2>Roast2D - How to Fall Into and Escape the Game Engine trap</h2>
+    <time datetime=" 2024-08-26" class="post-meta">2024-08-26</time>
+    <p>
+      
+      <a class="post-link" href=" tags/english">English</a>
+      
+      <a class="post-link" href=" tags/roast2d">Roast2D</a>
+      
+    </p>
+  </header>
+  <h2 id="roast2d">Roast2D</h2>
+
+<p><a href="https://github.com/jjyr/roast2d">Roast2D</a> is a rapid development 2D game engine inspired by <a href="https://github.com/phoboslab/high_impact">high_impact</a> and written in Rust. It comes with basic physics collision detection, supports the <a href="https://ldtk.io/">LDTK</a> level editor, and can be compiled to WASM for running in browsers.</p>
+
+<p><a href="https://github.com/jjyr/roast2d">Roast2D source code</a></p>
+
+<h2 id="examples">Examples</h2>
+
+<p>Breakout</p>
+
+<p><img src="/assets/images/Roast2D/brick-1.gif" width="240" height="240" /></p>
+
+<ul>
+  <li><a href="https://github.com/jjyr/roast2d/blob/master/examples/breakout.rs">Source code on GitHub</a></li>
+</ul>
+
+<p>Balloon platformer</p>
+
+<p><img src="/assets/images/Roast2D/balloon-2.gif" width="240" height="240" /></p>
+
+<ul>
+  <li><a href="https://jijiy.itch.io/gmtk-2024-balloon-advanture">Game on itch.io</a></li>
+  <li><a href="https://github.com/jjyr/balloon_game">Source code on GitHub</a></li>
+</ul>
+
+<h2 id="about-this-post">About this post</h2>
+
+<p>This post introduces <a href="https://github.com/jjyr/roast2d">Roast2D</a>, a 2D engine I developed after falling into the game engine trap.</p>
+
+<blockquote>
+  <p>The game engine development trap refers to a common state that amateur game developers often find themselves in: They start out wanting to make a game, but end up spending all their time developing a game engine, and ultimately never make the game itself.</p>
+</blockquote>
+
+<p>Originally, this post was titled “I developed a 2D game engine and used it in the GMTK Game Jam”, but I found it a bit too clickbait. I changed the title and move the focus, I decided to continuously update this post with new features of Roast2D, until the day I abandon its development.</p>
+
+<h2 id="inspiration">Inspiration</h2>
+
+<p>I’m an indie game and board game enthusiast, and I’m more drawn to intricate game mechanics than fantasy visuals. I wanted to create games similar to Into the Breach or Slay the Spire, which captivate through their mechanics, or like Tower of the Sorcerer and Cave Story, which don’t have complex mechanics but are highly engaging.</p>
+
+<p>Given my experience with Rust, I naturally started learning the Bevy engine. But it turned out to be the wrong choice. While Bevy might be a great engine for experienced developers, it’s not as easy for beginners to grasp, especially when you “lift the hood” and see a complex integrated system that’s hard to comprehend. Bevy is a fantastic engine that solves many problems in Rust game development, and I borrowed a lot from Bevy’s ECS design. However, when learning something new, it’s often best to open the hood and understand things, not rely on black boxes. Bevy’s abstraction was too complex for me, and it felt like a black box. While I created some game prototypes with it, I still didn’t feel fully in control, and those prototypes were abandoned due to lack of playability.</p>
+
+<p>When I hit a dead end with Bevy, I stumbled upon an <a href="https://phoboslab.org/log/2024/08/high_impact">article about the high_impact engine</a>, in which the author described how they rewrote a 10-year-old JavaScript-based engine called Impact using C. The article was simple yet informative, explaining the design of high_impact. It also mentioned that Cross Code was developed using the JavaScript version of the Impact engine, which interest me. I spent some time going through the parts of source code that interested me and quickly learn the implementation.</p>
+
+<p>The simplicity of high_impact’s design hit me hard. Simple technology can support such a complex game like Cross Code, and I realized that I should start with simple technology, not complex ones.</p>
+
+<p>I decided to develop my own simple 2D engine.</p>
+
+<h2 id="rust-needs-a-bit-of-ecs">Rust needs a bit of ECS</h2>
+
+<p>The initial design of Roast2D was influenced by high_impact, using structs to define Entities and traits to define callbacks for Entities.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[derive(Clone)]</span>
+<span class="k">pub</span> <span class="k">struct</span> <span class="n">Player</span> <span class="p">{</span>
+    <span class="n">can_jump</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">high_jump_time</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+    <span class="n">normal</span><span class="p">:</span> <span class="n">Vec2</span><span class="p">,</span>
+    <span class="n">anim</span><span class="p">:</span> <span class="n">Animation</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Vec2</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">EntityType</span> <span class="k">for</span> <span class="n">Player</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">load</span><span class="p">(</span><span class="n">eng</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Engine</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="k">Self</span><span class="p">;</span>
+    <span class="k">fn</span> <span class="nf">init</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span> <span class="n">eng</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Engine</span><span class="p">,</span> <span class="n">ent</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Entity</span><span class="p">);</span>
+    <span class="k">fn</span> <span class="nf">update</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span> <span class="n">eng</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Entity</span><span class="p">);</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Just like high_impact, Roast2D has simple built-in physics and collision detection. The Player receives an Entity in the callback, which the Entity contains common attributes like velocity, accelerate, pos, and health. The engine reads these values in the game loop update, then update the entity’s position, check collisions, etc.</p>
+
+<p>This setup is sufficient for simple logic, but Rust presents some challenges. Rust is a memory-safe language that ensures only one mutable reference can be held at a time. For example, when the engine calls Player’s update method, since update receives <code class="language-plaintext highlighter-rouge">&amp;mut self</code>, no other code can simultaneously obtain a reference to this player. So, how do we handle cases where we need to iterate through all players in the update method?</p>
+
+<ul>
+  <li>Option 1: Temporarily remove the object from the state before update, so that the current player being updated is not included in the iteration.</li>
+  <li>Option 2: Use Borrow to wrap the object, allowing the developer to dynamically check if the player is already being referenced and skip it if so.</li>
+</ul>
+
+<p>Both options work similarly, but either one can be cumbersome to handle.</p>
+
+<p>Using ECS (Entity Component System) solves this issue. An entity is just an ID, and callback methods don’t hold references to any state. Instead, components are accessed through the Entity ID only when needed, and references are kept as short-lived as possible to avoid lifetime conflicts. While ECS wasn’t specifically designed to address Rust’s borrow checker, its flexibility and modularity naturally avoid complex state access issues.</p>
+
+<p>Roast2D’s ECS design is similar to Bevy’s, but with a much simpler implementation.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[derive(Component)]</span>
+<span class="k">pub</span> <span class="k">struct</span> <span class="n">Player</span> <span class="p">{</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Color</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">Player</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="nf">init</span><span class="p">(</span><span class="n">w</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">World</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Vec2</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Ent</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="n">size</span> <span class="o">=</span> <span class="nn">Vec2</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="mf">128.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">);</span>
+        <span class="k">let</span> <span class="n">color</span> <span class="o">=</span> <span class="nn">Color</span><span class="p">::</span><span class="nf">rgb</span><span class="p">(</span><span class="mi">0x37</span><span class="p">,</span> <span class="mi">0x94</span><span class="p">,</span> <span class="mi">0x6e</span><span class="p">);</span>
+        <span class="k">let</span> <span class="n">ent</span> <span class="o">=</span> <span class="n">w</span>
+            <span class="nf">.spawn</span><span class="p">()</span>
+            <span class="nf">.add</span><span class="p">(</span><span class="nn">Transform</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+            <span class="nf">.add</span><span class="p">(</span><span class="n">Physics</span> <span class="p">{</span>
+                <span class="n">friction</span><span class="p">:</span> <span class="nn">Vec2</span><span class="p">::</span><span class="nf">splat</span><span class="p">(</span><span class="n">FRICTION</span><span class="p">),</span>
+                <span class="n">check_against</span><span class="p">:</span> <span class="nn">EntGroup</span><span class="p">::</span><span class="n">PROJECTILE</span><span class="p">,</span>
+                <span class="n">physics</span><span class="p">:</span> <span class="nn">EntPhysics</span><span class="p">::</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="o">..</span><span class="nn">Default</span><span class="p">::</span><span class="nf">default</span><span class="p">()</span>
+            <span class="p">})</span>
+            <span class="nf">.add</span><span class="p">(</span><span class="n">Player</span> <span class="p">{</span> <span class="n">color</span> <span class="p">})</span>
+            <span class="nf">.add</span><span class="p">(</span><span class="nn">Hooks</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">PlayerHooks</span><span class="p">))</span>
+            <span class="nf">.id</span><span class="p">();</span>
+        <span class="n">w</span><span class="py">.get_resource_mut</span><span class="p">::</span><span class="o">&lt;</span><span class="n">CollisionSet</span><span class="o">&gt;</span><span class="p">()</span><span class="nf">.unwrap</span><span class="p">()</span><span class="nf">.add</span><span class="p">(</span><span class="n">ent</span><span class="p">);</span>
+        <span class="n">ent</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">#[derive(Default)]</span>
+<span class="k">pub</span> <span class="k">struct</span> <span class="n">PlayerHooks</span><span class="p">;</span>
+
+<span class="k">impl</span> <span class="n">EntHooks</span> <span class="k">for</span> <span class="n">PlayerHooks</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">update</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">eng</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Engine</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">World</span><span class="p">,</span> <span class="n">ent</span><span class="p">:</span> <span class="n">Ent</span><span class="p">);</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>All entities, components, and resources are stored in World.</p>
+
+<p>We use <code class="language-plaintext highlighter-rouge">World#spawn</code> to create a new entity and then call <code class="language-plaintext highlighter-rouge">add</code> to add components. Roast2D provides basic components like <code class="language-plaintext highlighter-rouge">Transform</code>, <code class="language-plaintext highlighter-rouge">Physics</code>, and <code class="language-plaintext highlighter-rouge">Hooks</code>. Most entities require these components. <code class="language-plaintext highlighter-rouge">Hooks</code> accepts a trait that defines callbacks for the entity. The user-defined <code class="language-plaintext highlighter-rouge">Player</code> component is mostly just a marker.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Resources</code> are similar to singleton objects in OOP. In the example above, we add an entity to the <code class="language-plaintext highlighter-rouge">CollisionSet</code>, and the engine checks for collisions between entities in the <code class="language-plaintext highlighter-rouge">CollisionSet</code>.</p>
+
+<p>The <a href="https://github.com/jjyr/roast2d/pull/14/files#diff-417d46472f7f4d2d93a4a38fda64c631a103dcdd2f7c30c6e42d600a19bfe9b0R23">ECS implementation code</a> is extremely simple, just using <code class="language-plaintext highlighter-rouge">HashMap</code> to implement components and resources. This ECS design solves the reference issue mentioned earlier, I call it the Poor Man’s ECS.</p>
+
+<p>For more on ECS, I recommend the article <a href="https://moonside.games/posts/archetypal-ecs-considered-harmful/">Archetypal ECS Considered Harmful?</a>, which discusses archetype and sparse tables, which is general methods to implement effecient ECS.</p>
+
+<h2 id="ldtk-level-editor">LDTK level editor</h2>
+
+<p><a href="https://ldtk.io/">LDTK</a> is an open-source game level editor.</p>
+
+<p>LDTK is not tied to any specific game engine. It supports defining entities, worlds, levels, layers, and other common concepts, and allows importing tilesets and other assets. It exports a JSON file with the .ldtk extension.</p>
+
+<p>Roast2D supports reading LDTK JSON files and automatically loading entities and tilemaps.</p>
+
+<p>There are a few conventions when using Roast2D with LDTK:</p>
+
+<ul>
+  <li>Collision layer: If the layer type is IntGrid and its name is Collision, Roast2D will parse it as a collision map, where 0 represents no collision, and 1 represents a tile with collision.</li>
+  <li>Entities layer: If the layer type is Entity and its name is Entities, the entities in the layer must have names matching the component types defined in Roast2D. Roast2D will automatically spawn the entities and components.</li>
+</ul>
+
+<p><img src="/assets/images/Roast2D/level-editing.png" width="600" /></p>
+
+<h2 id="collision-detection">Collision detection</h2>
+
+<p>Collision detection can be enabled for an entity by adding <code class="language-plaintext highlighter-rouge">Transform</code>, <code class="language-plaintext highlighter-rouge">Physics</code> components, and inserting the Entity ID into the <code class="language-plaintext highlighter-rouge">CollisionSet</code>,</p>
+
+<p>During the game loop, engine iterates through all entities within the <code class="language-plaintext highlighter-rouge">CollisionSet</code>, and executes the <a href="https://leanrada.com/notes/sweep-and-prune/">sweep and prune algorithm</a>, which reduces unneccesary collision checks by only considering entities that overlap on the x-axis or y-axis.</p>
+
+<p>The Roast2D engine only supports rectangle collision detection. We use two different methods depending on wether the entity is rotated:</p>
+
+<ul>
+  <li>Unrotated, when <code class="language-plaintext highlighter-rouge">Transform#angle</code> is set to the default value or a right angle, the entity is an unrotated rectangle, so we just use AABB (Axis-Aligned Bounding Box) for collision detection.</li>
+  <li>Rotated, when <code class="language-plaintext highlighter-rouge">Transform#angle</code> is a non-right angle, the Entity is a rotated rectangle, so we use the <a href="https://dyn4j.org/2010/01/sat/">seperating axis theorem</a> for collision detection.</li>
+</ul>
+
+<h2 id="sdl2-and-wasm">SDL2 and WASM</h2>
+
+<p>The platform-related code is much simpler. The core requirement is to draw rectangles on different platforms and display pixels. We use a simple trait to abstract these methods.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pub</span> <span class="k">trait</span> <span class="n">Platform</span> <span class="p">{</span>
+    <span class="cd">/// Return seconds since game started</span>
+    <span class="k">fn</span> <span class="nf">now</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f32</span><span class="p">;</span>
+    <span class="k">fn</span> <span class="nf">prepare_frame</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">);</span>
+    <span class="k">fn</span> <span class="nf">end_frame</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">);</span>
+    <span class="k">fn</span> <span class="nf">cleanup</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">);</span>
+    <span class="k">fn</span> <span class="nf">draw</span><span class="p">(</span>
+        <span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span>
+        <span class="n">texture</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Handle</span><span class="p">,</span>
+        <span class="n">color</span><span class="p">:</span> <span class="n">Color</span><span class="p">,</span>
+        <span class="n">pos</span><span class="p">:</span> <span class="n">Vec2</span><span class="p">,</span>
+        <span class="n">size</span><span class="p">:</span> <span class="n">Vec2</span><span class="p">,</span>
+        <span class="n">uv_offset</span><span class="p">:</span> <span class="n">Vec2</span><span class="p">,</span>
+        <span class="n">uv_size</span><span class="p">:</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="n">Vec2</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="n">angle</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+        <span class="n">flip_x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">flip_y</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">);</span>
+    <span class="k">fn</span> <span class="nf">create_texture</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Handle</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">u8</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">UVec2</span><span class="p">);</span>
+    <span class="k">fn</span> <span class="nf">remove_texture</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span> <span class="n">handle_id</span><span class="p">:</span> <span class="n">HandleId</span><span class="p">);</span>
+    <span class="nd">#[allow(async_fn_in_trait)]</span>
+    <span class="k">async</span> <span class="k">fn</span> <span class="n">run</span><span class="o">&lt;</span><span class="n">Setup</span><span class="p">:</span> <span class="nf">FnOnce</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">Engine</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">u32</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">u32</span><span class="p">,</span>
+        <span class="n">vsync</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">setup</span><span class="p">:</span> <span class="n">Setup</span><span class="p">,</span>
+    <span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Result</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span>
+    <span class="k">where</span>
+        <span class="k">Self</span><span class="p">:</span> <span class="nb">Sized</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Initially, I decided to only support the SDL2 backend, but then I found that the sdl2 rust crate has many small problems, such as not being able to compile to the <code class="language-plaintext highlighter-rouge">wasm32-unknown-unknown</code> target, which means our game cannot run in the browser.</p>
+
+<p>So I decided to add Web backend support, using Web canvas interfaces to implement <code class="language-plaintext highlighter-rouge">Platform</code>.</p>
+
+<p>In Rust, we can directly call canvas interfaces through the <code class="language-plaintext highlighter-rouge">wasm-bindgen</code> crate, which is a great experience. Basically, anything that can be done in JavaScript can be done directly in Rust, without even considering lifetime! All Dom objects are internal mutable!</p>
+
+<p>The Web backend is essentially calling the canvas’s drawImage interface to draw images. I spent a lot of time dealing with the mysterious white lines that appear on the edges of tiles in Canvas, and the rest of the work went smoothly.</p>
+
+<p>When implementing the Web backend, I already had some game code that could run, and I could see the game gradually coming together as I implemented the simple interfaces, which is an amazing experience.</p>
+
+<h2 id="asset-loading">Asset Loading</h2>
+
+<p>Because I added Web support, loading images and other assets couldn’t be done with simple file I/O. I decided to imitate Bevy’s asset loading method, providing an AssetManager and a load interface. The interface immediately returns a Handle instance representing a reference to the asset. The Handle only saves an ID.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[derive(Debug)]</span>
+<span class="k">pub</span> <span class="k">enum</span> <span class="n">AssetType</span> <span class="p">{</span>
+    <span class="n">Raw</span><span class="p">,</span>
+    <span class="n">Texture</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">AssetManager</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="n">load</span><span class="o">&lt;</span><span class="n">P</span><span class="p">:</span> <span class="nb">AsRef</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">P</span><span class="p">,</span> <span class="n">asset_type</span><span class="p">:</span> <span class="n">AssetType</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Handle</span> <span class="p">{</span>
+        <span class="c1">//...</span>
+    <span class="p">}</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="nf">get_raw</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Handle</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Option</span><span class="o">&lt;&amp;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">u8</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+        <span class="c1">//...</span>
+    <span class="p">}</span>
+    <span class="k">pub</span><span class="p">(</span><span class="k">crate</span><span class="p">)</span> <span class="k">async</span> <span class="k">fn</span> <span class="nf">fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">FetchedTask</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+        <span class="c1">//...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When calling <code class="language-plaintext highlighter-rouge">load</code> to load a Texture, after the asset is loaded, the engine will automatically call <code class="language-plaintext highlighter-rouge">Platform#create_texture</code> to create a texture on different platforms. In SDL2, it will create an <code class="language-plaintext highlighter-rouge">SDLTexture</code>, and in Web, it will create an <code class="language-plaintext highlighter-rouge">OffscreenCanvas</code>.</p>
+
+<p>When calling <code class="language-plaintext highlighter-rouge">load</code> to load a Raw asset, we simply save it as a <code class="language-plaintext highlighter-rouge">Vec&lt;u8&gt;</code>. The game code needs to get the result through the <code class="language-plaintext highlighter-rouge">get_raw</code> interface and continue processing the asset.</p>
+
+<p>AssetManager’s <code class="language-plaintext highlighter-rouge">fetch</code> will be called every frame to check if there are any requested assets. If there are, it will try to load them. In Web, fetching assets is done through web workers, and in non-Web environments, it is done through standard library file I/O.</p>
+
+<p>The game code needs to save the Handle returned by <code class="language-plaintext highlighter-rouge">load</code> to reference the asset.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="n">handle</span> <span class="o">=</span> <span class="n">eng</span><span class="py">.assets</span><span class="nf">.load_texture</span><span class="p">(</span><span class="s">"demo.png"</span><span class="p">);</span>
+<span class="k">let</span> <span class="n">sprite</span> <span class="o">=</span> <span class="nn">Sprite</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="nn">UVec2</span><span class="p">::</span><span class="nf">splat</span><span class="p">(</span><span class="mi">32</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>When all references to the Handle are dropped, AssetManager will release the asset. If it’s a texture, it will call <code class="language-plaintext highlighter-rouge">Platform#remove_texture</code>.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">impl</span> <span class="nb">Drop</span> <span class="k">for</span> <span class="n">StrongHandle</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">drop</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="n">_</span> <span class="o">=</span> <span class="k">self</span><span class="py">.drop_sender</span><span class="nf">.send</span><span class="p">(</span><span class="nf">DropEvent</span><span class="p">(</span><span class="k">self</span><span class="py">.id</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">AssetManager</span> <span class="p">{</span>
+    <span class="k">pub</span><span class="p">(</span><span class="k">crate</span><span class="p">)</span> <span class="k">async</span> <span class="k">fn</span> <span class="nf">fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">FetchedTask</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+        <span class="c1">// ...</span>
+        <span class="c1">// remove dropped assets</span>
+        <span class="k">while</span> <span class="k">let</span> <span class="nf">Ok</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="o">=</span> <span class="k">self</span><span class="py">.receiver</span><span class="nf">.try_recv</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">self</span><span class="py">.assets</span><span class="nf">.remove</span><span class="p">(</span><span class="o">&amp;</span><span class="n">event</span><span class="na">.0</span><span class="p">);</span>
+            <span class="k">let</span> <span class="n">fetched_task</span> <span class="o">=</span> <span class="nn">FetchedTask</span><span class="p">::</span><span class="n">RemoveTexture</span> <span class="p">{</span> <span class="n">handle</span><span class="p">:</span> <span class="n">event</span><span class="na">.0</span> <span class="p">};</span>
+            <span class="n">tasks</span><span class="nf">.push</span><span class="p">(</span><span class="n">fetched_task</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The code is largely inspired by Bevy, but I only implemented a simplified version, removing the parts related to reflection and reducing unnecessary abstraction layers.</p>
+
+<h2 id="audio-interface">Audio Interface</h2>
+
+<p>I’m not familiar with how to design an audio playback interface, so I chose not to integrate audio into the engine. However, game code can directly use the <a href="https://github.com/tesselode/kira">kira</a> crate to support audio across platforms. The game can use the AssetManager interface provided by <a href="https://github.com/jjyr/roast2d">Roast2D</a> to load audio resources and then hand them over to kira for processing after the resources are loaded.</p>
+
+<p>Here is an <a href="https://github.com/jjyr/balloon-game/blob/835ea2f0fb768d944484fe33b8f662a4a1e4daf7/src/lib.rs#L643-L759">example code</a> that checks if there is a cached file every time it plays audio. If not, it checks if the asset is loaded in AssetManager.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">match</span> <span class="k">self</span><span class="py">.sounds_data</span><span class="nf">.get</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">Some</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">=&gt;</span> <span class="p">{</span>
+        <span class="k">log</span><span class="p">::</span><span class="nd">debug!</span><span class="p">(</span><span class="s">"Get sound {sound:?} cached"</span><span class="p">);</span>
+        <span class="nf">Some</span><span class="p">(</span><span class="n">data</span><span class="nf">.to_owned</span><span class="p">())</span>
+    <span class="p">}</span>
+    <span class="nb">None</span> <span class="k">=&gt;</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nf">Some</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">=</span> <span class="n">eng</span><span class="py">.assets</span><span class="nf">.get_raw</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span><span class="nf">.cloned</span><span class="p">()</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">log</span><span class="p">::</span><span class="nd">debug!</span><span class="p">(</span><span class="s">"Get sound {sound:?} not ready"</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nb">None</span><span class="p">;</span>
+        <span class="p">};</span>
+        <span class="k">log</span><span class="p">::</span><span class="nd">debug!</span><span class="p">(</span><span class="s">"Get sound {sound:?} done"</span><span class="p">);</span>
+        <span class="k">let</span> <span class="n">data</span> <span class="o">=</span> <span class="nn">StaticSoundData</span><span class="p">::</span><span class="nf">from_media_source</span><span class="p">(</span><span class="nn">Cursor</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span><span class="nf">.unwrap</span><span class="p">();</span>
+        <span class="k">self</span><span class="py">.sounds_data</span><span class="nf">.insert</span><span class="p">(</span><span class="n">handle</span><span class="nf">.to_owned</span><span class="p">(),</span> <span class="n">data</span><span class="nf">.clone</span><span class="p">());</span>
+        <span class="nf">Some</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="ending">Ending?</h2>
+
+<p>No, princess is in another castle!</p>
+
+
+</article>
+
+  </main>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+      JJy
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+</body>
+
+</html>

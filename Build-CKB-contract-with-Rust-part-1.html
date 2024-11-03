@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JJy | Rust contract part 1 - Build CKB contract with Rust</title>
+  <link rel="stylesheet" href=" /css/main.css">
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <!-- and it's easy to individually load additional languages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  
+  <script>hljs.highlightAll();</script>
+</head>
+
+
+<body>
+  <header>
+  <nav>
+    <ul>
+        <li><a href=" /">All</a></li>
+        <li><a href=" /about">@JJy</a></li>
+        <li><a href=" /atom.xml">RSS</a></li>
+    </ul>
+</nav>
+
+</header>
+
+  <main class="container">
+    <article>
+  <header>
+    <h2>Rust contract part 1 - Build CKB contract with Rust</h2>
+    <time datetime=" 2019-12-24" class="post-meta">2019-12-24</time>
+    <p>
+      
+      <a class="post-link" href=" tags/rust">Rust</a>
+      
+      <a class="post-link" href=" tags/ckb">CKB</a>
+      
+      <a class="post-link" href=" tags/english">English</a>
+      
+    </p>
+  </header>
+  <blockquote>
+  <p>Edited at 2020-03-27</p>
+
+  <ul>
+    <li>Update ckg-std link</li>
+    <li>Remove the linker script section since I found its unnecessary to customize linker</li>
+    <li>Refactor the main function interface</li>
+  </ul>
+</blockquote>
+
+<p>AFAIK, the most popular contracts that deployed on CKB is writing in C. There are 3 default contracts in the genesis block: <code class="language-plaintext highlighter-rouge">secp256k1 lock</code>, <code class="language-plaintext highlighter-rouge">secp256k1 multisig lock</code> and <code class="language-plaintext highlighter-rouge">Deposited DAO</code>, basically everyone uses CKB are using these contracts.</p>
+
+<p>As a rustacean, I understand that you want to write everything in Rust. The good news is it’s possible, since CKB-VM supports RISC-V ISA(instruction set architecture), and recently the RISC-V target is added to Rust, which means we can directly compile our code to RISC-V. However, the bad news is that the RISC-V target is not supporting the std library yet, which means you can’t use Rust as a usual way.</p>
+
+<p>This series of articles show you how to write a CKB contract in Rust and deploy it. We’ll see that the <code class="language-plaintext highlighter-rouge">no_std</code> Rust is better than our first impression.</p>
+
+<p>This article assumes you are familiar with Rust and have some basic knowledge of CKB. You should know the CKB transaction structure and understand what a <code class="language-plaintext highlighter-rouge">type</code> script is and what a <code class="language-plaintext highlighter-rouge">lock</code> script is. The word <code class="language-plaintext highlighter-rouge">contract</code> used to describe both <code class="language-plaintext highlighter-rouge">type</code> script and <code class="language-plaintext highlighter-rouge">lock</code> script in this article.</p>
+
+<h2 id="setup-rust-environment">Setup Rust environment</h2>
+
+<h3 id="create-a-project">create a project</h3>
+
+<p>Let’s initial a project template. First, we create two projects: <code class="language-plaintext highlighter-rouge">ckb-rust-demo</code> and <code class="language-plaintext highlighter-rouge">contract</code>. The <code class="language-plaintext highlighter-rouge">ckb-rust-demo</code> used to put our tests code, and the <code class="language-plaintext highlighter-rouge">contract</code> used to put the contract code.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cargo new <span class="nt">--lib</span> ckb-rust-demo
+<span class="nb">cd </span>ckb-rust-demo
+cargo new contract
+</code></pre></div></div>
+
+<h3 id="install-riscv64imac-unknown-none-elf-target">install <code class="language-plaintext highlighter-rouge">riscv64imac-unknown-none-elf</code> target</h3>
+
+<p>We choose nightly Rust since several unstable features are required, then we install the RISC-V target.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># use nightly version rust</span>
+<span class="nb">echo</span> <span class="s2">"nightly"</span> <span class="o">&gt;</span> rust-toolchain
+cargo version <span class="c"># -&gt; cargo 1.41.0-nightly (626f0f40e 2019-12-03)</span>
+rustup target add riscv64imac-unknown-none-elf
+</code></pre></div></div>
+
+<h2 id="compile-our-first-contract">Compile our first contract</h2>
+
+<p>Let’s try to compile the contract and see what happened:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>contract
+cargo build <span class="nt">--target</span> riscv64imac-unknown-none-elf
+</code></pre></div></div>
+
+<p>The compiling fails because of no <code class="language-plaintext highlighter-rouge">std</code> for target <code class="language-plaintext highlighter-rouge">riscv64imac-unknown-none-elf</code>.</p>
+
+<p>Edit the <code class="language-plaintext highlighter-rouge">src/main.rs</code> to notate <code class="language-plaintext highlighter-rouge">no_std</code> flag.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#![no_std]</span>
+<span class="nd">#![no_main]</span>
+<span class="nd">#![feature(start)]</span>
+<span class="nd">#![feature(lang_items)]</span>
+
+<span class="nd">#[no_mangle]</span>
+<span class="nd">#[start]</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">start</span><span class="p">(</span><span class="n">_argc</span><span class="p">:</span> <span class="nb">isize</span><span class="p">,</span> <span class="n">_argv</span><span class="p">:</span> <span class="o">*</span><span class="k">const</span> <span class="o">*</span><span class="k">const</span> <span class="nb">u8</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">isize</span> <span class="p">{</span>
+    <span class="mi">0</span>
+<span class="p">}</span>
+
+<span class="nd">#[panic_handler]</span>
+<span class="k">fn</span> <span class="nf">panic_handler</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="o">&amp;</span><span class="nn">core</span><span class="p">::</span><span class="nn">panic</span><span class="p">::</span><span class="n">PanicInfo</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">!</span> <span class="p">{</span>
+    <span class="k">loop</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="nd">#[lang</span> <span class="nd">=</span> <span class="s">"eh_personality"</span><span class="nd">]</span>
+<span class="k">extern</span> <span class="s">"C"</span> <span class="k">fn</span> <span class="nf">eh_personality</span><span class="p">()</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p>The above code is a basic <code class="language-plaintext highlighter-rouge">no_std</code> main, try compile again:</p>
+
+<p>To avoid typing the <code class="language-plaintext highlighter-rouge">--target</code> every time, we can write it into a config file <code class="language-plaintext highlighter-rouge">contract/.cargo/config</code> then update the content:</p>
+
+<div class="language-toml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[build]</span>
+<span class="py">target</span> <span class="p">=</span> <span class="s">"riscv64imac-unknown-none-elf"</span>
+</code></pre></div></div>
+
+<p>Then build:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cargo build
+file target/riscv64imac-unknown-none-elf/debug/contract
+<span class="c"># -&gt; target/riscv64imac-unknown-none-elf/debug/contract: ELF 64-bit LSB executable, UCB RISC-V, version 1 (SYSV), statically linked, with debug_info, not stripped</span>
+</code></pre></div></div>
+
+<h2 id="test-our-contract">Test our contract</h2>
+
+<p>The only thing that the contract does is to return exit-code <code class="language-plaintext highlighter-rouge">0</code>. It’s perfect for a <code class="language-plaintext highlighter-rouge">lock</code> script (it’s not perfect, don’t do it on the mainnet!).</p>
+
+<p>The basic idea to write test code is to use our contract as a cell’s lock script, our contract return <code class="language-plaintext highlighter-rouge">0</code>, which means anyone can spend the cell.
+First, we mock a cell with our contract as the lock script, then construct a transaction to spend the cell, if the transaction verification succeeded that means our lock script is working.</p>
+
+<p>Add <code class="language-plaintext highlighter-rouge">ckb-tool</code> as dependent:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">dependencies</span><span class="p">]</span>
+<span class="n">ckb</span><span class="o">-</span><span class="n">tool</span> <span class="o">=</span> <span class="p">{</span> <span class="n">git</span> <span class="o">=</span> <span class="s">"https://github.com/jjyr/ckb-tool.git"</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ckb-tool</code> contains helper methods from several crates.</p>
+
+<p>The test code which put in <code class="language-plaintext highlighter-rouge">ckb-rust-demo/src/lib.rs</code> as below:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[test]</span>
+<span class="k">fn</span> <span class="nf">it_works</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// load contract code</span>
+    <span class="k">let</span> <span class="k">mut</span> <span class="n">code</span> <span class="o">=</span> <span class="nn">Vec</span><span class="p">::</span><span class="nf">new</span><span class="p">();</span>
+    <span class="nn">File</span><span class="p">::</span><span class="nf">open</span><span class="p">(</span><span class="s">"contract/target/riscv64imac-unknown-none-elf/debug/contract"</span><span class="p">)</span><span class="nf">.unwrap</span><span class="p">()</span><span class="nf">.read_to_end</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">code</span><span class="p">)</span><span class="nf">.expect</span><span class="p">(</span><span class="s">"read code"</span><span class="p">);</span>
+    <span class="k">let</span> <span class="n">code</span> <span class="o">=</span> <span class="nn">Bytes</span><span class="p">::</span><span class="nf">from</span><span class="p">(</span><span class="n">code</span><span class="p">);</span>
+
+    <span class="c1">// build contract context</span>
+    <span class="k">let</span> <span class="k">mut</span> <span class="n">context</span> <span class="o">=</span> <span class="nn">Context</span><span class="p">::</span><span class="nf">default</span><span class="p">();</span>
+    <span class="n">context</span><span class="nf">.deploy_contract</span><span class="p">(</span><span class="n">code</span><span class="nf">.clone</span><span class="p">());</span>
+    <span class="k">let</span> <span class="n">tx</span> <span class="o">=</span> <span class="nn">TxBuilder</span><span class="p">::</span><span class="nf">default</span><span class="p">()</span><span class="nf">.lock_bin</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="nf">.inject_and_build</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">context</span><span class="p">)</span><span class="nf">.expect</span><span class="p">(</span><span class="s">"build tx"</span><span class="p">);</span>
+
+    <span class="c1">// do the verification</span>
+    <span class="k">let</span> <span class="n">max_cycles</span> <span class="o">=</span> <span class="mi">50_000u64</span><span class="p">;</span>
+    <span class="k">let</span> <span class="n">verify_result</span> <span class="o">=</span> <span class="n">context</span><span class="nf">.verify_tx</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tx</span><span class="p">,</span> <span class="n">max_cycles</span><span class="p">);</span>
+    <span class="n">verify_result</span><span class="nf">.expect</span><span class="p">(</span><span class="s">"pass test"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Load contract code.</li>
+  <li>Build a context. The <code class="language-plaintext highlighter-rouge">TxBuilder</code> helps us inject a mocked cell into the context with our contract as the cell’s lock script, then construct a transaction to spend the cell.</li>
+  <li>Do verification.</li>
+</ol>
+
+<p>Let’s try it:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cargo <span class="nb">test</span>
+<span class="c"># -&gt;</span>
+<span class="nt">----</span> tests::it_works stdout <span class="nt">----</span>
+thread <span class="s1">'tests::it_works'</span> panicked at <span class="s1">'pass test: Error { kind: InternalError { kind: Compat { error: ErrorMessage { msg: "OutOfBound" } }
+
+VM }
+
+Internal }'</span>, src/libcore/result.rs:1188:5
+note: run with <span class="sb">`</span><span class="nv">RUST_BACKTRACE</span><span class="o">=</span>1<span class="sb">`</span> environment variable to display a backtrace.
+</code></pre></div></div>
+
+<p>Don’t panic! The error tells us our program access some memory that out of bound.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">riscv64imac-unknown-none-elf</code> target is little different on handling the entry point, use <code class="language-plaintext highlighter-rouge">riscv64-unknown-elf-objdump -D &lt;binary&gt;</code> to disassembly we can find out that there no <code class="language-plaintext highlighter-rouge">.text</code> section, we must find the other way to indicates the entry point other than using <code class="language-plaintext highlighter-rouge">#[start]</code>.</p>
+
+<h2 id="define-the-entry-point-and-main">Define the entry point and main</h2>
+
+<p>Let’s remove the entire <code class="language-plaintext highlighter-rouge">#[start]</code> function, insteadly define a function with name <code class="language-plaintext highlighter-rouge">_start</code> as entry point:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">_start</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="o">!</span> <span class="p">{</span>
+    <span class="k">loop</span><span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The return value of <code class="language-plaintext highlighter-rouge">_start</code> is <code class="language-plaintext highlighter-rouge">!</code>, which means this function never returns; if you try to return from this function, you get an <code class="language-plaintext highlighter-rouge">InvalidPermission</code> error, since the entry point has no place to return.</p>
+
+<p>Let’s compile it:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cargo build
+
+<span class="c"># -&gt; rust-lld: error: undefined symbol: abort</span>
+</code></pre></div></div>
+
+<p>We define an <code class="language-plaintext highlighter-rouge">abort</code> function to passing the compile.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">abort</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="o">!</span> <span class="p">{</span>
+    <span class="nd">panic!</span><span class="p">(</span><span class="s">"abort!"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Compile and run test again:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cargo build
+<span class="nb">cd</span> ..
+cargo tests
+<span class="c"># -&gt;</span>
+<span class="nt">----</span> tests::it_works stdout <span class="nt">----</span>
+thread <span class="s1">'tests::it_works'</span> panicked at <span class="s1">'pass test: Error { kind: ExceededMaximumCycles
+
+Script }'</span>, src/libcore/result.rs:1188:5
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ExceededMaximumCycles</code> error occurs when the script cycles exceed the max cycle limitation.</p>
+
+<p>To exit the program, we need to invoke the <code class="language-plaintext highlighter-rouge">exit</code> syscall.</p>
+
+<h2 id="ckb-vm-syscall">CKB-VM syscall</h2>
+
+<p>The CKB environment supports several <a href="https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md">syscalls</a>.</p>
+
+<p>We need call <code class="language-plaintext highlighter-rouge">exit</code> syscall to exit program and return a exit code:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">_start</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="o">!</span> <span class="p">{</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>To invoke syscall <code class="language-plaintext highlighter-rouge">exit</code> from Rust, we need to write some interesting code:</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#![feature(asm)]</span>
+
+<span class="o">...</span>
+
+<span class="cd">/// Exit syscall</span>
+<span class="cd">/// https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">exit</span><span class="p">(</span><span class="n">_code</span><span class="p">:</span> <span class="nb">i8</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">!</span> <span class="p">{</span>
+    <span class="k">unsafe</span> <span class="p">{</span>
+        <span class="c1">// a0 is _code</span>
+        <span class="nd">asm!</span><span class="p">(</span><span class="s">"li a7, 93"</span><span class="p">);</span>
+        <span class="nd">asm!</span><span class="p">(</span><span class="s">"ecall"</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">loop</span> <span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">a0</code> register contains our first arg <code class="language-plaintext highlighter-rouge">_code</code> according to the function calling convention, the <code class="language-plaintext highlighter-rouge">a7</code> register indicates the syscall number, <code class="language-plaintext highlighter-rouge">93</code> is the syscall number of exit. We mark the return value with <code class="language-plaintext highlighter-rouge">!</code> since <code class="language-plaintext highlighter-rouge">exit</code> should never return.</p>
+
+<p>Compile and rerun the test.</p>
+
+<p>It finally works!</p>
+
+<p>Now you can try to search each unstable <code class="language-plaintext highlighter-rouge">feature</code> we used and try to figure out what it means. Try to modify the exit code and the <code class="language-plaintext highlighter-rouge">_start</code> function, rerun the test see what happened.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The intention of this demo is trying to show you how to use <code class="language-plaintext highlighter-rouge">Rust</code> to write a CKB contract from a low-level sight. The real power of Rust is the abstract ability of the language and the Rust toolchain, which we do not touch in this article.</p>
+
+<p>For example, with <code class="language-plaintext highlighter-rouge">cargo</code>, we can abstract libraries into crates; we gain a better developing experiment if we can just import a syscalls crate instead write it ourselves. More people use <code class="language-plaintext highlighter-rouge">Rust</code> on CKB, more crates we can use.</p>
+
+<p>Another advantage to use Rust is that in CKB, the contract only does verification. Aside from on-chain contracts, we also need to write an off-chain program to generate transaction data. That means we may need to write duplicated code if we use different languages, but with Rust, we can use the same code across the contract and the generator.</p>
+
+<p>Write a CKB contract in Rust may seem a little bit complex; you may wonder the thing could get much more straightforward if you choose C, and you are right, just for now!</p>
+
+<p>In the next article, I’ll show you how to rewrite our contract with <code class="language-plaintext highlighter-rouge">ckb-std</code> library; you’ll surprise how simple thing goes.</p>
+
+<p>That’s it. We’ll also discuss more serious contracts in later articles.</p>
+
+<ul>
+  <li><a href="https://justjjy.com/CKB-contract-in-Rust-part-2-Rewrite-contract-with-ckb">CKB contract in Rust - part 2</a></li>
+  <li><a href="https://github.com/jjyr/ckb-rust-demo">ckb-rust-demo repository</a></li>
+  <li><a href="https://github.com/jjyr/ckb-std">ckb-std repository</a></li>
+  <li><a href="https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0019-data-structures/0019-data-structures.md">CKB data structure</a></li>
+  <li><a href="https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md">CKB syscalls</a></li>
+</ul>
+
+</article>
+
+  </main>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+      JJy
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+</body>
+
+</html>
