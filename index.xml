@@ -1,1 +1,33 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JJy</title><link>https://jjylab.com/</link><description>Recent content on JJy</description><generator>Hugo</generator><language>zh-CN</language><atom:link href="https://jjylab.com/index.xml" rel="self" type="application/rss+xml"/></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JJy</title><link>https://jjylab.com/</link><description>Recent content on JJy</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Wed, 25 Feb 2026 15:02:03 +0800</lastBuildDate><atom:link href="https://jjylab.com/index.xml" rel="self" type="application/rss+xml"/><item><title>为什么我认为三星仍值得投资</title><link>https://jjylab.com/posts/samsung-still-worth-to-invest/</link><pubDate>Wed, 25 Feb 2026 15:02:03 +0800</pubDate><guid>https://jjylab.com/posts/samsung-still-worth-to-invest/</guid><description>&lt;p&gt;挖金子的人太多太拥挤，不如去卖铲子。&lt;/p&gt;
+&lt;p&gt;卖不了铲子，就去投资卖铲子的公司。&lt;/p&gt;
+&lt;p&gt;如果铲子已经太贵，那就继续往上游走，&lt;/p&gt;
+&lt;p&gt;识别整个链条中&lt;strong&gt;最赚钱、最不可替代的那几家&lt;/strong&gt;去投。&lt;/p&gt;
+&lt;p&gt;华尔街可以做空，但 AI 这座金山不会被人们忽视。&lt;/p&gt;
+&lt;p&gt;这就是我在“大 AI 时代”中的一些思考。&lt;/p&gt;
+&lt;p&gt;过去一年，三星电子已经上涨接近一倍。我此前没有上车。但现在越发感觉三星正处在这轮 AI 基建的卖铲子的核心地位。&lt;/p&gt;
+&lt;h2 id="大-ai-时代真正的铲子是什么"&gt;大 AI 时代：真正的&amp;quot;铲子&amp;quot;是什么？&lt;/h2&gt;
+&lt;p&gt;最近几年，众所周知卖铲子的是英伟达，利润节节高。&lt;/p&gt;
+&lt;p&gt;但是仍有达摩克利斯之剑悬在其上：&lt;/p&gt;
+&lt;p&gt;谷歌的 TPU，亚马逊的 Trainium，阿里、华为等国内厂商的自研芯片。&lt;/p&gt;
+&lt;p&gt;有能力的厂商都不愿意把赚到的利润交给英伟达，纷纷选择自研。&lt;/p&gt;
+&lt;p&gt;这把剑从去年的 DeepSeek 时刻就一直悬在空中，但是不会突然斩下，而是更可能更加慢慢缓缓的切到英伟达的利润上。从自研芯片取代一部分推理，逐渐到取代一部分训练，渐渐的反应在英伟达的订单上。&lt;/p&gt;
+&lt;p&gt;那么我们向上游延伸，有能力的厂商会选择保住利润自研，但是自研芯片也不是从沙子搓起，我注意到高带宽内存 HBM 这一组件。&lt;/p&gt;
+&lt;p&gt;无论是 GPU 还是自研芯片，没有内存带宽就跑不动 AI 的训练和推导。&lt;/p&gt;
+&lt;p&gt;AI 模型训练，本质上是：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;计算 × 带宽 × 存储&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;自研芯片可以绕过英伟达的 GPU，但是仍然需要依靠 HBM&lt;/p&gt;
+&lt;p&gt;TPU 需要 HBM, Trainium 不需要 HBM 当仍然需要三星、sk 海力士的DDR&lt;/p&gt;
+&lt;h2 id="三星的生态位"&gt;三星的生态位&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;全球三大 DRAM 厂商之一&lt;/li&gt;
+&lt;li&gt;HBM 的核心供应商&lt;/li&gt;
+&lt;li&gt;拥有晶圆制造能力&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在目前产业链中三星以及 sk 海力士处在供应链的前端，而且掌握 HBM 这一高利润的产品。&lt;/p&gt;
+&lt;p&gt;在中美对抗这一背景下，无论是美国企业还是中国企业都需要 HBM 芯片技术，无论倒向哪一方，庞大的市场都足够推高三星、sk 海力士的利润。&lt;/p&gt;
+&lt;p&gt;在台海地缘政治风险下，韩国半导体相比台积电地缘政治风险要小很多，而且有美国寻求的高端代工能力。&lt;/p&gt;
+&lt;p&gt;这意味着三星的高利润搭配的是低地缘政治风险。&lt;/p&gt;
+&lt;h2 id="hbm-的增长潜力如何现在进去是接盘侠么"&gt;HBM 的增长潜力如何，现在进去是接盘侠么&lt;/h2&gt;
+&lt;p&gt;我直接让 AI 推演下利润增长和股价的关系。&lt;/p&gt;</description></item></channel></rss>
