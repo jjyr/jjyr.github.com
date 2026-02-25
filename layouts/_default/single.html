@@ -2,13 +2,31 @@
 {{ $isPost := eq .Section "posts" }}
 <header class="home-header">
   <p class="meta-links">
+    <a href="{{ .Site.Params.github }}" rel="noreferrer">GitHub</a>
+    <span aria-hidden="true"> / </span>
+    <a href="{{ .Site.Params.x }}" rel="noreferrer">X</a>
+    <span aria-hidden="true"> / </span>
+    <a href="mailto:{{ .Site.Params.email }}">Email</a>
+    <span aria-hidden="true"> / </span>
+    {{ with .Site.Home.OutputFormats.Get "rss" }}
+      <a href="{{ .RelPermalink }}">RSS</a>
+    {{ else }}
+      <a href="{{ "index.xml" | relURL }}">RSS</a>
+    {{ end }}
+  </p>
+</header>
+
+<hr class="divider">
+
+<section class="section">
+  <p class="meta-links">
     {{ if $isPost }}
       <a href="{{ "posts/" | relURL }}">全部文章</a>
       <span aria-hidden="true"> / </span>
     {{ end }}
     <a href="{{ "/" | relURL }}">首页</a>
   </p>
-</header>
+</section>
 
 <hr class="divider">
 

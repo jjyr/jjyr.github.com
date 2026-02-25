@@ -30,6 +30,19 @@
 <hr class="divider">
 
 <section class="section">
+  {{ $posts := where .Site.RegularPages "Section" "posts" }}
+  {{ if gt (len $posts) 0 }}
+    <ul class="post-list" role="list">
+      {{ range first 10 ($posts.ByDate.Reverse) }}
+        <li class="post-item">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+          <span class="post-date">{{ .Date.Format "2006-01-02" }}</span>
+        </li>
+      {{ end }}
+    </ul>
+  {{ else }}
+    <p class="empty">暂无文章。</p>
+  {{ end }}
   <p><a class="secondary-link" href="{{ "posts/" | relURL }}">全部文章</a></p>
 </section>
 {{ end }}
