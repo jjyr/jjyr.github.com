@@ -1,0 +1,19 @@
+baseURL = "https://jjylab.com/"
+languageCode = "zh-CN"
+defaultContentLanguage = "zh-cn"
+title = "JJy"
+enableRobotsTXT = true
+disableKinds = ["taxonomy", "term"]
+
+[outputs]
+home = ["HTML", "RSS"]
+section = ["HTML", "RSS"]
+
+[permalinks]
+posts = "/posts/:slugorcontentbasename/"
+
+[params]
+name = "JJy"
+bio = "记录一些日常想法、技术笔记和短文章。项目相关内容会逐步更新在这里。"
+github = "https://github.com/jjyr"
+email = "jjyruby@gmail.com"
