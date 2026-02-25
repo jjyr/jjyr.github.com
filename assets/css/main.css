@@ -1,11 +1,11 @@
 :root {
-  --bg: #ffffff;
-  --text: #1b1b1b;
-  --muted: #858585;
-  --link: #111111;
-  --border: #dddddd;
-  --divider: #ececec;
-  --max-width: 680px;
+  --bg: #fbfcfd;
+  --text: #1a1f24;
+  --muted: #77838e;
+  --link: #1f2b36;
+  --border: #e2e8ec;
+  --divider: #e8edf1;
+  --max-width: 700px;
 }
 
 * {
@@ -14,6 +14,7 @@
 
 html {
   font-size: 18px;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -21,8 +22,13 @@ body {
   padding: 2.75rem 1.1rem 3rem;
   background: var(--bg);
   color: var(--text);
-  font-family: Georgia, "Times New Roman", Times, serif;
-  line-height: 1.75;
+  font-family: "Alibaba PuHuiTi 3.0", "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  line-height: 1.88;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  line-break: loose;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .container {
@@ -33,67 +39,80 @@ body {
 h1,
 h2,
 h3 {
-  line-height: 1.3;
   margin: 0 0 0.75rem;
+  line-height: 1.45;
   font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
 }
 
 h1 {
-  font-size: 1.65rem;
+  font-size: 1.52rem;
 }
 
 h2 {
-  font-size: 1.2rem;
-  margin-top: 2rem;
+  font-size: 1.12rem;
+  margin-top: 1.5rem;
 }
 
 a {
   color: var(--link);
   text-decoration: underline;
-  text-underline-offset: 0.14em;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 0.055em;
+}
+
+a:hover {
+  color: var(--text);
 }
 
 p {
-  margin: 0.7rem 0;
+  margin: 0.75rem 0;
 }
 
 .section {
-  margin-top: 0;
+  margin: 0;
 }
 
 .divider {
-  margin: 1rem 0;
+  margin: 1.1rem 0;
   border: 0;
   border-top: 1px solid var(--divider);
 }
 
 .meta-links {
-  margin-top: 0.35rem;
-  font-size: 0.86rem;
+  margin: 0.1rem 0;
+  font-size: 0.82rem;
   color: var(--muted);
 }
 
 .meta-links a {
   color: var(--muted);
-  text-decoration-thickness: 0.05em;
-}
-
-.about-list {
-  margin: 0.4rem 0;
-  padding-left: 1.2rem;
 }
 
 .about-name {
-  margin: 0 0 0.3rem;
-  font-size: 0.95rem;
+  margin: 0 0 0.38rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.about-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
 }
 
 .about-list li {
-  margin: 0.2rem 0;
+  margin: 0.32rem 0;
 }
 
 .about-quote {
-  margin-top: 0.7rem;
+  margin-top: 0.8rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--divider);
+  color: var(--muted);
+  font-size: 0.93rem;
 }
 
 .post-list {
@@ -103,18 +122,18 @@ p {
 }
 
 .post-item {
-  margin: 0 0 0.9rem;
+  margin: 0 0 1rem;
 }
 
 .post-item a {
-  text-decoration-thickness: 0.05em;
+  color: var(--text);
 }
 
 .post-date {
   display: block;
-  font-size: 0.8rem;
+  margin-top: 0.12rem;
+  font-size: 0.76rem;
   color: var(--muted);
-  margin-top: 0.05rem;
 }
 
 .empty {
@@ -123,27 +142,33 @@ p {
 
 .secondary-link {
   color: var(--muted);
-  font-size: 0.86rem;
-  text-decoration-thickness: 0.05em;
-}
-
-.secondary-link:hover {
-  color: var(--text);
+  font-size: 0.84rem;
 }
 
 .post {
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
 }
 
 .post-content > * + * {
-  margin-top: 0.9rem;
+  margin-top: 1rem;
+}
+
+.post-content p,
+.post-content li {
+  line-height: 1.95;
+}
+
+.post-content ul,
+.post-content ol {
+  margin: 0.65rem 0 0.25rem;
+  padding-left: 1.25rem;
 }
 
 blockquote {
-  margin: 1rem 0;
-  padding-left: 0.95rem;
+  margin: 1.15rem 0;
+  padding-left: 0.9rem;
   border-left: 2px solid var(--border);
-  color: #454545;
+  color: #4f5a64;
 }
 
 pre,
@@ -151,21 +176,28 @@ code {
   font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-code {
-  font-size: 0.9em;
+pre {
+  margin: 1.1rem 0;
+  padding: 0.78rem 0.9rem;
+  border: 1px solid var(--border);
+  background: #f5f8fa;
+  overflow-x: auto;
+  line-height: 1.6;
 }
 
-pre {
+:not(pre) > code {
+  font-size: 0.86em;
+  padding: 0.08em 0.3em;
   border: 1px solid var(--border);
-  background: #f6f6f6;
-  padding: 0.75rem 0.85rem;
-  overflow-x: auto;
-  line-height: 1.5;
-  margin: 1rem 0;
+  background: #f3f6f8;
+  border-radius: 3px;
 }
 
 pre code {
-  font-size: 0.85em;
+  font-size: 0.84em;
+  border: 0;
+  padding: 0;
+  background: transparent;
 }
 
 img {
@@ -175,10 +207,14 @@ img {
 
 @media (max-width: 640px) {
   html {
-    font-size: 17px;
+    font-size: 16.5px;
   }
 
   body {
-    padding-top: 2rem;
+    padding: 2rem 1rem 2.6rem;
+  }
+
+  .divider {
+    margin: 0.95rem 0;
   }
 }
