@@ -1,19 +1,31 @@
 {{ define "main" }}
-<header class="section-header">
-  <h1>全部文章</h1>
-  <p><a href="{{ "/" | relURL }}">返回首页</a></p>
+<header class="home-header">
+  <p class="meta-links">
+    <a href="{{ "/" | relURL }}">首页</a>
+    <span aria-hidden="true"> / </span>
+    {{ with .OutputFormats.Get "rss" }}
+      <a href="{{ .RelPermalink }}">RSS</a>
+    {{ else }}
+      <a href="{{ "posts/index.xml" | relURL }}">RSS</a>
+    {{ end }}
+  </p>
 </header>
 
-{{ if gt (len .RegularPages) 0 }}
-  <ul class="post-list" role="list">
-    {{ range .RegularPages.ByDate.Reverse }}
-      <li class="post-item">
-        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-        <span class="post-date">{{ .Date.Format "2006-01-02" }}</span>
-      </li>
-    {{ end }}
-  </ul>
-{{ else }}
-  <p class="empty">暂无文章。</p>
-{{ end }}
+<hr class="divider">
+
+<section class="section">
+  <p class="about-name">全部文章</p>
+  {{ if gt (len .RegularPages) 0 }}
+    <ul class="post-list" role="list">
+      {{ range .RegularPages.ByDate.Reverse }}
+        <li class="post-item">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+          <span class="post-date">{{ .Date.Format "2006-01-02" }}</span>
+        </li>
+      {{ end }}
+    </ul>
+  {{ else }}
+    <p class="empty">暂无文章。</p>
+  {{ end }}
+</section>
 {{ end }}

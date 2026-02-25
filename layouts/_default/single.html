@@ -1,11 +1,18 @@
 {{ define "main" }}
+{{ $isPost := eq .Section "posts" }}
+<header class="home-header">
+  <p class="meta-links">
+    {{ if $isPost }}
+      <a href="{{ "posts/" | relURL }}">全部文章</a>
+      <span aria-hidden="true"> / </span>
+    {{ end }}
+    <a href="{{ "/" | relURL }}">首页</a>
+  </p>
+</header>
+
+<hr class="divider">
+
 <article class="post">
-  {{ $isPost := eq .Section "posts" }}
-  {{ if $isPost }}
-    <p><a href="{{ "posts/" | relURL }}">返回文章列表</a></p>
-  {{ else }}
-    <p><a href="{{ "/" | relURL }}">返回首页</a></p>
-  {{ end }}
   <h1>{{ .Title }}</h1>
   {{ if $isPost }}
     <p class="post-date">{{ .Date.Format "2006-01-02" }}</p>
