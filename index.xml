@@ -1,4 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JJy</title><link>https://jjylab.com/</link><description>Recent content on JJy</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Wed, 25 Feb 2026 15:02:03 +0800</lastBuildDate><atom:link href="https://jjylab.com/index.xml" rel="self" type="application/rss+xml"/><item><title>为什么我认为三星仍值得投资</title><link>https://jjylab.com/posts/samsung-still-worth-to-invest/</link><pubDate>Wed, 25 Feb 2026 15:02:03 +0800</pubDate><guid>https://jjylab.com/posts/samsung-still-worth-to-invest/</guid><description>&lt;p&gt;挖金子的人太多太拥挤，不如去卖铲子。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JJy</title><link>https://jjylab.com/</link><description>Recent content on JJy</description><generator>Hugo</generator><language>zh-CN</language><lastBuildDate>Sun, 22 Mar 2026 10:00:00 +0800</lastBuildDate><atom:link href="https://jjylab.com/index.xml" rel="self" type="application/rss+xml"/><item><title>Coding agent 还有哪些方向可以做？</title><link>https://jjylab.com/posts/coding-agent/</link><pubDate>Sun, 22 Mar 2026 10:00:00 +0800</pubDate><guid>https://jjylab.com/posts/coding-agent/</guid><description>&lt;p&gt;2026 年 3 月，现在的 AI agent 可以持续几个小时运作去生成高质量代码，也可能在一个细节设计上做出明显愚蠢的决策。Claude code, Codex, Opencode 等 coding agent 几乎占领市场，但个人自用的 coding agent 也层出不穷。&lt;/p&gt;
+&lt;p&gt;笔者也在尝试写自己的 coding agent, 本文想要探讨在当下时间点，coding agent 还有哪些值得做的方向。&lt;/p&gt;
+&lt;h2 id="任务编排"&gt;任务编排&lt;/h2&gt;
+&lt;p&gt;御三家(Claude code, Codex, Opencode) 都支持多 agent 编排。&lt;/p&gt;
+&lt;p&gt;我们可以使用 Workflow 编排插件如 &lt;code&gt;superpowers&lt;/code&gt;, &lt;code&gt;compound-engineering-plugin/&lt;/code&gt; 等来完成 brainstorm -&amp;gt; plan -&amp;gt; 执行 -&amp;gt; review 的流程，以及在其中某些环节让多 agent 作为不同的团队成员角色去合作完成。&lt;/p&gt;
+&lt;p&gt;多 agent 在很多场景都能做到更有效，每个 agent 负责一个 domain 可以做到高效的利用 context，且让 coding agent 整体耗时更短。但是这种编排仍然是线性的，和笔者想象中的编排差别很大。&lt;/p&gt;
+&lt;p&gt;笔者想象中的任务编排应该更像实际的开发流程，这个开发流程应该从两个维度去分解任务：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;这个功能如何按照 domain 拆分&lt;/li&gt;
+&lt;li&gt;每个 domain 中的任务应该交给负责对应 domain 的 agent 去进一步拆分&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;每个 domain 的任务可以并行在不同的 branch / worktree 开发，并最终分别提交，由整体的 reviewer 以及验证者来做最终的验证并合并到 main branch。Domain agent 在整个流程中保持存活以便随时返工。&lt;/p&gt;</description></item><item><title>为什么我认为三星仍值得投资</title><link>https://jjylab.com/posts/samsung-still-worth-to-invest/</link><pubDate>Wed, 25 Feb 2026 15:02:03 +0800</pubDate><guid>https://jjylab.com/posts/samsung-still-worth-to-invest/</guid><description>&lt;p&gt;挖金子的人太多太拥挤，不如去卖铲子。&lt;/p&gt;
 &lt;p&gt;卖不了铲子，就去投资卖铲子的公司。&lt;/p&gt;
 &lt;p&gt;如果铲子已经太贵，那就继续往上游走，&lt;/p&gt;
 &lt;p&gt;识别整个链条中&lt;strong&gt;最赚钱、最不可替代的那几家&lt;/strong&gt;去投。&lt;/p&gt;
