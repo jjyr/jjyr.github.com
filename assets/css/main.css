@@ -149,6 +149,30 @@ p {
   margin-top: 0.3rem;
 }
 
+.site-footer {
+  margin: 2.2rem auto 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--divider);
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer-mark {
+  letter-spacing: 0.06em;
+}
+
+.site-footer-links {
+  margin-top: 0.18rem;
+}
+
+.site-footer a {
+  color: var(--muted);
+}
+
 .post-content > * + * {
   margin-top: 1.15rem;
 }
@@ -248,5 +272,9 @@ img {
 
   .divider {
     margin: 0.95rem 0;
+  }
+
+  .site-footer {
+    margin-top: 1.8rem;
   }
 }

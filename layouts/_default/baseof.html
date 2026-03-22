@@ -14,5 +14,19 @@
   <main class="container">
     {{ block "main" . }}{{ end }}
   </main>
+  <footer class="site-footer container" role="contentinfo">
+    <p class="site-footer-mark">EOF</p>
+    <p class="site-footer-links">
+      <a href="{{ "/" | relURL }}">首页</a>
+      <span aria-hidden="true"> / </span>
+      <a href="{{ "posts/" | relURL }}">全部文章</a>
+      <span aria-hidden="true"> / </span>
+      {{ with .Site.Home.OutputFormats.Get "rss" }}
+        <a href="{{ .RelPermalink }}">RSS</a>
+      {{ else }}
+        <a href="{{ "index.xml" | relURL }}">RSS</a>
+      {{ end }}
+    </p>
+  </footer>
 </body>
 </html>
