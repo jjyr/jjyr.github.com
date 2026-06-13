@@ -97,24 +97,6 @@ p {
   color: var(--text);
 }
 
-.about-list {
-  margin: 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.about-list li {
-  margin: 0.32rem 0;
-}
-
-.about-quote {
-  margin-top: 0.8rem;
-  padding-left: 0.75rem;
-  border-left: 1px solid var(--divider);
-  color: var(--muted);
-  font-size: 0.93rem;
-}
-
 .post-list {
   list-style: none;
   margin: 0;

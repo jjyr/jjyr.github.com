@@ -1,5 +1,5 @@
 baseURL = "https://jjylab.com/"
-languageCode = "zh-CN"
+locale = "zh-CN"
 defaultContentLanguage = "zh-cn"
 title = "JJy"
 enableRobotsTXT = true
@@ -17,8 +17,3 @@ name = "JJy"
 github = "https://github.com/jjyr"
 x = "https://x.com/jjybtw"
 email = "jjyruby@gmail.com"
-about_items = [
-  "纯粹人类思维",
-  "理解世间万物",
-]
-about_quote = "Pure human thoughts"

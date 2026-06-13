@@ -1,6 +1,10 @@
 {{ define "main" }}
 <header class="home-header">
   <p class="meta-links">
+    <a href="{{ "/" | relURL }}">首页</a>
+    <span aria-hidden="true"> / </span>
+    <a href="{{ "about/" | relURL }}">关于</a>
+    <span aria-hidden="true"> / </span>
     <a href="{{ .Site.Params.github }}" rel="noreferrer">GitHub</a>
     <span aria-hidden="true"> / </span>
     <a href="{{ .Site.Params.x }}" rel="noreferrer">X</a>
@@ -14,18 +18,6 @@
     {{ end }}
   </p>
 </header>
-
-<hr class="divider">
-
-<section class="section">
-  <p class="about-name">{{ .Site.Params.name }}</p>
-  <ul class="about-list" role="list">
-    {{ range .Site.Params.about_items }}
-      <li>{{ . }}</li>
-    {{ end }}
-  </ul>
-  <p class="about-quote">{{ .Site.Params.about_quote }}</p>
-</section>
 
 <hr class="divider">
 
