@@ -4,7 +4,7 @@
 
 - `archive`: frozen legacy Jekyll snapshot
 - `source`: default branch, Hugo source only
-- `master`: generated static output only
+- `master`: legacy generated static output snapshot
 
 Do not merge `master` back into `source`.
 
@@ -22,34 +22,21 @@ hugo --minify
 
 Generated files are written to `public/`.
 
-## One-Command Release
+## Deploy
 
-Run from `source` branch:
-
-```bash
-./scripts/release.sh "your source commit message" "Deploy YYYY-MM-DD HH:MM:SS +0800"
-```
-
-Arguments are optional:
+Push `source` to trigger GitHub Actions deployment:
 
 ```bash
-./scripts/release.sh
+git push origin source
 ```
 
-This command will:
+The workflow builds Hugo, checks that `public/CNAME` exists, uploads `public/` as a GitHub Pages artifact, and deploys it. Do not commit `public/` or update `master` for deployment.
 
-1. Commit all source changes on `source` (if any)
-2. Push `source` to `origin/source`
-3. Build with `hugo --minify --cleanDestinationDir`
-4. Sync `public/` output to `master`
-5. Commit and push `master`
+Manual dispatch is also available from the `Deploy GitHub Pages` workflow in GitHub Actions.
 
-## Manual Publish (source -> master)
+## GitHub Pages
 
-1. Work in `source` and verify locally.
-2. Build with `hugo --minify`.
-3. Copy `public/` output into `master` branch and commit there.
-4. Ensure `CNAME` is present in published output.
+Repository Pages source should be set to `GitHub Actions`, not a branch.
 
 ## New Post
 

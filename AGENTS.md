@@ -11,14 +11,15 @@ This file defines project-level operating rules for agents working in this repos
 ## 2. Branch Strategy
 
 - `archive`: frozen legacy Jekyll site snapshot.
-- `source`: default branch, Hugo source only.
-- `master`: generated static output only.
+- `source`: default branch, Hugo source only. Pushes to this branch trigger GitHub Pages deployment through GitHub Actions.
+- `master`: legacy generated static output snapshot. Do not use it for new deployment work.
 
 Rules:
 
 - Do not merge `master` back into `source`.
 - Do not commit build artifacts to `source`.
 - Preserve `CNAME` in published output.
+- Do not publish by committing generated files to `master`; GitHub Pages deploys from the Actions artifact.
 
 ## 3. Site Structure Requirements
 
@@ -58,8 +59,8 @@ Do not add tags/categories unless explicitly requested.
 In `source` branch:
 
 1. Preview locally: `hugo server -D`
-2. Build output: `hugo --minify`
-3. Publish by updating `master` with generated files from `public/`
+2. Verify build locally: `hugo --minify`
+3. Push `source`; GitHub Actions builds and deploys the Pages artifact.
 
 ## 7. Non-goals (until explicitly requested)
 
@@ -67,4 +68,3 @@ In `source` branch:
 - Search
 - Tags/categories taxonomy pages
 - JS-heavy components
-- CI/CD automation for deployment
