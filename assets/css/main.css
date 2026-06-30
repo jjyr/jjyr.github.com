@@ -243,6 +243,10 @@ img {
   height: auto;
 }
 
+.post-content img[alt="微信公众号二维码"] {
+  width: 220px;
+}
+
 @media (max-width: 640px) {
   html {
     font-size: 16.5px;
