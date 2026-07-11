@@ -22,3 +22,8 @@ build:
 ## 微信公众号
 
 {{< figure src="/images/wechat-qrcode.jpg" alt="微信公众号二维码" >}}
+
+## 友情链接
+
+- [博客大联盟](https://bo.ke/)
+
