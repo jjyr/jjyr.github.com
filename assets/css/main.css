@@ -384,8 +384,8 @@ img {
 }
 
 /* Avatar styling */
-.post-content img[alt*="头像"],
-.about-avatar {
+.about-avatar,
+.post-content .about-avatar {
   width: 72px;
   height: 72px;
   border-radius: 50%;
@@ -415,6 +415,51 @@ img {
 /* 404 */
 .not-found {
   margin-top: 2rem;
+}
+
+/* Post Navigation */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 3.5rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid var(--divider);
+}
+
+.post-nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 48%;
+}
+
+.post-nav-next {
+  margin-left: auto;
+  text-align: right;
+  align-items: flex-end;
+}
+
+.post-nav-label {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.post-nav-link {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
+  text-decoration: underline;
+  text-decoration-color: var(--link-underline);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.15s ease, color 0.15s ease;
+}
+
+.post-nav-link:hover {
+  text-decoration-color: var(--link-underline-hover);
 }
 
 /* Responsive */
@@ -458,5 +503,20 @@ img {
   .post-content table {
     display: block;
     overflow-x: auto;
+  }
+
+  .post-nav {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .post-nav-item {
+    max-width: 100%;
+  }
+
+  .post-nav-next {
+    margin-left: 0;
+    text-align: left;
+    align-items: flex-start;
   }
 }

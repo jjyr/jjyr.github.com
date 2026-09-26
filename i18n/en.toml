@@ -15,3 +15,9 @@ other = "Page not found."
 
 [back_to_home]
 other = "Back to home"
+
+[prev_post]
+other = "Previous"
+
+[next_post]
+other = "Next"

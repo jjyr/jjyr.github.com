@@ -4,7 +4,7 @@ build:
   list: never
 ---
 
-![JJy's X Avatar](/images/jjybtw-avatar.jpg)
+<img src="/images/jjybtw-avatar.jpg" alt="JJy" class="about-avatar">
 
 Independent Thinker | AI | Gaming
 

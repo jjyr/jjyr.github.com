@@ -10,5 +10,25 @@
   <div class="post-content">
     {{ .Content }}
   </div>
+  {{ if $isPost }}
+    {{ $prev := .PrevInSection }}
+    {{ $next := .NextInSection }}
+    {{ if or $prev $next }}
+      <nav class="post-nav" aria-label="文章导航">
+        {{ with $prev }}
+          <div class="post-nav-item post-nav-prev">
+            <span class="post-nav-label">← {{ i18n "prev_post" }}</span>
+            <a href="{{ .RelPermalink }}" class="post-nav-link">{{ .Title }}</a>
+          </div>
+        {{ end }}
+        {{ with $next }}
+          <div class="post-nav-item post-nav-next">
+            <span class="post-nav-label">{{ i18n "next_post" }} →</span>
+            <a href="{{ .RelPermalink }}" class="post-nav-link">{{ .Title }}</a>
+          </div>
+        {{ end }}
+      </nav>
+    {{ end }}
+  {{ end }}
 </article>
 {{ end }}

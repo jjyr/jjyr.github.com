@@ -32,3 +32,8 @@ name = "JJy"
 github = "https://github.com/jjyr"
 x = "https://x.com/jjybtw"
 email = "jjyruby@gmail.com"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

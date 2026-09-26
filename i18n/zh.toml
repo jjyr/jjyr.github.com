@@ -15,3 +15,9 @@ other = "页面不存在。"
 
 [back_to_home]
 other = "返回首页"
+
+[prev_post]
+other = "上一篇"
+
+[next_post]
+other = "下一篇"

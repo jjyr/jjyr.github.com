@@ -3,7 +3,8 @@ title: "关于"
 build:
   list: never
 ---
-![JJy 的 X 头像](/images/jjybtw-avatar.jpg)
+
+<img src="/images/jjybtw-avatar.jpg" alt="JJy" class="about-avatar">
 
 独立学者 | AI | 游戏
 
