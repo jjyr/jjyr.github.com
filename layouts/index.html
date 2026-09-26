@@ -1,34 +1,12 @@
 {{ define "main" }}
-<header class="home-header">
-  <p class="meta-links">
-    <a href="{{ "/" | relURL }}">首页</a>
-    <span aria-hidden="true"> / </span>
-    <a href="{{ "about/" | relURL }}">关于</a>
-    <span aria-hidden="true"> / </span>
-    <a href="{{ .Site.Params.github }}" rel="noreferrer">GitHub</a>
-    <span aria-hidden="true"> / </span>
-    <a href="{{ .Site.Params.x }}" rel="noreferrer">X</a>
-    <span aria-hidden="true"> / </span>
-    <a href="mailto:{{ .Site.Params.email }}">Email</a>
-    <span aria-hidden="true"> / </span>
-    {{ with .OutputFormats.Get "rss" }}
-      <a href="{{ .RelPermalink }}">RSS</a>
-    {{ else }}
-      <a href="{{ "index.xml" | relURL }}">RSS</a>
-    {{ end }}
-  </p>
-</header>
-
-<hr class="divider">
-
-<section class="section">
+<section class="posts-section">
   {{ $posts := where .Site.RegularPages "Section" "posts" }}
   {{ if gt (len $posts) 0 }}
     <ul class="post-list" role="list">
-      {{ range first 10 ($posts.ByDate.Reverse) }}
+      {{ range $posts.ByDate.Reverse }}
         <li class="post-item">
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-          <span class="post-date">{{ .Date.Format "2006-01-02" }}</span>
+          <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+          {{ partial "relative-time.html" . }}
         </li>
       {{ end }}
     </ul>

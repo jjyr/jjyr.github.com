@@ -1,0 +1,5 @@
+{{- $date := .Date | default . -}}
+<relative-time class="post-date" datetime="{{ $date.Format "2006-01-02T15:04:05Z07:00" }}" date="{{ $date.Format "2006-01-02" }}">
+  <span class="rel-date">{{ $date.Format "2006-01-02" }}</span>
+  <span class="abs-date">{{ $date.Format "2006-01-02" }}</span>
+</relative-time>

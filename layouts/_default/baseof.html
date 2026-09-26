@@ -3,19 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
   {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
-  {{ with .OutputFormats.Get "rss" }}
+  {{ with .Site.Home.OutputFormats.Get "rss" }}
     <link rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" href="{{ .RelPermalink }}">
   {{ end }}
 </head>
 <body>
-  <main class="container">
-    {{ block "main" . }}{{ end }}
-  </main>
-  <footer class="site-footer container" role="contentinfo">
-    <p class="site-footer-mark">EOF</p>
-  </footer>
+  <div class="site-wrapper container">
+    <header class="site-header">
+      <div class="site-header-inner">
+        <a href="{{ "/" | relURL }}" class="site-brand">{{ .Site.Title }}</a>
+        <nav class="site-nav" aria-label="主要导航">
+          <a href="{{ "/" | relURL }}"{{ if .IsHome }} class="active" aria-current="page"{{ end }}>首页</a>
+          <a href="{{ "about/" | relURL }}"{{ if eq .RelPermalink "/about/" }} class="active" aria-current="page"{{ end }}>关于</a>
+          <a href="{{ .Site.Params.github }}" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="{{ .Site.Params.x }}" target="_blank" rel="noreferrer">X</a>
+          <a href="mailto:{{ .Site.Params.email }}">Email</a>
+          <a href="{{ "index.xml" | relURL }}">RSS</a>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      {{ block "main" . }}{{ end }}
+    </main>
+    <footer class="site-footer" role="contentinfo">
+      <p class="site-footer-mark">EOF</p>
+    </footer>
+  </div>
+  {{ $js := resources.Get "js/relative-time.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 </body>
 </html>

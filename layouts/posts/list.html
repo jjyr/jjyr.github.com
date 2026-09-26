@@ -1,26 +1,12 @@
 {{ define "main" }}
-<header class="home-header">
-  <p class="meta-links">
-    <a href="{{ "/" | relURL }}">首页</a>
-    <span aria-hidden="true"> / </span>
-    {{ with .OutputFormats.Get "rss" }}
-      <a href="{{ .RelPermalink }}">RSS</a>
-    {{ else }}
-      <a href="{{ "posts/index.xml" | relURL }}">RSS</a>
-    {{ end }}
-  </p>
-</header>
-
-<hr class="divider">
-
-<section class="section">
-  <p class="about-name">全部文章</p>
+<section class="posts-section">
+  <h1 class="section-title">全部文章</h1>
   {{ if gt (len .RegularPages) 0 }}
     <ul class="post-list" role="list">
       {{ range .RegularPages.ByDate.Reverse }}
         <li class="post-item">
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-          <span class="post-date">{{ .Date.Format "2006-01-02" }}</span>
+          <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+          {{ partial "relative-time.html" . }}
         </li>
       {{ end }}
     </ul>

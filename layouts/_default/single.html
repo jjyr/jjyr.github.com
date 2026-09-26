@@ -1,32 +1,12 @@
 {{ define "main" }}
 {{ $isPost := eq .Section "posts" }}
-<header class="home-header">
-  <p class="meta-links">
-    <a href="{{ "/" | relURL }}">首页</a>
-    <span aria-hidden="true"> / </span>
-    <a href="{{ "about/" | relURL }}">关于</a>
-    <span aria-hidden="true"> / </span>
-    <a href="{{ .Site.Params.github }}" rel="noreferrer">GitHub</a>
-    <span aria-hidden="true"> / </span>
-    <a href="{{ .Site.Params.x }}" rel="noreferrer">X</a>
-    <span aria-hidden="true"> / </span>
-    <a href="mailto:{{ .Site.Params.email }}">Email</a>
-    <span aria-hidden="true"> / </span>
-    {{ with .Site.Home.OutputFormats.Get "rss" }}
-      <a href="{{ .RelPermalink }}">RSS</a>
-    {{ else }}
-      <a href="{{ "index.xml" | relURL }}">RSS</a>
-    {{ end }}
-  </p>
-</header>
-
-<hr class="divider">
-
 <article class="post">
-  <h1>{{ .Title }}</h1>
-  {{ if $isPost }}
-    <p class="post-date">{{ .Date.Format "2006-01-02" }}</p>
-  {{ end }}
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{ if $isPost }}
+      {{ partial "relative-time.html" . }}
+    {{ end }}
+  </header>
   <div class="post-content">
     {{ .Content }}
   </div>

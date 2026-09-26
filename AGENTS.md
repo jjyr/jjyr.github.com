@@ -35,7 +35,7 @@ Rules:
 - Avoid decorative UI elements (cards, shadows, heavy effects).
 - Prefer HTML + minimal CSS; avoid unnecessary JavaScript.
 - Typography:
-  - Body text uses serif font.
+  - Body text uses clean, solid, free sans-serif font (e.g. PingFang SC / Noto Sans SC / Source Han Sans).
   - Code block and inline code use monospace.
 - Post list style: title-first, date in small/light color.
 - Date format: `YYYY-MM-DD`.
