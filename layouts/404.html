@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="not-found">
   <h1 class="section-title">404</h1>
-  <p>页面不存在。</p>
-  <p><a href="{{ "/" | relURL }}">返回首页</a></p>
+  <p>{{ i18n "page_not_found" | default "页面不存在。" }}</p>
+  <p><a href="{{ "/" | relLangURL }}">{{ i18n "back_to_home" | default "返回首页" }}</a></p>
 </div>
 {{ end }}

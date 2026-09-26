@@ -1,6 +1,6 @@
 baseURL = "https://jjylab.com/"
-locale = "zh-CN"
-defaultContentLanguage = "zh-cn"
+defaultContentLanguage = "zh"
+defaultContentLanguageInSubdir = false
 title = "JJy"
 enableRobotsTXT = true
 disableKinds = ["taxonomy", "term"]
@@ -11,6 +11,21 @@ section = ["HTML", "RSS"]
 
 [permalinks]
 posts = "/posts/:slugorcontentbasename/"
+
+[languages]
+  [languages.zh]
+    locale = "zh-CN"
+    label = "中文"
+    contentDir = "content"
+    weight = 1
+    title = "JJy"
+
+  [languages.en]
+    locale = "en"
+    label = "English"
+    contentDir = "content"
+    weight = 2
+    title = "JJy"
 
 [params]
 name = "JJy"

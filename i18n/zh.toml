@@ -1,0 +1,17 @@
+[home]
+other = "首页"
+
+[about]
+other = "关于"
+
+[all_posts]
+other = "全部文章"
+
+[no_posts]
+other = "暂无文章。"
+
+[page_not_found]
+other = "页面不存在。"
+
+[back_to_home]
+other = "返回首页"

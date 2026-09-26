@@ -1,6 +1,6 @@
 {{ define "main" }}
 <section class="posts-section">
-  <h1 class="section-title">全部文章</h1>
+  <h1 class="section-title">{{ i18n "all_posts" | default "全部文章" }}</h1>
   {{ if gt (len .RegularPages) 0 }}
     <ul class="post-list" role="list">
       {{ range .RegularPages.ByDate.Reverse }}
@@ -11,7 +11,7 @@
       {{ end }}
     </ul>
   {{ else }}
-    <p class="empty">暂无文章。</p>
+    <p class="empty">{{ i18n "no_posts" | default "暂无文章。" }}</p>
   {{ end }}
 </section>
 {{ end }}

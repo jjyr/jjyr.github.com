@@ -10,7 +10,9 @@ class RelativeTime extends HTMLElement {
     if (isNaN(date.getTime())) return;
 
     const absDate = this.getAttribute('date') || datetime.slice(0, 10);
-    const relDate = this.formatRelative(date);
+    const lang = (this.closest('[lang]')?.getAttribute('lang') || document.documentElement.lang || 'zh').toLowerCase();
+    const isEn = lang.startsWith('en');
+    const relDate = this.formatRelative(date, isEn);
 
     let relSpan = this.querySelector('.rel-date');
     let absSpan = this.querySelector('.abs-date');
@@ -23,17 +25,24 @@ class RelativeTime extends HTMLElement {
     }
   }
 
-  formatRelative(date) {
+  formatRelative(date, isEn) {
     const now = new Date();
     const diffMs = now - date;
-    if (diffMs < 0) return '刚刚';
+    if (diffMs < 0) return isEn ? 'just now' : '刚刚';
 
     const diffDays = Math.floor(diffMs / 86400000);
     if (diffDays < 1) {
       const diffHours = Math.floor(diffMs / 3600000);
-      return diffHours < 1 ? '刚刚' : `${diffHours} 小时前`;
+      if (diffHours < 1) return isEn ? 'just now' : '刚刚';
+      if (isEn) {
+        return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+      }
+      return `${diffHours} 小时前`;
     }
     if (diffDays < 30) {
+      if (isEn) {
+        return diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
+      }
       return `${diffDays} 天前`;
     }
 
@@ -43,7 +52,10 @@ class RelativeTime extends HTMLElement {
     }
     if (months < 1) months = 1;
     if (months < 12) {
-      return `${months} 月前`;
+      if (isEn) {
+        return months === 1 ? '1 month ago' : `${months} months ago`;
+      }
+      return `${months} 个月前`;
     }
 
     let years = now.getFullYear() - date.getFullYear();
@@ -51,6 +63,9 @@ class RelativeTime extends HTMLElement {
       years--;
     }
     if (years < 1) years = 1;
+    if (isEn) {
+      return years === 1 ? '1 year ago' : `${years} years ago`;
+    }
     return `${years} 年前`;
   }
 }

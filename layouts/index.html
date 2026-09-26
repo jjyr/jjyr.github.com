@@ -11,7 +11,7 @@
       {{ end }}
     </ul>
   {{ else }}
-    <p class="empty">暂无文章。</p>
+    <p class="empty">{{ i18n "no_posts" | default "暂无文章。" }}</p>
   {{ end }}
 </section>
 {{ end }}

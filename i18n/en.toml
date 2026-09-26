@@ -1,0 +1,17 @@
+[home]
+other = "Home"
+
+[about]
+other = "About"
+
+[all_posts]
+other = "All Posts"
+
+[no_posts]
+other = "No posts yet."
+
+[page_not_found]
+other = "Page not found."
+
+[back_to_home]
+other = "Back to home"

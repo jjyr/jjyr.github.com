@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Git pre-commit hook to verify bilingual content integrity
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+if command -v uv >/dev/null 2>&1; then
+  uv run python "$REPO_ROOT/scripts/check_i18n.py"
+elif command -v python3 >/dev/null 2>&1; then
+  python3 "$REPO_ROOT/scripts/check_i18n.py"
+else
+  echo "[ERROR] Python 3 or uv is required to run pre-commit checks." >&2
+  exit 1
+fi
