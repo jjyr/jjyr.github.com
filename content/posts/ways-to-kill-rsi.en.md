@@ -1,7 +1,7 @@
 ---
 title: "Some Ways to Kill RSI in the Future"
 date: 2026-09-26T19:27:42+08:00
-draft: true
+draft: false
 ---
 
 ![Human Wage vs AI Cost](/images/way-to-kill-rsi.jpg)
