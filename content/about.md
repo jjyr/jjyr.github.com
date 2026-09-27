@@ -6,18 +6,12 @@ build:
 
 <img src="/images/jjybtw-avatar.jpg" alt="JJy" class="about-avatar">
 
-独立学者 | AI | 游戏
+**JJy** · 独立学者 | AI | 游戏  
+[GitHub](https://github.com/jjyr) · [X](https://x.com/jjybtw) · [Email](mailto:jjyruby@gmail.com)
+
+---
 
 捕捉大脑一瞬间的状态是很有意义的，仅靠海马体无法形成长期的认知和思考。
 
-
-
 > 大部分文章是中文写作，使用 AI 辅助翻译
-
-## 链接
-
-- [X @jjybtw](https://x.com/jjybtw)
-- [GitHub @jjyr](https://github.com/jjyr)
-- [Email](mailto:jjyruby@gmail.com)
-- [RSS](/index.xml)
 

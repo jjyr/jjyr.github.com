@@ -6,15 +6,11 @@ build:
 
 <img src="/images/jjybtw-avatar.jpg" alt="JJy" class="about-avatar">
 
-Independent Thinker | AI | Gaming
+**JJy** · Independent Thinker | AI | Gaming  
+[GitHub](https://github.com/jjyr) · [X](https://x.com/jjybtw) · [Email](mailto:jjyruby@gmail.com)
+
+---
 
 Capturing a momentary state of the brain is deeply meaningful; the hippocampus alone cannot form long-term cognition and thinking.
 
 > Most articles are originally written in Chinese and translated with the assistance of AI.
-
-## Links
-
-- [X @jjybtw](https://x.com/jjybtw)
-- [GitHub @jjyr](https://github.com/jjyr)
-- [Email](mailto:jjyruby@gmail.com)
-- [RSS](/en/index.xml)
