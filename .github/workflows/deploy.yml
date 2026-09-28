@@ -41,7 +41,7 @@ jobs:
           hugo version
 
       - name: Build site
-        run: hugo --gc --minify --cleanDestinationDir --baseURL "${{ steps.pages.outputs.base_url }}/"
+        run: hugo --gc --minify --cleanDestinationDir
 
       - name: Verify custom domain
         run: test -f public/CNAME
