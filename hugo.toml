@@ -19,6 +19,8 @@ posts = "/posts/:slugorcontentbasename/"
     contentDir = "content"
     weight = 1
     title = "JJy"
+    [languages.zh.params]
+      description = "JJy · 独立学者 | AI | 游戏"
 
   [languages.en]
     locale = "en"
@@ -26,12 +28,17 @@ posts = "/posts/:slugorcontentbasename/"
     contentDir = "content"
     weight = 2
     title = "JJy"
+    [languages.en.params]
+      description = "JJy · Independent Thinker | AI | Gaming"
 
 [params]
 name = "JJy"
 github = "https://github.com/jjyr"
 x = "https://x.com/jjybtw"
+twitter = "@jjybtw"
 email = "jjyruby@gmail.com"
+avatar = "/images/jjybtw-avatar.jpg"
+ogImage = "/images/og-default.jpg"
 
 [markup]
   [markup.goldmark]
