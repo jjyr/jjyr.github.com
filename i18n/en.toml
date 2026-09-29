@@ -1,6 +1,12 @@
 [home]
 other = "Home"
 
+[main_navigation]
+other = "Main navigation"
+
+[post_navigation]
+other = "Post navigation"
+
 [about]
 other = "About"
 

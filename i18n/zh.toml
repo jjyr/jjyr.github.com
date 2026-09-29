@@ -1,6 +1,12 @@
 [home]
 other = "首页"
 
+[main_navigation]
+other = "主要导航"
+
+[post_navigation]
+other = "文章导航"
+
 [about]
 other = "关于"
 

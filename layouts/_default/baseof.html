@@ -5,56 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
   {{ partial "seo.html" . }}
-  {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
-  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
+  {{ $css := resources.Get "css/main.css" | minify }}
+  <style>{{ $css.Content | safeCSS }}</style>
   {{ with .Site.Home.OutputFormats.Get "rss" }}
     <link rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" href="{{ .RelPermalink }}">
   {{ end }}
-  <script>
-  (function() {
-    var pref = localStorage.getItem('site_lang');
-    if (pref) return;
-    var currentLang = '{{ .Language.Lang }}';
-    var navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    var targetLang = navLang.startsWith('zh') ? 'zh' : 'en';
-    if (targetLang !== currentLang) {
-      {{ if eq .Language.Lang "zh" }}
-        {{ with .Translations }}
-          {{ range . }}
-            {{ if eq .Language.Lang "en" }}
-              window.location.replace('{{ .RelPermalink }}');
-            {{ end }}
-          {{ end }}
-        {{ else }}
-          window.location.replace('/en' + window.location.pathname + window.location.search);
-        {{ end }}
-      {{ else }}
-        {{ with .Translations }}
-          {{ range . }}
-            {{ if eq .Language.Lang "zh" }}
-              window.location.replace('{{ .RelPermalink }}');
-            {{ end }}
-          {{ end }}
-        {{ else }}
-          var p = window.location.pathname;
-          if (p.startsWith('/en/')) {
-            p = p.replace(/^\/en/, '');
-          } else if (p === '/en') {
-            p = '/';
-          }
-          window.location.replace(p + window.location.search);
-        {{ end }}
-      {{ end }}
-    }
-  })();
-  </script>
 </head>
 <body>
   <div class="site-wrapper container">
     <header class="site-header">
       <div class="site-header-inner">
         <a href="{{ "/" | relLangURL }}" class="site-brand">{{ .Site.Title }}</a>
-        <nav class="site-nav" aria-label="主要导航">
+        <nav class="site-nav" aria-label="{{ i18n "main_navigation" }}">
           <a href="{{ "/" | relLangURL }}"{{ if .IsHome }} class="active" aria-current="page"{{ end }}>{{ i18n "home" }}</a>
           <a href="{{ "about/" | relLangURL }}"{{ if eq .RelPermalink (printf "%sabout/" .Site.Home.RelPermalink) }} class="active" aria-current="page"{{ end }}>{{ i18n "about" }}</a>
           <a href="{{ "index.xml" | relLangURL }}">RSS</a>
@@ -62,21 +24,21 @@
             {{ with .Translations }}
               {{ range . }}
                 {{ if eq .Language.Lang "en" }}
-                  <a href="{{ .RelPermalink }}" data-lang-switch="en" class="lang-switch">EN</a>
+                  <a href="{{ .RelPermalink }}" class="lang-switch">EN</a>
                 {{ end }}
               {{ end }}
             {{ else }}
-              <a href="/en/" data-lang-switch="en" class="lang-switch">EN</a>
+              <a href="/en/" class="lang-switch">EN</a>
             {{ end }}
           {{ else }}
             {{ with .Translations }}
               {{ range . }}
                 {{ if eq .Language.Lang "zh" }}
-                  <a href="{{ .RelPermalink }}" data-lang-switch="zh" class="lang-switch">中</a>
+                  <a href="{{ .RelPermalink }}" class="lang-switch">中</a>
                 {{ end }}
               {{ end }}
             {{ else }}
-              <a href="/" data-lang-switch="zh" class="lang-switch">中</a>
+              <a href="/" class="lang-switch">中</a>
             {{ end }}
           {{ end }}
         </nav>
@@ -89,14 +51,6 @@
       <p class="site-footer-mark">EOF</p>
     </footer>
   </div>
-  <script>
-  document.addEventListener('click', function(e) {
-    var el = e.target.closest('[data-lang-switch]');
-    if (el) {
-      localStorage.setItem('site_lang', el.getAttribute('data-lang-switch'));
-    }
-  });
-  </script>
   {{ $js := resources.Get "js/relative-time.js" | minify | fingerprint }}
   <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 </body>

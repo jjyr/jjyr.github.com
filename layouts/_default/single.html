@@ -14,7 +14,7 @@
     {{ $prev := .PrevInSection }}
     {{ $next := .NextInSection }}
     {{ if or $prev $next }}
-      <nav class="post-nav" aria-label="文章导航">
+      <nav class="post-nav" aria-label="{{ i18n "post_navigation" }}">
         {{ with $prev }}
           <div class="post-nav-item post-nav-prev">
             <span class="post-nav-label">← {{ i18n "prev_post" }}</span>
