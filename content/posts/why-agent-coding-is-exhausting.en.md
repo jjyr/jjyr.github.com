@@ -1,10 +1,10 @@
 ---
-title: "Why Am I So Tired When I Code with Agents?"
+title: "Why Coding with Agents Is Exhausting"
 date: 2026-10-23T23:12:36+08:00
 draft: false
 ---
 
-Why am I so tired when I code with agents?
+Why coding with agents is exhausting?
 
 I often see people complain about this, and my own experience is similar. After an afternoon of working with a coding agent, I frequently feel exhausted, with little to show for it.
 
@@ -57,7 +57,7 @@ All of these problems can be addressed with any agent or harness, but I wanted t
 At the moment, I think an assistant-style AI is a good solution. Chat is an asynchronous form of communication, which makes it well suited to staying quiet when the user doesn't need to intervene.
 An assistant also naturally has an ongoing conversation, where instructions about the user's habits can accumulate, and a memory system can more easily extract user preferences from those conversations.
 
-The assistant format also suits automation. One of the classic use cases since the days of the "little lobster" was gathering the latest news on a schedule.
+The assistant format also suits automation. One of the classic use cases since the OpenClaw days was gathering the latest news on a schedule.
 Pot was designed with this scenario in mind too. For example:
 
 We can create an assistant dedicated to operating a project, have it inspect production service logs for anomalies every day, automatically open issues, and launch multiple tasks to investigate those issues, fix them, and open PRs. Another development assistant can then review and merge them automatically, and deploy the updates. Pot connects communication between assistants, scheduled tasks, and external GitHub notifications, so assistants can decide what to do based on their instructions.
@@ -66,9 +66,9 @@ Notice that we are using several different assistants. Each maintains its own on
 
 ![Multiple assistants in Pot, with assistants delegating requests to background tasks](/images/ai-tasks.png)
 
-Pot was inspired by ChatGPT Dot. Dot made me realize that today's models can already support AI assistants that are more useful than those from the "little lobster" days. Perhaps we will find ourselves raising little lobsters again.
+Pot was inspired by ChatGPT Dot. Dot made me realize that today's models can already support AI assistants that are more useful than those from the OpenClaw days. Perhaps we will find ourselves raising our own OpenClaws again.
 
-To avoid exhausting ourselves, we can train an AI assistant to crack the whip for us.
+To avoid exhausting ourselves, we might as well train an AI assistant to hold the whip for us.
 
 ![AI Assistant](/images/ai-assistant.png)
 
