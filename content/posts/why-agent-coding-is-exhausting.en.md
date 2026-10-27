@@ -64,7 +64,7 @@ Notice that we are using several different assistants. Each maintains its own on
 
 ![Multiple assistants in Pot, with assistants delegating requests to background tasks](/images/ai-tasks.png)
 
-Pot was inspired by ChatGPT Dot. Dot made me realize that today's models can already support AI assistants that are more useful than those from the OpenClaw days. Perhaps we will find ourselves raising our own OpenClaws again.
+Pot was inspired by ChatGPT Dot. Dot made me realize that today's models can already support AI assistants that are more useful than those from the OpenClaw days. Maybe we're back to running our own AI assistants again.
 
 To avoid exhausting ourselves, we might as well train an AI assistant to hold the whip for us.
 
