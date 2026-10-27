@@ -10,8 +10,6 @@ I often see people complain about this, and my own experience is similar. After 
 
 In this post, I want to share my thoughts, along with [Pot](https://pot.jjylab.com/), an open-source AI assistant I built while exploring this problem.
 
-*Let me explain why as plainly and directly as possible.*
-
 ### There Are Always Small, Repetitive Preferences to Explain to the AI
 
 For example, I ask the AI to develop in a separate worktree and branch, sync the main branch with upstream before starting, and open a PR after testing.
