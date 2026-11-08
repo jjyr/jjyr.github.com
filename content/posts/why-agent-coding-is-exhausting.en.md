@@ -10,7 +10,7 @@ Why coding with agents is exhausting?
 
 I often see people complain about this, and my own experience is similar. After an afternoon of working with a coding agent, I frequently feel exhausted, with little to show for it.
 
-In this post, I want to share my thoughts, along with [Pot](https://pot.jjylab.com/), an open-source AI assistant I built while exploring this problem (the project is now archived; see the postscript at the end).
+In this post, I want to share my thoughts, along with [Pot](https://pot.jjylab.com/), an open-source AI assistant I built while exploring this problem.
 
 ### There Are Always Small, Repetitive Preferences to Explain to the AI
 
@@ -47,7 +47,7 @@ As for improving code quality, the answer is to wait for a newer model and have 
 
 ### The Pot AI Assistant
 
-*(What follows is my thinking at the time of writing. See the postscript at the end for where I stand now.)*
+> This section reflects my thinking at the time of writing. I have since abandoned this direction; see the postscript at the end.
 
 I would summarize the core approach to these problems in two points:
 
@@ -70,7 +70,7 @@ Notice that we are using several different assistants. Each maintains its own on
 
 Pot was inspired by ChatGPT Dot. Dot made me realize that today's models can already support AI assistants that are more useful than those from the OpenClaw days. Maybe we're back to running our own AI assistants again.
 
-To avoid exhausting ourselves, we might as well train an AI assistant to hold the whip for us. (See the postscript at the end; I no longer think so.)
+To avoid exhausting ourselves, we might as well train an AI assistant to hold the whip for us.
 
 ![AI Assistant](/images/ai-assistant.png)
 
@@ -82,13 +82,8 @@ After writing this post, I forced myself to develop with assistant-style agents,
 
 > The original point of an assistant was to learn the user's habits and pass some of those preferences to task agents when needed, reducing how often the user has to step in. But thinking it through, that is exactly what an agent's memory system does: Codex and Claude already extract memories from conversations and learn preferences, and they even save the extra communication overhead.
 
-*(Source: the author's tweets, November 2026.)*
+*(Source: [Twitter](https://x.com/jjybtw/status/2118369379855556943))*
 
 I think I had gone in the wrong direction. I used to believe that once I told an assistant my personal context and preferences, it would be able to manage task agents for me. After actually trying it, I ended up confirming the details of each task with the assistant one by one. That turned out to be no better than using Claude or Codex directly and letting their memory systems do the summarizing. Claude's memory system, in fact, also summarizes user preferences from each session and organizes them into memory.
 
 So what's more worth solving is how to pass human context to agent context more conveniently, not the superficial difference between an assistant and a CLI. I've archived the Pot project and will start again from a different direction.
-
----
-
-- Pot website (archived): <https://pot.jjylab.com/>
-- GitHub (archived): <https://github.com/jjyr/pot>
