@@ -4,11 +4,19 @@ date: 2026-10-23T23:12:36+08:00
 draft: false
 ---
 
+**Update (2026-11-08)**: I've changed my mind. Below are two tweets I posted afterward (translated from the original Chinese):
+
+> I forced myself to develop with assistant-style agents for two weeks (Dot and Pot, the one I built). The results fell far short of what I imagined. I pictured simply handing tasks to an assistant agent, which would then adjust the task agent's behavior on its own to get them done. In practice, I still often had to prompt the handling of each specific task step by step. Add the communication between agents, and overall efficiency got slower.
+
+> The original point of an assistant was to learn the user's habits and pass some of those preferences to task agents when needed, reducing how often the user has to step in. But thinking it through, that is exactly what an agent's memory system does: Codex and Claude already extract memories from conversations and learn preferences, and they even save the extra communication overhead.
+
+*(Source: the author's tweets, November 2026.)*
+
 Why coding with agents is exhausting?
 
 I often see people complain about this, and my own experience is similar. After an afternoon of working with a coding agent, I frequently feel exhausted, with little to show for it.
 
-In this post, I want to share my thoughts, along with [Pot](https://pot.jjylab.com/), an open-source AI assistant I built while exploring this problem.
+In this post, I want to share my thoughts, along with [Pot](https://pot.jjylab.com/), an open-source AI assistant I built while exploring this problem (no longer recommended; see the update above).
 
 ### There Are Always Small, Repetitive Preferences to Explain to the AI
 
@@ -44,6 +52,8 @@ These methods work well for personal projects. For company projects that require
 As for improving code quality, the answer is to wait for a newer model and have it refactor the code.
 
 ### The Pot AI Assistant
+
+*(What follows is my thinking at the time of writing. See the update at the top for where I stand now.)*
 
 I would summarize the core approach to these problems in two points:
 
