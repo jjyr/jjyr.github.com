@@ -82,7 +82,7 @@ After writing this post, I forced myself to develop with assistant-style agents,
 
 > The original point of an assistant was to learn the user's habits and pass some of those preferences to task agents when needed, reducing how often the user has to step in. But thinking it through, that is exactly what an agent's memory system does: Codex and Claude already extract memories from conversations and learn preferences, and they even save the extra communication overhead.
 
-*(Source: [Twitter](https://x.com/jjybtw/status/2118369379855556943))*
+[Twitter](https://x.com/jjybtw/status/2118369379855556943)
 
 I think I had gone in the wrong direction. I used to believe that once I told an assistant my personal context and preferences, it would be able to manage task agents for me. After actually trying it, I ended up confirming the details of each task with the assistant one by one. That turned out to be no better than using Claude or Codex directly and letting their memory systems do the summarizing. Claude's memory system, in fact, also summarizes user preferences from each session and organizes them into memory.
 
